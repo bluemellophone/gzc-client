@@ -28,7 +28,6 @@ class CoordinateMap:
         difference_y = math.fabs(given_y - base_y)
         x_loc = int(round((difference_x * self.dx)))
         y_loc = int(round((difference_y * self.dy)))
-        print("(%r, %r)" % (x_loc, y_loc))
         if x_loc < 0 or x_loc >= self.width:
             print("Error: point outside image")
             #return (-1, -1)
@@ -45,7 +44,6 @@ class CoordinateMap:
         difference_y = math.fabs(given_y - base_y)
         x_loc = (difference_x * self.dx)
         y_loc = (difference_y * self.dy)
-        print("(%r, %r)" % (x_loc, y_loc))
         if x_loc < 0 or x_loc >= self.width:
             print("Error: point outside image")
             #return (-1, -1)
