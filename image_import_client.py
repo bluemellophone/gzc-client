@@ -1,137 +1,227 @@
-from PyQt4 import QtCore, QtGui
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
+from gpsclient import colorSelectButton
+import sys
+import platform
 
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
+#TODO: 
+# framework to avoid re-use of already observed images
+# parallel import
+# add status bar to bottom
 
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+class image_selection_roll(QLabel):
+    #Need to modify the QLabel functionality to allow it to act like a button 
+    DEFAULT_IMAGE = 'reroll.png'
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(800, 600)
-        self.centralwidget = QtGui.QWidget(MainWindow)
-        self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        self.browse_button = QtGui.QPushButton(self.centralwidget)
-        self.browse_button.setGeometry(QtCore.QRect(200, 60, 85, 21))
-        self.browse_button.setObjectName(_fromUtf8("browse_button"))
-        self.browse_label = QtGui.QLabel(self.centralwidget)
-        self.browse_label.setGeometry(QtCore.QRect(20, 60, 181, 21))
-        self.browse_label.setObjectName(_fromUtf8("browse_label"))
-        self.browse_text = QtGui.QLineEdit(self.centralwidget)
-        self.browse_text.setGeometry(QtCore.QRect(30, 90, 251, 25))
-        self.browse_text.setObjectName(_fromUtf8("browse_text"))
-        self.browse_import = QtGui.QPushButton(self.centralwidget)
-        self.browse_import.setGeometry(QtCore.QRect(30, 120, 251, 26))
-        self.browse_import.setObjectName(_fromUtf8("browse_import"))
-        self.id_label = QtGui.QLabel(self.centralwidget)
-        self.id_label.setGeometry(QtCore.QRect(20, 200, 261, 16))
-        self.id_label.setObjectName(_fromUtf8("id_label"))
-        self.id_color = QtGui.QComboBox(self.centralwidget)
-        self.id_color.setGeometry(QtCore.QRect(30, 250, 121, 31))
-        self.id_color.setObjectName(_fromUtf8("id_color"))
-        self.id_color.addItem(_fromUtf8(""))
-        self.id_color.addItem(_fromUtf8(""))
-        self.id_color.addItem(_fromUtf8(""))
-        self.id_color.addItem(_fromUtf8(""))
-        self.id_color.addItem(_fromUtf8(""))
-        self.id_color.addItem(_fromUtf8(""))
-        self.id_color.addItem(_fromUtf8(""))
-        self.id_car = QtGui.QSpinBox(self.centralwidget)
-        self.id_car.setGeometry(QtCore.QRect(150, 250, 71, 31))
-        self.id_car.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.id_car.setObjectName(_fromUtf8("id_car"))
-        self.id_car_label = QtGui.QLabel(self.centralwidget)
-        self.id_car_label.setGeometry(QtCore.QRect(30, 230, 141, 16))
-        self.id_car_label.setObjectName(_fromUtf8("id_car_label"))
-        self.id_person_label = QtGui.QLabel(self.centralwidget)
-        self.id_person_label.setGeometry(QtCore.QRect(230, 230, 71, 16))
-        self.id_person_label.setObjectName(_fromUtf8("id_person_label"))
-        self.id_person = QtGui.QLineEdit(self.centralwidget)
-        self.id_person.setGeometry(QtCore.QRect(230, 250, 71, 31))
-        self.id_person.setObjectName(_fromUtf8("id_person"))
-        self.sync_label = QtGui.QLabel(self.centralwidget)
-        self.sync_label.setGeometry(QtCore.QRect(20, 330, 241, 16))
-        self.sync_label.setObjectName(_fromUtf8("sync_label"))
-        self.sync_number = QtGui.QLabel(self.centralwidget)
-        self.sync_number.setGeometry(QtCore.QRect(30, 360, 121, 16))
-        self.sync_number.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.sync_number.setObjectName(_fromUtf8("sync_number"))
-        self.spinBox = QtGui.QSpinBox(self.centralwidget)
-        self.spinBox.setGeometry(QtCore.QRect(160, 360, 61, 21))
-        self.spinBox.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.spinBox.setMaximum(100000)
-        self.spinBox.setObjectName(_fromUtf8("spinBox"))
-        self.sync_time = QtGui.QLabel(self.centralwidget)
-        self.sync_time.setGeometry(QtCore.QRect(30, 390, 121, 16))
-        self.sync_time.setObjectName(_fromUtf8("sync_time"))
-        self.timeEdit = QtGui.QTimeEdit(self.centralwidget)
-        self.timeEdit.setGeometry(QtCore.QRect(130, 390, 91, 25))
-        self.timeEdit.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.timeEdit.setObjectName(_fromUtf8("timeEdit"))
-        self.status_bar = QtGui.QProgressBar(self.centralwidget)
-        self.status_bar.setGeometry(QtCore.QRect(0, 530, 791, 23))
-        self.status_bar.setProperty("value", 24)
-        self.status_bar.setObjectName(_fromUtf8("status_bar"))
-        self.line = QtGui.QFrame(self.centralwidget)
-        self.line.setGeometry(QtCore.QRect(0, 500, 801, 20))
-        self.line.setFrameShape(QtGui.QFrame.HLine)
-        self.line.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line.setObjectName(_fromUtf8("line"))
-        self.line_2 = QtGui.QFrame(self.centralwidget)
-        self.line_2.setGeometry(QtCore.QRect(390, 0, 20, 511))
-        self.line_2.setFrameShape(QtGui.QFrame.VLine)
-        self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_2.setObjectName(_fromUtf8("line_2"))
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 25))
-        self.menubar.setObjectName(_fromUtf8("menubar"))
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setObjectName(_fromUtf8("statusbar"))
-        MainWindow.setStatusBar(self.statusbar)
-        self.actionAsdlfh = QtGui.QAction(MainWindow)
-        self.actionAsdlfh.setObjectName(_fromUtf8("actionAsdlfh"))
+    def __init__(self, parent):
+        QLabel.__init__(self, parent)
+        self.setScaledContents(True)
+        Pixmap = QPixmap((self.DEFAULT_IMAGE)).scaled(QSize(150,150))
+        self.desiredsize = Pixmap.size();
+        self.setPixmap(Pixmap)
+        self.current_image =  self.DEFAULT_IMAGE
+ 
+    def mouseReleaseEvent(self, ev):
+        self.emit(SIGNAL('clicked()'))
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "Image Import Interface", None))
-        self.browse_button.setText(_translate("MainWindow", "Browse", None))
-        self.browse_label.setText(_translate("MainWindow", "1) Select Drive With SD Card", None))
-        self.browse_import.setText(_translate("MainWindow", "Import", None))
-        self.id_label.setText(_translate("MainWindow", "2) Input identification information", None))
-        self.id_color.setItemText(0, _translate("MainWindow", "Red", None))
-        self.id_color.setItemText(1, _translate("MainWindow", "Green", None))
-        self.id_color.setItemText(2, _translate("MainWindow", "Blue", None))
-        self.id_color.setItemText(3, _translate("MainWindow", "Yellow", None))
-        self.id_color.setItemText(4, _translate("MainWindow", "Black", None))
-        self.id_color.setItemText(5, _translate("MainWindow", "White", None))
-        self.id_color.setItemText(6, _translate("MainWindow", "Orange", None))
-        self.id_car_label.setText(_translate("MainWindow", "Car color and number", None))
-        self.id_person_label.setText(_translate("MainWindow", "Individual", None))
-        self.sync_label.setText(_translate("MainWindow", "3) Synchronize image information", None))
-        self.sync_number.setText(_translate("MainWindow", "First image number", None))
-        self.sync_time.setText(_translate("MainWindow", "First image time", None))
-        self.actionAsdlfh.setText(_translate("MainWindow", "asdlfh", None))
+    def changeImage(self, image_file):
+        self.setPixmap(QPixmap(image_file).scaled(self.desiredsize));
+        self.current_image = image_file
 
 
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+class image_selection_box(QWidget):
+    #One selection box. Contains the image and two buttons
+    def __init__(self, *args):
+        apply(QWidget.__init__,(self, ) + args)
+        QWidget.__init__(self)
 
+        self.init_widgets()
+        self.init_layout()
+        self.init_connect()
+
+    def init_widgets(self):
+        self.image = image_selection_roll(self)
+        self.select_zebra = QRadioButton('Zebra',self)
+        self.select_giraffe = QRadioButton('Giraffe',self)
+
+        self.select_group = QButtonGroup(self)
+        self.select_group.addButton(self.select_zebra)
+        self.select_group.addButton(self.select_giraffe)
+
+
+    def init_layout(self):
+        grid = QGridLayout()
+        grid.addWidget(self.image, 0, 0, 1, 0)
+        grid.addWidget(self.select_zebra, 2, 0)
+        grid.addWidget(self.select_giraffe, 2, 1)
+
+        self.setLayout(grid)
+
+    def init_connect(self):
+        self.connect(self.image, SIGNAL('clicked()'), lambda: self.reroll(self.image))
+
+
+    def reroll(self, image_button):
+        image_button.changeImage("test/first.jpg")
+        #uncheck the buttons if image is rerolled
+        checked = self.select_group.checkedButton()
+        print checked
+        if checked is not None:
+            #HACK to reset all checked states
+            self.select_group.setExclusive(False)
+            checked.setChecked(False)
+            self.select_group.setExclusive(True)
+
+    def get_selection(self):
+        return (self.image.current_image, self.selection_group.checkedButton())
+
+class selection_group(QWidget):
+    #The right side of the interface
+    def __init__(self, *args):
+        apply(QWidget.__init__,(self, ) + args)
+        QWidget.__init__(self)
+        self.init_widgets()
+        self.init_layout()
+        # self.init_connect()
+
+    def init_widgets(self):
+        self.image_boxes = []
+        for i in range(12):
+            self.image_boxes.append(image_selection_box(self))
+
+    def init_layout(self):
+        grid = QGridLayout()
+        for i, image_box in enumerate(self.image_boxes):
+            grid.addWidget(image_box, i/3, i%3)
+
+        self.setLayout(grid)
+
+
+class user_input(QWidget):
+    def __init__(self, *args):
+        apply(QWidget.__init__,(self, ) + args)
+        QWidget.__init__(self)
+        self.init_widgets()
+        self.init_layout()
+        # self.init_connect()
+
+    def init_widgets(self):
+        self.browse_label = QLabel("1) Select Drive With SD card:", self)
+        self.browse_button = QPushButton("Browse", self)
+        self.browse_text = QLineEdit(self)
+
+
+        self.id_label = QLabel("2) Input Identification Information", self)
+        self.id_car_label = QLabel("Car Number:", self)
+        self.id_person_label = QLabel("ID Letter:")
+
+        colorList = ["Red", "Green", "Blue", "Yellow", "Black", "White"]
+        bgList = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 0, 0), (255, 255, 255)]
+        fgList = [(255, 255, 255), (255, 255, 255), (255, 255, 255), None, (255, 255, 255), None, None]
+        self.id_car_color = QButtonGroup(self)
+        self.id_car_color_buttons = []
+        for color, bg, fg in zip(colorList, bgList, fgList):
+            newButton = colorSelectButton(text=color, bgcolor=bg, fgcolor=fg)
+            self.id_car_color.addButton(newButton)
+            self.id_car_color_buttons.append(newButton)
+
+        self.id_car_number = QSpinBox(self)
+        self.id_car_number.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.id_person_text = QLineEdit(self)
+
+        self.sync_label = QLabel("3) Synchronize Image Infromation", self)
+        self.sync_number_label = QLabel("First Image Number:", self)
+        self.sync_time_label = QLabel("First Image Timestamp:", self)
+
+        self.sync_number = QSpinBox(self)
+        self.sync_number.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.sync_time = QTimeEdit(self)
+        self.sync_time.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.import_label = QLabel("4) Import", self)
+        self.import_button = QPushButton("Import", self)
+
+    def init_layout(self):
+        browse_upper = QHBoxLayout()
+        browse_upper.addWidget(self.browse_label)
+        browse_upper.addWidget(self.browse_button)
+
+        browse_lower = QHBoxLayout()
+        browse_lower.addStretch()
+        browse_lower.addWidget(self.browse_text)
+
+        browse_group = QVBoxLayout()
+        browse_group.addLayout(browse_upper)
+        browse_group.addLayout(browse_lower)
+
+        id_grid = QGridLayout()
+        for i ,button in enumerate(self.id_car_color_buttons):
+            id_grid.addWidget(button, i/3, i%3)
+        id_grid.addWidget(self.id_car_label, 0, 3)
+        id_grid.addWidget(self.id_car_number, 0, 4)
+        id_grid.addWidget(self.id_person_label, 1, 3)
+        id_grid.addWidget(self.id_person_text, 1, 4)
+
+        id_group = QVBoxLayout()
+        id_group.addWidget(self.id_label)
+        id_group.addLayout(id_grid)
+
+        sync_upper = QHBoxLayout()
+        sync_upper.addWidget(self.sync_number_label)
+        sync_upper.addWidget(self.sync_number)
+
+        sync_lower = QHBoxLayout()
+        sync_lower.addWidget(self.sync_time_label)
+        sync_lower.addWidget(self.sync_time)
+
+        sync_group = QVBoxLayout()
+        sync_group.addWidget(self.sync_label)
+        sync_group.addLayout(sync_upper)
+        sync_group.addLayout(sync_lower)
+
+        import_group = QHBoxLayout()
+        import_group.addWidget(self.import_label)
+        import_group.addWidget(self.import_button)
+
+
+        self.left_hand_layout = QVBoxLayout()
+        self.left_hand_layout.addLayout(browse_group)
+        self.left_hand_layout.addStretch()
+        self.left_hand_layout.addLayout(id_group)
+        self.left_hand_layout.addStretch()
+        self.left_hand_layout.addLayout(sync_group)
+        self.left_hand_layout.addStretch()
+        self.left_hand_layout.addLayout(import_group)
+
+        self.setLayout(self.left_hand_layout)
+
+
+class image_import_interface(QWidget):
+    def __init__(self, *args):
+        apply(QWidget.__init__,(self, ) + args)
+        QWidget.__init__(self)
+        self.init_widgets()
+        self.init_layout()
+
+    def init_widgets(self):
+        self.image_selection_group = selection_group(self)
+        self.user_input_group = user_input(self)
+
+    def init_layout(self):
+        self.main_layout = QHBoxLayout()
+        self.main_layout.addWidget(self.user_input_group)
+        self.main_layout.addWidget(self.image_selection_group)
+
+        self.setLayout(self.main_layout)
+
+
+
+        
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = image_import_interface()
+    win.show()
+    app.exec_()
+    sys.exit()
