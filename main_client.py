@@ -10,9 +10,9 @@ def main():
     
     # image_import tab
     MainWindow = QtGui.QMainWindow()
-    ui = iic.Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    tabs.addTab(MainWindow, "Images")
+    ui = iic.image_import_interface(MainWindow)
+    # ui.setupUi(MainWindow)
+    tabs.addTab(ui, "Images")
 
     # GPS_import tab
 
@@ -29,7 +29,7 @@ def main():
     #Move QTabWidget to x:300,y:300
     tabs.move(300, 300)
     
-    tabs.setWindowTitle('\'TheGreat Zebra Count Image Upload\'')
+    tabs.setWindowTitle('\'The Great Zebra Count Image Upload\'')
     tabs.show()
     
     sys.exit(app.exec_())

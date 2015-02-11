@@ -22,9 +22,9 @@ class CopyThread(QtCore.QThread):
             for outdir in self.destinations:
                 if not exists(outdir):
                     makedirs(outdir)
-                time.sleep(2)
+                # time.sleep(2)
                 shutil.copy2(filepath, outdir)
-                self.emit(QtCore.SIGNAL('file_done'), f)
+                self.emit(QtCore.SIGNAL('file_done'), (outdir+"/"+f))
         return
 
 

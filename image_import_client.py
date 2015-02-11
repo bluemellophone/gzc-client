@@ -1,20 +1,23 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from gpsclient import colorSelectButton
+from fileprocessing_main_test import CopyThread
+from os import listdir, makedirs, getcwd
+import random
 import sys
 import platform
 
 #TODO: 
 # framework to avoid re-use of already observed images
-# parallel import
-# add status bar to bottom
+# add status bar to bottom -- WIP
 
 class image_selection_roll(QLabel):
     #Need to modify the QLabel functionality to allow it to act like a button 
     DEFAULT_IMAGE = 'reroll.png'
 
-    def __init__(self, parent):
-        QLabel.__init__(self, parent)
+    def __init__(self, *args):
+        apply(QLabel.__init__,(self, ) + args)
+        QLabel.__init__(self)
         self.setScaledContents(True)
         Pixmap = QPixmap((self.DEFAULT_IMAGE)).scaled(QSize(150,150))
         self.desiredsize = Pixmap.size();
@@ -58,14 +61,17 @@ class image_selection_box(QWidget):
         self.setLayout(grid)
 
     def init_connect(self):
-        self.connect(self.image, SIGNAL('clicked()'), lambda: self.reroll(self.image))
+        self.connect(self.image, SIGNAL('clicked()'), self.reroll)
 
 
-    def reroll(self, image_button):
-        image_button.changeImage("test/first.jpg")
+    def reroll(self):
+        #get new filename
+        filename = self.parent().get_filename()
+
+        self.image.changeImage(filename)
         #uncheck the buttons if image is rerolled
         checked = self.select_group.checkedButton()
-        print checked
+        # print checked
         if checked is not None:
             #HACK to reset all checked states
             self.select_group.setExclusive(False)
@@ -82,6 +88,7 @@ class selection_group(QWidget):
         QWidget.__init__(self)
         self.init_widgets()
         self.init_layout()
+        self.active_files = []
         # self.init_connect()
 
     def init_widgets(self):
@@ -96,6 +103,21 @@ class selection_group(QWidget):
 
         self.setLayout(grid)
 
+    def add_filename(self, filename):
+        self.active_files.append(filename)
+        #for the first couple of images to be copied, we will update the displayed photos
+        if len(self.active_files) < 2:
+            for IB in self.image_boxes:
+                if IB.image.current_image == IB.image.DEFAULT_IMAGE:
+                    IB.reroll()
+                    break
+
+    def get_filename(self):
+        filename = self.active_files.pop((random.randrange(len(self.active_files))))
+        return filename
+
+
+
 
 class user_input(QWidget):
     def __init__(self, *args):
@@ -103,9 +125,12 @@ class user_input(QWidget):
         QWidget.__init__(self)
         self.init_widgets()
         self.init_layout()
-        # self.init_connect()
+        self.init_connect()
 
     def init_widgets(self):
+        self.logo = QLabel(self)
+        self.logo.setPixmap(QPixmap("ibeis_logo.png").scaled(QSize(100,100)))
+
         self.browse_label = QLabel("1) Select Drive With SD card:", self)
         self.browse_button = QPushButton("Browse", self)
         self.browse_text = QLineEdit(self)
@@ -141,13 +166,13 @@ class user_input(QWidget):
         self.import_label = QLabel("4) Import", self)
         self.import_button = QPushButton("Import", self)
 
+
     def init_layout(self):
         browse_upper = QHBoxLayout()
         browse_upper.addWidget(self.browse_label)
         browse_upper.addWidget(self.browse_button)
 
         browse_lower = QHBoxLayout()
-        browse_lower.addStretch()
         browse_lower.addWidget(self.browse_text)
 
         browse_group = QVBoxLayout()
@@ -185,6 +210,8 @@ class user_input(QWidget):
 
 
         self.left_hand_layout = QVBoxLayout()
+        self.left_hand_layout.addWidget(self.logo)
+        self.left_hand_layout.addStretch()
         self.left_hand_layout.addLayout(browse_group)
         self.left_hand_layout.addStretch()
         self.left_hand_layout.addLayout(id_group)
@@ -195,6 +222,21 @@ class user_input(QWidget):
 
         self.setLayout(self.left_hand_layout)
 
+    def init_connect(self):
+        self.browse_button.clicked.connect(self.open_directory)
+        self.import_button.clicked.connect(self.import_)
+
+
+    def open_directory(self):
+        directory = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.browse_text.setText(directory)
+
+    def import_(self):
+        directory = self.browse_text.text()
+        files = listdir(directory)        
+        self.copyThread = CopyThread(directory, files, ["testfolder"])
+        self.connect(self.copyThread, SIGNAL("file_done"), self.parent().update_recent_file)
+        self.copyThread.start()
 
 class image_import_interface(QWidget):
     def __init__(self, *args):
@@ -206,13 +248,22 @@ class image_import_interface(QWidget):
     def init_widgets(self):
         self.image_selection_group = selection_group(self)
         self.user_input_group = user_input(self)
+        self.progress_bar = QLineEdit(self)
 
     def init_layout(self):
+        self.uber_layout = QVBoxLayout()
         self.main_layout = QHBoxLayout()
         self.main_layout.addWidget(self.user_input_group)
         self.main_layout.addWidget(self.image_selection_group)
+        self.uber_layout.addLayout(self.main_layout)
+        self.uber_layout.addWidget(self.progress_bar)
 
-        self.setLayout(self.main_layout)
+        self.setLayout(self.uber_layout)
+
+    def update_recent_file(self, filename):
+        self.progress_bar.setText("Imported new image to " + filename)
+        # 2am hack, will need to make robust for multiple uses
+        self.image_selection_group.add_filename(filename)
 
 
 
