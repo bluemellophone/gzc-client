@@ -23,7 +23,7 @@ data = {
 
 # image data
 # LOAD THE ZIP AND ADD TO THE PAYLOAD
-content = open('test.zip', 'rb')
+content = open('test_image.zip', 'rb')
 files = {
     'image_archive': content,
 }
@@ -37,7 +37,7 @@ response = json.loads(r.text)
 print("RESPONSE:", response)
 
 # gps data
-content = open(join('dummy_gps', 'dummy_gps.csv'), 'rb')
+content = open(join('test_gps', 'track.gpx'), 'rb')
 files = {
     'gps_data': content,
 }
@@ -46,4 +46,3 @@ r = requests.post(GPSURL, data=data, files=files)
 print("HTTP STATUS:", r.status_code)
 response = json.loads(r.text)
 print("RESPONSE:", response)
-

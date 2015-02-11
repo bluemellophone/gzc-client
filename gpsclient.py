@@ -7,9 +7,9 @@ COLOR_BUTTON_BASE = QtGui.QPushButton
 
 
 class colorSelectButton(COLOR_BUTTON_BASE):
-    def __init__(self, text="", bgcolor=None, fgcolor=None):
+    def __init__(self, text="", bgcolor=None, fgcolor=None, ischeckable=True):
         COLOR_BUTTON_BASE.__init__(self, text)
-        self.setCheckable(True)
+        self.setCheckable(ischeckable)
         style_sheet_str = self.make_style_sheet(bgcolor=bgcolor, fgcolor=fgcolor)
         if style_sheet_str is not None:
             self.setStyleSheet(style_sheet_str)
@@ -38,6 +38,7 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         GPS_WIDGET_BASE.__init__(gpswgt)
         gpswgt.dpath = None
         gpswgt.buttonList = []
+        gpswgt.map_image_file = "map.png"
         gpswgt._init_components()
         gpswgt._init_layout()
         gpswgt._init_signals()
@@ -96,37 +97,50 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         #gpswgt.carColor.addButton(gpswgt.whiteButton)
         #gpswgt.carColor.addButton(gpswgt.orangeButton)
         # 5) GPS Widgets
+        gpsImg = QtGui.QPixmap(gpswgt.map_image_file)
+        gpswgt.gpsImageLabel = QtGui.QLabel()
+        gpswgt.gpsImageLabel.setPixmap(gpsImg.scaledToWidth(500))
         # 6) Status Area / Submit Button Widgets
+        gpswgt.submitButton = colorSelectButton(text="Submit", bgcolor=(255, 255, 255), ischeckable=False)
         # 7) Reset Button Widgets
+        gpswgt.resetButton = colorSelectButton(text="Reset", bgcolor=(255, 0, 0), ischeckable=False)
 
     def _init_layout(gpswgt):
         upperLayout = QtGui.QHBoxLayout()
+        lowerLayout = QtGui.QHBoxLayout()
         leftBox = QtGui.QVBoxLayout()
+        rightBox = QtGui.QVBoxLayout()
         # 0) Logo Widgets
         logoBox = QtGui.QHBoxLayout()
         logoBox.addWidget(gpswgt.ibeisLogoLabel)
+        logoBox.addStretch()
         # 1) GPS CSV Select Widgets
         csvSelectBox = QtGui.QHBoxLayout()
         csvSelectBox.addWidget(gpswgt.fileSelectLabel)
         csvSelectBox.addWidget(gpswgt.fileSelectTextbox)
         csvSelectBox.addWidget(gpswgt.browseButton)
+        csvSelectBox.addStretch()
         # 2) Sync / Start Time Selection Widgets
         timeBox = QtGui.QHBoxLayout()
         timeBox.addWidget(gpswgt.timeLabel)
         timeBox.addWidget(gpswgt.timeEdit)
+        timeBox.addStretch()
         # 3) Import Button Widgets
         importBox = QtGui.QHBoxLayout()
         importBox.addWidget(gpswgt.importLabel)
         importBox.addWidget(gpswgt.importButton)
+        importBox.addStretch()
         # 4) Car Input Widgets
         carBox = QtGui.QVBoxLayout()
         numberBox = QtGui.QHBoxLayout()
         colorBox = QtGui.QHBoxLayout()
         numberBox.addWidget(gpswgt.carLabel)
         numberBox.addWidget(gpswgt.carNumberSelect)
+        numberBox.addStretch()
 
         for button in gpswgt.buttonList:
             colorBox.addWidget(button)
+        colorBox.addStretch()
         #colorBox.addWidget(gpswgt.redButton)
         #colorBox.addWidget(gpswgt.greenButton)
         #colorBox.addWidget(gpswgt.blueButton)
@@ -139,8 +153,18 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         carBox.addLayout(colorBox)
 
         # 5) GPS Widgets
+        gpsBox = QtGui.QVBoxLayout()
+        gpsBox.addWidget(gpswgt.gpsImageLabel)
         # 6) Status Area / Submit Button Widgets
+        submitLayout = QtGui.QVBoxLayout()
+        resetLayout = QtGui.QVBoxLayout()
+
+        submitLayout.addWidget(gpswgt.submitButton)
+
+        lowerLayout.addLayout(submitLayout)
         # 7) Reset Button Widgets
+        resetLayout.addWidget(gpswgt.resetButton)
+        lowerLayout.addLayout(resetLayout)
 
         # Layout Widgets
         leftBox.addLayout(logoBox)
@@ -148,10 +172,19 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         leftBox.addLayout(timeBox)
         leftBox.addLayout(importBox)
         leftBox.addLayout(carBox)
+        leftBox.addStretch()
+
+        #placeholderBox = QtGui.QHBoxLayout()
+
+        #rightBox.addLayout(placeholderBox)
+        rightBox.addLayout(gpsBox)
+        rightBox.addStretch()
 
         upperLayout.addLayout(leftBox)
+        upperLayout.addLayout(rightBox)
 
         gpswgt.pageLayout.addLayout(upperLayout)
+        gpswgt.pageLayout.addLayout(lowerLayout)
 
     def _init_signals(gpswgt):
         gpswgt.browseButton.clicked.connect(gpswgt.open_directory)
