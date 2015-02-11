@@ -1,8 +1,9 @@
 import subprocess
-import requests
-import simplejson as json
 from os.path import join, exists  # NOQA
 from os import mkdir
+from datetime import datetime
+import time
+import xml.etree.ElementTree as ET
 
 
 def ensure_structure(data, kind, car_number, car_color, person=None):
@@ -33,14 +34,42 @@ def ensure_structure(data, kind, car_number, car_color, person=None):
     return person_dir
 
 
-def import_gpx(domain, data):
-    GPSURL = domain + '/gps/submit'
+def convert_gpx_to_json(gpx_str):
+    json_list = []
+    try:
+        root = ET.fromstring(gpx_str)
+    except ET.ParseError:
+        print "Couldn't parse GPX File"
+        return { "track": [] }
+
+    namespace = '{http://www.topografix.com/GPX/1/1}'
+    # Load all waypoint elements
+    element = './/%strkpt' % (namespace, )
+    trkpt_list = root.findall(element)
+    for trkpt in trkpt_list:
+        # Load time out of trkpt
+        element = './/%stime' % (namespace, )
+        dt = datetime.strptime(trkpt.find(element).text, '%Y-%m-%dT%H:%M:%S.%fZ')
+        # Gather values
+        posix = int(time.mktime(dt.timetuple()))
+        lat   = float(trkpt.get('lat'))
+        lon   = float(trkpt.get('lon'))
+        json_list.append({
+            'time': posix,
+            'lat':  lat,
+            'lon':  lon,
+        })
+    return { "track": json_list }
+
+
+def import_gpx(data):
     DEFAULT_DATA_DIR = 'data'
     command = "igotu2gpx --action dump --format gpx"
     args = command.split()
     p = subprocess.Popen(args, stdout=subprocess.PIPE)
     stdout, stderr = p.communicate()
-
+    if len(stdout) == 0:
+        raise IOError
     # Process gps for car
     car_color  = data['car_color'].lower()
     car_number = str(data['car_number'])
@@ -53,26 +82,15 @@ def import_gpx(domain, data):
     f.write(stdout)
     f.close()
 
-    # gps data
-    content = open(join('test_gps', 'track.gpx'), 'rb')
-    files = {
-        'gps_data': content,
-    }
-    print content
-
-    r = requests.post(GPSURL, data=data, files=files)
-    print("HTTP STATUS:", r.status_code)
-    response = json.loads(r.text)
-    print("RESPONSE:", response)
     return stdout
 
 
 if __name__ == "__main__":
     data = {
         'car_color': 'RED',
-        'car_number': 3,
+        'car_number': 1,
         'image_first_time_hour': 10,
         'image_first_time_minute': 36,
     }
-    stdout = import_gpx("http://localhost:5000", data)
+    status_code, stdout = import_gpx(data)
     #print stdout
