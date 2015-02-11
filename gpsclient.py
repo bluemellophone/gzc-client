@@ -23,8 +23,8 @@ class colorSelectButton(COLOR_BUTTON_BASE):
         if fgcolor is not None:
             style_list.append('color: rgb({fgcolor})')
             fmtdict['fgcolor'] = ','.join(map(str, fgcolor))
-        style_list.append('padding-left: 0px')
-        style_list.append('padding-right: 0px')
+        #style_list.append('padding-left: 0px')
+        #style_list.append('padding-right: 0px')
         if len(style_list) > 0:
             style_sheet_fmt = ';'.join(style_list)
             style_sheet_str = style_sheet_fmt.format(**fmtdict)
@@ -99,7 +99,9 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         # 5) GPS Widgets
         gpsImg = QtGui.QPixmap(gpswgt.map_image_file)
         gpswgt.gpsImageLabel = QtGui.QLabel()
-        gpswgt.gpsImageLabel.setPixmap(gpsImg.scaledToWidth(500))
+        gpswgt.gpsImageLabel.setPixmap(gpsImg.scaled(gpswgt.gpsImageLabel.width(), gpswgt.gpsImageLabel.height(), aspectRatioMode=1))
+        #gpswgt.gpsImageLabel.setPixmap(gpsImg.scaledToWidth(500))
+        #gpswgt.gpsImageLabel.setScaledContents(True)
         # 6) Status Area / Submit Button Widgets
         gpswgt.submitButton = colorSelectButton(text="Submit", bgcolor=(255, 255, 255), ischeckable=False)
         # 7) Reset Button Widgets
@@ -192,14 +194,14 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
     def open_directory(gpswgt):
         qdlg = QtGui.QFileDialog()
         # hack to fix the dialog window on ubuntu
-        if 'ubuntu' in platform.platform().lower():
-            qopt = QtGui.QFileDialog.ShowDirsOnly | QtGui.QFileDialog.DontUseNativeDialog
-        else:
-            qopt = QtGui.QFileDialog.ShowDirsOnly
+        #if 'ubuntu' in platform.platform().lower():
+        #    qopt = QtGui.QFileDialog.ShowDirsOnly | QtGui.QFileDialog.DontUseNativeDialog
+        #else:
+        #    qopt = QtGui.QFileDialog.ShowDirsOnly
         qtkw = {
-            'options': qopt,
+            #'options': qopt,
         }
-        dpath = str(qdlg.getExistingDirectory(None, **qtkw))
+        dpath = str(qdlg.getOpenFileName(None, **qtkw))
         print('dpath = %r' % dpath)
         if dpath == '' or dpath is None:
             dpath = None
