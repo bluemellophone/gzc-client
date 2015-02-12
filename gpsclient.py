@@ -8,6 +8,7 @@ from coordinate_map import CoordinateMap
 import requests
 import simplejson as json
 from os.path import join, exists  # NOQA
+from QwwColorComboBox import QwwColorComboBox
 
 GPS_WIDGET_BASE = QtGui.QWidget
 COLOR_BUTTON_BASE = QtGui.QPushButton
@@ -60,6 +61,7 @@ class colorSelectButton(COLOR_BUTTON_BASE):
 class GPSGuiWidget(GPS_WIDGET_BASE):
     def __init__(gpswgt, parent=None, flags=0):
         GPS_WIDGET_BASE.__init__(gpswgt)
+        gpswgt.parent = parent
         gpswgt.buttonList = []
         gpswgt.map_image_file = "map.png"
         #gpswgt.map_image_file = "troy_map.png"
@@ -98,14 +100,18 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
 
         gpswgt.colorList = ["Red", "Green", "Blue", "Yellow", "Black", "White"]
         bgList = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 0, 0), (255, 255, 255)]
-        fgList = [(255, 255, 255), (255, 255, 255), (255, 255, 255), None, (255, 255, 255), None, None]
+        #fgList = [(255, 255, 255), (255, 255, 255), (255, 255, 255), None, (255, 255, 255), None, None]
+        gpswgt.colorBox = QwwColorComboBox()
+        for color_name, rgb in zip(gpswgt.colorList, bgList):
+            color = QtGui.QColor(rgb[0], rgb[1], rgb[2])
+            gpswgt.colorBox.addColor(color, color_name)
 
-        gpswgt.carColor = QtGui.QButtonGroup(gpswgt)
+        #gpswgt.carColor = QtGui.QButtonGroup(gpswgt)
 
-        for color, bg, fg in zip(gpswgt.colorList, bgList, fgList):
-            newButton = colorSelectButton(text=color, bgcolor=bg, fgcolor=fg)
-            gpswgt.buttonList.append(newButton)
-            gpswgt.carColor.addButton(newButton)
+        #for color, bg, fg in zip(gpswgt.colorList, bgList, fgList):
+        #    newButton = colorSelectButton(text=color, bgcolor=bg, fgcolor=fg)
+        #    gpswgt.buttonList.append(newButton)
+        #    gpswgt.carColor.addButton(newButton)
 
         # 5) GPS Widgets
         gpsImg = QtGui.QPixmap(gpswgt.map_image_file)
@@ -129,18 +135,19 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         carBox = QtGui.QVBoxLayout()
         numberBox = QtGui.QHBoxLayout()
         colorBoxTop = QtGui.QHBoxLayout()
-        colorBoxBottom = QtGui.QHBoxLayout()
+        #colorBoxBottom = QtGui.QHBoxLayout()
         numberBox.addWidget(gpswgt.carLabel)
         numberBox.addStretch()
 
-        for button in gpswgt.buttonList[:len(gpswgt.buttonList) / 2]:
-            colorBoxTop.addWidget(button)
-        for button in gpswgt.buttonList[len(gpswgt.buttonList) / 2:]:
-            colorBoxBottom.addWidget(button)
-        colorBoxTop.addWidget(gpswgt.numberLabel)
+        #for button in gpswgt.buttonList[:len(gpswgt.buttonList) / 2]:
+        #    colorBoxTop.addWidget(button)
+        #for button in gpswgt.buttonList[len(gpswgt.buttonList) / 2:]:
+        #    colorBoxBottom.addWidget(button)
+        #colorBoxTop.addWidget(gpswgt.numberLabel)
+        colorBoxTop.addWidget(gpswgt.colorBox)
+        #colorBoxTop.addStretch()
         colorBoxTop.addWidget(gpswgt.carNumberSelect)
-        colorBoxTop.addStretch()
-        colorBoxBottom.addStretch()
+        #colorBoxBottom.addStretch()
         # 2) Sync / Start Time Selection Widgets
         timeBox = QtGui.QHBoxLayout()
         timeBox.addWidget(gpswgt.timeLabel)
@@ -154,7 +161,7 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
 
         carBox.addLayout(numberBox)
         carBox.addLayout(colorBoxTop)
-        carBox.addLayout(colorBoxBottom)
+        #carBox.addLayout(colorBoxBottom)
 
         # 5) GPS Widgets
         gpsBox = QtGui.QVBoxLayout()
@@ -193,11 +200,12 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         gpswgt.resetButton.clicked.connect(gpswgt._reset_interface)
 
     def compile_data(gpswgt):
-        color_index = gpswgt.carColor.checkedId()
-        if color_index == -1:
-            print("Error: No Car Color Selected")
-            return None
-        car_color = gpswgt.colorList[abs(color_index) - 2]
+        #color_index = gpswgt.carColor.checkedId()
+        #if color_index == -1:
+        #    print("Error: No Car Color Selected")
+        #    return None
+        #car_color = gpswgt.colorList[abs(color_index) - 2]
+        car_color = str(gpswgt.colorBox.currentText())
         car_number = gpswgt.carNumberSelect.value()
         gps_start_time = gpswgt.timeEdit.time()
         gps_start_time_hour = gps_start_time.hour()
@@ -225,6 +233,15 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         #from mpl_toolkits.basemap import Basemap
         import cv2
         #gpx_string = open("test_gps/track.gpx", "r").read()
+        ## Process gps for car
+        #car_color  = data['car_color'].lower()
+        #car_number = str(data['car_number'])
+        ## Ensure the folder
+        #car_dir = import_gps_tracks.ensure_structure('data', 'gps', car_number, car_color)
+        #gps_path  = join(car_dir, 'track.gpx')
+        #f = open(gps_path, 'w')
+        #f.write(gpx_string)
+        #f.close()
         gps_json = import_gps_tracks.convert_gpx_to_json(gpx_string)
         if len(gps_json['track']) == 0:
             print("No points found")
@@ -289,7 +306,12 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
             'gps_data': content,
         }
 
-        r = requests.post(GPSURL, data=data, files=files)
+        try:
+            r = requests.post(GPSURL, data=data, files=files)
+        except requests.exceptions.ConnectionError:
+            print("Ensure that the server is running and the url is correct")
+            gpswgt.submitButton.change_color(bgcolor=(163, 11, 55))
+            return 111
         print("HTTP STATUS:", r.status_code)
         try:
             response = json.loads(r.text)
@@ -309,10 +331,10 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         gpswgt.timeEdit.setTime(gpswgt.timeEdit.minimumTime())
         gpswgt.carNumberSelect.setValue(gpswgt.carNumberSelect.minimum())
 
-        color_index = gpswgt.carColor.checkedId()
-        if color_index != -1:
-            checked_button = gpswgt.buttonList[abs(color_index) - 2]
-            checked_button.setChecked(False)
+        #color_index = gpswgt.carColor.checkedId()
+        #if color_index != -1:
+        #    checked_button = gpswgt.buttonList[abs(color_index) - 2]
+        #    checked_button.setChecked(False)
 
         gpswgt.submitButton.change_color(bgcolor=(255, 255, 255))
 
