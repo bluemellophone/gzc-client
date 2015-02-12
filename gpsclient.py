@@ -61,7 +61,9 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
     def __init__(gpswgt, parent=None, flags=0):
         GPS_WIDGET_BASE.__init__(gpswgt)
         gpswgt.buttonList = []
-        gpswgt.map_image_file = "map.png"
+        #gpswgt.map_image_file = "map.png"
+        #gpswgt.map_image_file = "troy_map.png"
+        gpswgt.map_image_file = "close_troy_map_small.png"
         gpswgt._init_components()
         gpswgt._init_layout()
         gpswgt._init_signals()
@@ -87,7 +89,7 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         # 2) Sync / Start Time Selection Widgets
         gpswgt.timeLabel = QtGui.QLabel(QtCore.QString("2) Select Car Start Time:"))
         gpswgt.timeEdit = QtGui.QTimeEdit()
-        gpswgt.timeEdit.setDisplayFormat("h:mm")
+        gpswgt.timeEdit.setDisplayFormat("h:mm AP")
 
         # 3) Import Button Widgets
         gpswgt.importLabel = QtGui.QLabel(QtCore.QString("3)"))
@@ -107,7 +109,7 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         # 5) GPS Widgets
         gpsImg = QtGui.QPixmap(gpswgt.map_image_file)
         gpswgt.gpsImageLabel = QtGui.QLabel()
-        gpswgt.gpsImageLabel.setPixmap(gpsImg.scaled(gpswgt.gpsImageLabel.width(), gpswgt.gpsImageLabel.height(), aspectRatioMode=1))
+        gpswgt.gpsImageLabel.setPixmap(gpsImg)
         # 6) Status Area / Submit Button Widgets
         gpswgt.submitButton = colorSelectButton(text="Submit", bgcolor=(255, 255, 255), ischeckable=False)
         # 7) Reset Button Widgets
@@ -232,8 +234,10 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         xs = []
         ys = []
         pts = []
-        img = cv2.imread("map.png")
-        coord_map = CoordinateMap((-1.32504, 36.766777), (-1.442833, 36.965561), img)
+        img = cv2.imread(gpswgt.map_image_file)
+        #coord_map = CoordinateMap((-1.32504, 36.766777), (-1.442833, 36.965561), img)  # Nairobi (map.png)
+        #coord_map = CoordinateMap((42.789920, -73.759957), (42.673663, -73.592416), img)  # Troy (troy_map.png)
+        coord_map = CoordinateMap((42.740739, -73.697043), (42.720154, -73.657561), img)  # Close up Troy (close_troy_map_small.png)
         for point in gps_json['track']:
             lat = point['lat']
             lon = point['lon']
