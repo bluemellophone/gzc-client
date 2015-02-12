@@ -158,6 +158,13 @@ class QwwColorComboBox(QComboBox):
             c.setNamedColor(e.mimeData().text())
         self.setCurrentColor(c)
 
+    def sizeHint(self):
+        size = QComboBox.sizeHint(self)
+        height = size.height()
+        width = size.width()
+        new_size = QSize(width + 20, height)
+        return new_size
+
 if __name__ == "__main__":
     from sys import argv, exit
 

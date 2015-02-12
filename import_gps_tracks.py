@@ -36,11 +36,12 @@ def ensure_structure(data, kind, car_number, car_color, person=None):
 
 def convert_gpx_to_json(gpx_str):
     json_list = []
-    try:
-        root = ET.fromstring(gpx_str)
-    except ET.ParseError:
-        print "Couldn't parse GPX File"
-        return { "track": [] }
+    root = ET.fromstring(gpx_str)
+    #try:
+    #    root = ET.fromstring(gpx_str)
+    #except ET.ParseError:
+    #    print "Couldn't parse GPX File"
+    #    return { "track": [] }
 
     namespace = '{http://www.topografix.com/GPX/1/1}'
     # Load all waypoint elements

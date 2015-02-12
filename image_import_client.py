@@ -6,6 +6,7 @@ from os import listdir, makedirs, getcwd
 import random
 import sys
 import platform
+from QwwColorComboBox import QwwColorComboBox
 
 #TODO: 
 # framework to avoid re-use of already observed images
@@ -140,15 +141,18 @@ class user_input(QWidget):
         self.id_car_label = QLabel("Car Number:", self)
         self.id_person_label = QLabel("ID Letter:")
 
-        colorList = ["Red", "Green", "Blue", "Yellow", "Black", "White"]
+        self.colorList = ["Red", "Green", "Blue", "Yellow", "Black", "White"]
         bgList = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 0, 0), (255, 255, 255)]
-        fgList = [(255, 255, 255), (255, 255, 255), (255, 255, 255), None, (255, 255, 255), None, None]
-        self.id_car_color = QButtonGroup(self)
-        self.id_car_color_buttons = []
-        for color, bg, fg in zip(colorList, bgList, fgList):
-            newButton = colorSelectButton(text=color, bgcolor=bg, fgcolor=fg)
-            self.id_car_color.addButton(newButton)
-            self.id_car_color_buttons.append(newButton)
+        self.colorBox = QwwColorComboBox()
+        for color_name, rgb in zip(self.colorList, bgList):
+            color = QColor(rgb[0], rgb[1], rgb[2])
+            self.colorBox.addColor(color, color_name)
+        #self.id_car_color = QButtonGroup(self)
+        #self.id_car_color_buttons = []
+        #for color, bg, fg in zip(colorList, bgList, fgList):
+        #    newButton = colorSelectButton(text=color, bgcolor=bg, fgcolor=fg)
+        #    self.id_car_color.addButton(newButton)
+        #    self.id_car_color_buttons.append(newButton)
 
         self.id_car_number = QSpinBox(self)
         self.id_car_number.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
@@ -171,33 +175,51 @@ class user_input(QWidget):
         browse_upper = QHBoxLayout()
         browse_upper.addWidget(self.browse_label)
         browse_upper.addWidget(self.browse_button)
+        browse_upper.addStretch()
 
         browse_lower = QHBoxLayout()
         browse_lower.addWidget(self.browse_text)
+        browse_lower.addStretch()
 
         browse_group = QVBoxLayout()
         browse_group.addLayout(browse_upper)
         browse_group.addLayout(browse_lower)
 
-        id_grid = QGridLayout()
-        for i ,button in enumerate(self.id_car_color_buttons):
-            id_grid.addWidget(button, i/3, i%3)
-        id_grid.addWidget(self.id_car_label, 0, 3)
-        id_grid.addWidget(self.id_car_number, 0, 4)
-        id_grid.addWidget(self.id_person_label, 1, 3)
-        id_grid.addWidget(self.id_person_text, 1, 4)
+        id_group = QHBoxLayout()
+        color_layout = QVBoxLayout()
+        label_layout = QVBoxLayout()
+        input_layout = QVBoxLayout()
+        #for i ,button in enumerate(self.id_car_color_buttons):
+        #    id_grid.addWidget(button, i/3, i%3)
+        color_layout.addWidget(self.colorBox)
+        color_layout.addStretch()
 
-        id_group = QVBoxLayout()
-        id_group.addWidget(self.id_label)
-        id_group.addLayout(id_grid)
+        label_layout.addWidget(self.id_car_label)
+        label_layout.addWidget(self.id_person_label)
+
+        input_layout.addWidget(self.id_car_number)
+        input_layout.addWidget(self.id_person_text)
+
+        #id_grid.addWidget(self.colorBox, 0, 1)
+        #id_grid.addWidget(self.id_car_label, 0, 2)
+        #id_grid.addWidget(self.id_car_number, 0, 3)
+        #id_grid.addWidget(self.id_person_label, 1, 2)
+        #id_grid.addWidget(self.id_person_text, 1, 3)
+
+        id_group.addLayout(color_layout)
+        id_group.addLayout(label_layout)
+        id_group.addLayout(input_layout)
+        id_group.addStretch()
 
         sync_upper = QHBoxLayout()
         sync_upper.addWidget(self.sync_number_label)
         sync_upper.addWidget(self.sync_number)
+        sync_upper.addStretch()
 
         sync_lower = QHBoxLayout()
         sync_lower.addWidget(self.sync_time_label)
         sync_lower.addWidget(self.sync_time)
+        sync_lower.addStretch()
 
         sync_group = QVBoxLayout()
         sync_group.addWidget(self.sync_label)
@@ -207,6 +229,7 @@ class user_input(QWidget):
         import_group = QHBoxLayout()
         import_group.addWidget(self.import_label)
         import_group.addWidget(self.import_button)
+        import_group.addStretch()
 
 
         self.left_hand_layout = QVBoxLayout()
@@ -214,6 +237,7 @@ class user_input(QWidget):
         self.left_hand_layout.addStretch()
         self.left_hand_layout.addLayout(browse_group)
         self.left_hand_layout.addStretch()
+        self.left_hand_layout.addWidget(self.id_label)
         self.left_hand_layout.addLayout(id_group)
         self.left_hand_layout.addStretch()
         self.left_hand_layout.addLayout(sync_group)
@@ -248,6 +272,9 @@ class image_import_interface(QWidget):
     def init_widgets(self):
         self.image_selection_group = selection_group(self)
         self.user_input_group = user_input(self)
+        #self.scroll_area = QScrollArea()
+        #self.scroll_area.setWidget(self.image_selection_group)
+        #self.scroll_area.setHorizontalScrollBarPolicy(1)
         self.progress_bar = QLineEdit(self)
 
     def init_layout(self):
@@ -255,6 +282,7 @@ class image_import_interface(QWidget):
         self.main_layout = QHBoxLayout()
         self.main_layout.addWidget(self.user_input_group)
         self.main_layout.addWidget(self.image_selection_group)
+        #self.main_layout.addWidget(self.scroll_area)
         self.uber_layout.addLayout(self.main_layout)
         self.uber_layout.addWidget(self.progress_bar)
 
