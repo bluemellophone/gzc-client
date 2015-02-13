@@ -277,17 +277,19 @@ class image_import_interface(QWidget):
     def init_widgets(self):
         self.image_selection_group = selection_group(self)
         self.user_input_group = user_input(self)
-        #self.scroll_area = QScrollArea()
-        #self.scroll_area.setWidget(self.image_selection_group)
-        #self.scroll_area.setHorizontalScrollBarPolicy(1)
+        # Hack to get the image_selection_group to fit on the screen
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidget(self.image_selection_group)
+        self.scroll_area.setHorizontalScrollBarPolicy(1)
         self.progress_bar = QLineEdit(self)
 
     def init_layout(self):
         self.uber_layout = QVBoxLayout()
         self.main_layout = QHBoxLayout()
         self.main_layout.addWidget(self.user_input_group)
-        self.main_layout.addWidget(self.image_selection_group)
-        #self.main_layout.addWidget(self.scroll_area)
+        #self.main_layout.addWidget(self.image_selection_group)
+        # Hack to get the image_selection_group to fit on the screen
+        self.main_layout.addWidget(self.scroll_area)
         self.uber_layout.addLayout(self.main_layout)
         self.uber_layout.addWidget(self.progress_bar)
 
