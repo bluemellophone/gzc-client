@@ -5,14 +5,14 @@ from os import listdir, makedirs, getcwd
 import random
 import sys
 import platform
+import copy
 from QwwColorComboBox import QwwColorComboBox
 
 #TODO: 
-# framework to avoid re-use of already observed images
 # add status bar to bottom -- WIP
 
 class image_selection_roll(QLabel):
-    #Need to modify the QLabel functionality to allow it to act like a button 
+    #Modify the QLabel functionality to allow it to act like a button 
     DEFAULT_IMAGE = 'reroll.png'
 
     def __init__(self, *args):
@@ -88,6 +88,7 @@ class selection_group(QWidget):
         QWidget.__init__(self)
         self.init_widgets()
         self.init_layout()
+        self.stored_files = []
         self.active_files = []
         # self.init_connect()
 
@@ -105,6 +106,7 @@ class selection_group(QWidget):
 
     def add_filename(self, filename):
         self.active_files.append(filename)
+        self.stored_files.append(filename)
         #for the first couple of images to be copied, we will update the displayed photos
         if len(self.active_files) < 2:
             for IB in self.image_boxes:
@@ -113,6 +115,10 @@ class selection_group(QWidget):
                     break
 
     def get_filename(self):
+        if len(self.active_files) ==  0:
+            # If we've run through all the filename, just blindly restart the q
+            self.active_files = copy.deepcopy(self.stored_files)
+
         filename = self.active_files.pop((random.randrange(len(self.active_files))))
         return filename
 
@@ -289,7 +295,6 @@ class image_import_interface(QWidget):
 
     def update_recent_file(self, filename):
         self.progress_bar.setText("Imported new image to " + filename)
-        # 2am hack, will need to make robust for multiple uses
         self.image_selection_group.add_filename(filename)
 
 
