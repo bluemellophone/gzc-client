@@ -1,6 +1,5 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-from gpsclient import colorSelectButton
 from fileprocessing_main_test import CopyThread
 from os import listdir, makedirs, getcwd, path, chdir
 import simplejson as json
@@ -102,6 +101,7 @@ class selection_group(QWidget):
         self.image_boxes = []
         for i in range(11):
             self.image_boxes.append(image_selection_box(self))
+
     def init_layout(self):
         grid = QGridLayout()
         grid.addWidget(self.first_image, 0, 0)
@@ -260,7 +260,7 @@ class user_input(QWidget):
         self.left_hand_layout.addLayout(import_group)
 
         self.setLayout(self.left_hand_layout)
-        # self.setFixedSize(400,400)
+        self.setFixedWidth(400)
 
     def init_connect(self):
         self.browse_button.clicked.connect(self.open_directory)
@@ -289,21 +289,21 @@ class image_import_interface(QWidget):
     def init_widgets(self):
         self.image_selection_group = selection_group(self)
         self.user_input_group = user_input(self)
-        #self.scroll_area = QScrollArea()
-        #self.scroll_area.setWidget(self.image_selection_group)
-        #self.scroll_area.setHorizontalScrollBarPolicy(1)
+        # Hack to get the image_selection_group to fit on the screen
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidget(self.image_selection_group)
+        self.scroll_area.setHorizontalScrollBarPolicy(1)
         self.progress_bar = QLineEdit(self)
-        self.submit_button = QPushButton(self)
+        self.submit_button = QPushButton("Submit and Upload", self)
 
 
     def init_layout(self):
         self.uber_layout = QVBoxLayout()
         self.main_layout = QHBoxLayout()
         self.main_layout.addWidget(self.user_input_group)
-        self.main_layout.addWidget(self.image_selection_group)
-        #self.main_layout.addWidget(self.scroll_area)
-        self.main_layout.addWidget(self.submit_button)
+        self.main_layout.addWidget(self.scroll_area)
         self.uber_layout.addLayout(self.main_layout)
+        self.uber_layout.addWidget(self.submit_button)
         self.uber_layout.addWidget(self.progress_bar)
 
         self.setLayout(self.uber_layout)

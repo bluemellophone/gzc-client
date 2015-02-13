@@ -64,54 +64,13 @@ class ImportThread(QtCore.QThread):
         thrd.start()
 
 
-class colorSelectButton(COLOR_BUTTON_BASE):
-    def __init__(self, text="", bgcolor=None, fgcolor=None, ischeckable=True):
-        COLOR_BUTTON_BASE.__init__(self, text)
-        self.setCheckable(ischeckable)
-        style_sheet_str = self.make_style_sheet(bgcolor=bgcolor, fgcolor=fgcolor)
-        if style_sheet_str is not None:
-            self.setStyleSheet(style_sheet_str)
-
-    def make_style_sheet(self, bgcolor=None, fgcolor=None):
-        style_list = []
-        fmtdict = {}
-        if bgcolor is not None:
-            style_list.append('background-color: rgb({bgcolor})')
-            fmtdict['bgcolor'] = ','.join(map(str, bgcolor))
-        if fgcolor is not None:
-            style_list.append('color: rgb({fgcolor})')
-            fmtdict['fgcolor'] = ','.join(map(str, fgcolor))
-        #style_list.append('padding-left: 0px')
-        #style_list.append('padding-right: 0px')
-        if len(style_list) > 0:
-            style_sheet_fmt = ';'.join(style_list)
-            style_sheet_str = style_sheet_fmt.format(**fmtdict)
-            return style_sheet_str
-        else:
-            return None
-
-    def change_color(self, bgcolor=None, fgcolor=None):
-        style_list = []
-        fmtdict = {}
-        if bgcolor is not None:
-            style_list.append('background-color: rgb({bgcolor})')
-            fmtdict['bgcolor'] = ','.join(map(str, bgcolor))
-        if fgcolor is not None:
-            style_list.append('color: rgb({fgcolor})')
-            fmtdict['fgcolor'] = ','.join(map(str, fgcolor))
-        if len(style_list) > 0:
-            style_sheet_fmt = ';'.join(style_list)
-            style_sheet_str = style_sheet_fmt.format(**fmtdict)
-        else:
-            style_sheet_str = None
-        if style_sheet_str is not None:
-            self.setStyleSheet(style_sheet_str)
-
-
 class GPSGuiWidget(GPS_WIDGET_BASE):
     def __init__(gpswgt, parent=None, flags=0):
         GPS_WIDGET_BASE.__init__(gpswgt)
-        gpswgt.parent = parent
+        if parent is not None:
+            gpswgt.parent = parent
+        else:
+            gpswgt.parent = gpswgt
         gpswgt.buttonList = []
         #gpswgt.map_image_file = "map.png"
         #gpswgt.map_image_file = "troy_map.png"
@@ -121,7 +80,6 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         gpswgt._init_layout()
         gpswgt._init_signals()
         gpswgt.setWindowTitle(QtCore.QString("GPS Information Import"))
-        gpswgt.domain = "http://localhost:5000"
         gpswgt.processing_palette = QtGui.QPalette(QtGui.QColor(255, 255, 255))
         gpswgt.ready_palette = QtGui.QPalette(QtGui.QColor(155, 209, 229))
         gpswgt.sending_palette = QtGui.QPalette(QtGui.QColor(63, 124, 172))
@@ -141,14 +99,15 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         gpswgt.ibeisLogoLabel.setPixmap(ibeisLogoImg.scaled(100, 100))
 
         # 1) Car Input Widgets
-        gpswgt.carLabel = QtGui.QLabel(QtCore.QString("1) Input Identification Info:"))
+        gpswgt.carLabel = QtGui.QLabel(QtCore.QString("1) Input Identification Information"))
         gpswgt.numberLabel = QtGui.QLabel(QtCore.QString("Car Number:"))
         gpswgt.carNumberSelect = QtGui.QSpinBox()
         gpswgt.carNumberSelect.setMinimum(1)
         gpswgt.carNumberSelect.setMaximum(5000)
 
         # 2) Sync / Start Time Selection Widgets
-        gpswgt.timeLabel = QtGui.QLabel(QtCore.QString("2) Select Car Start Time:"))
+        gpswgt.timeWidgetLabel = QtGui.QLabel(QtCore.QString("2) Synchronize GPS Information:"))
+        gpswgt.timeLabel = QtGui.QLabel(QtCore.QString("Car Start Time:"))
         gpswgt.timeEdit = QtGui.QTimeEdit()
         gpswgt.timeEdit.setDisplayFormat("h:mm AP")
 
@@ -189,13 +148,17 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         numberBox.addStretch()
 
         colorBoxTop.addWidget(gpswgt.colorBox)
+        colorBoxTop.addWidget(gpswgt.numberLabel)
         colorBoxTop.addWidget(gpswgt.carNumberSelect)
         colorBoxTop.addStretch()
         # 2) Sync / Start Time Selection Widgets
+        timeWidgetBox = QtGui.QVBoxLayout()
+        timeWidgetBox.addWidget(gpswgt.timeWidgetLabel)
         timeBox = QtGui.QHBoxLayout()
         timeBox.addWidget(gpswgt.timeLabel)
         timeBox.addWidget(gpswgt.timeEdit)
         timeBox.addStretch()
+        timeWidgetBox.addLayout(timeBox)
         # 3) Import Button Widgets
         importBox = QtGui.QHBoxLayout()
         importBox.addWidget(gpswgt.importLabel)
@@ -224,7 +187,7 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         # Layout Widgets
         leftBox.addLayout(logoBox)
         leftBox.addLayout(carBox)
-        leftBox.addLayout(timeBox)
+        leftBox.addLayout(timeWidgetBox)
         leftBox.addLayout(importBox)
         leftBox.addStretch()
 
@@ -264,68 +227,12 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         gpswgt.gpsImageLabel.setPixmap(gpsImg.scaled(gpswgt.gpsImageLabel.width(), gpswgt.gpsImageLabel.height(), aspectRatioMode=1))
         gpswgt.parent.status_bar.setPalette(gpswgt.ready_palette)
 
-    #def _import_gpx(gpswgt):
-    #    #When hooked up to a i-gotu gps dongle
-    #    data = gpswgt.compile_data()
-    #    gpswgt.parent.status_bar.showMessage(QtCore.QString("Importing GPS information"))
-    #    try:
-    #        gpx_string = import_gps_tracks.import_gpx(data)
-    #    except IOError:
-    #        gpswgt.parent.status_bar.showMessage(QtCore.QString("Couldn't import GPS info. Make sure the dongle is connected"))
-    #        gpswgt.parent.status_bar.setPalette(gpswgt.error_palette)
-    #        return
-    #    #from mpl_toolkits.basemap import Basemap
-    #    import cv2
-    #    #gpx_string = open("test_gps/track.gpx", "r").read()
-    #    ## Process gps for car
-    #    #car_color  = data['car_color'].lower()
-    #    #car_number = str(data['car_number'])
-    #    ## Ensure the folder
-    #    #car_dir = import_gps_tracks.ensure_structure('data', 'gps', car_number, car_color)
-    #    #gps_path  = join(car_dir, 'track.gpx')
-    #    #f = open(gps_path, 'w')
-    #    #f.write(gpx_string)
-    #    #f.close()
-    #    #print gpx_string
-    #    gps_json = import_gps_tracks.convert_gpx_to_json(gpx_string)
-    #    if len(gps_json['track']) == 0:
-    #        gpswgt.parent.status_bar.showMessage(QtCore.QString("No Points found. Import again."))
-    #        gpswgt.parent.status_bar.setPalette(gpswgt.error_palette)
-    #        return
-    #    lats = []
-    #    lons = []
-    #    xs = []
-    #    ys = []
-    #    pts = []
-    #    img = cv2.imread(gpswgt.map_image_file)
-    #    #coord_map = CoordinateMap((-1.32504, 36.766777), (-1.442833, 36.965561), img)  # Nairobi (map.png)
-    #    #coord_map = CoordinateMap((42.789920, -73.759957), (42.673663, -73.592416), img)  # Troy (troy_map.png)
-    #    #coord_map = CoordinateMap((42.740739, -73.697043), (42.720154, -73.657561), img)  # Close up Troy (close_troy_map_small.png)
-    #    coord_map = CoordinateMap((42.735759, -73.686637), (42.726444, -73.664621), img)  # RPI Campus (rpi_map.png)
-    #    for point in gps_json['track']:
-    #        lat = point['lat']
-    #        lon = point['lon']
-    #        lats.append(lat)
-    #        lons.append(lon)
-    #        x, y = coord_map.map_point_float((lat, lon))
-    #        pts.append(np.array([x, y]))
-    #        xs.append(x)
-    #        ys.append(y)
-
-    #    lats = np.array(lats)
-    #    lons = np.array(lons)
-
-    #    cv2.polylines(img, [np.array(pts, dtype=np.int32)], False, (255, 0, 0), thickness=2)
-    #    cv2.imwrite("figure.png", img)
-    #    gpsImg = QtGui.QPixmap("figure.png")
-    #    gpswgt.gpsImageLabel.setPixmap(gpsImg.scaled(gpswgt.gpsImageLabel.width(), gpswgt.gpsImageLabel.height(), aspectRatioMode=1))
-    #    gpswgt.parent.status_bar.setPalette(gpswgt.ready_palette)
-
     def _submit_gps(gpswgt):
+        gpswgt.parent.status_bar.showMessage("Submitting to server")
         gpswgt.parent.status_bar.setPalette(gpswgt.sending_palette)
         data = gpswgt.compile_data()
 
-        GPSURL = gpswgt.domain + '/gps/submit'
+        GPSURL = gpswgt.parent.domain + '/gps/submit'
         DEFAULT_DATA_DIR = 'data'
 
         # Process gps for car
@@ -351,14 +258,10 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         except requests.exceptions.ConnectionError:
             gpswgt.parent.status_bar.showMessage(QtCore.QString("Couldn't connect to server. Ensure that the server is running and the domain is correct."))
             gpswgt.parent.status_bar.setPalette(gpswgt.error_palette)
-            return 111
+            return
         print("HTTP STATUS:", r.status_code)
-        try:
-            response = json.loads(r.text)
-            print("RESPONSE:", response)
-        except json.scanner.JSONDecodeError:
-            gpswgt.parent.status_bar.showMessage(QtCore.QString("JSON file not readable. Import again"))
-            gpswgt.parent.status_bar.setPalette(gpswgt.error_palette)
+        response = json.loads(r.text)
+        print("RESPONSE:", response)
         if r.status_code == 200:
             gpswgt.parent.status_bar.showMessage(QtCore.QString("Submit successful."))
             gpswgt.parent.status_bar.setPalette(gpswgt.sent_palette)
