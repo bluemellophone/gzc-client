@@ -6,6 +6,7 @@ from os import listdir, makedirs, getcwd
 import random
 import sys
 import platform
+import copy
 from QwwColorComboBox import QwwColorComboBox
 
 #TODO: 
@@ -106,7 +107,7 @@ class selection_group(QWidget):
 
     def add_filename(self, filename):
         self.active_files.append(filename)
-        self.active_files.append(filename)
+        self.stored_files.append(filename)
         #for the first couple of images to be copied, we will update the displayed photos
         if len(self.active_files) < 2:
             for IB in self.image_boxes:
@@ -117,7 +118,7 @@ class selection_group(QWidget):
     def get_filename(self):
         if len(self.active_files) ==  0:
             # If we've run through all the filename, just blindly restart the q
-            self.active_files = self.stored_files
+            self.active_files = copy.deepcopy(self.stored_files)
 
         filename = self.active_files.pop((random.randrange(len(self.active_files))))
         return filename
