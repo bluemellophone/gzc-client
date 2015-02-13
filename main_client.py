@@ -33,6 +33,7 @@ class GZCMainWindow(GZC_BASE_CLASS):
         gzc.options_menu.addAction("Set Domain")
 
         gzc.domain_dialog = QtGui.QInputDialog()
+        gzc.domain_dialog.setLabelText(QtCore.QString("Enter server domain:"))
 
     def _init_tabs(gzc):
         gzc.tabs.addTab(gzc.image_client, "Images")
@@ -42,6 +43,7 @@ class GZCMainWindow(GZC_BASE_CLASS):
 
     def _init_layout(gzc):
         gzc.setCentralWidget(gzc.tabs)
+        gzc.setWindowTitle("The Great Zebra Count")
         #gzc.centralWidget = QtGui.QVBoxLayout(gzc)
         #gzc.centralWidget.addWidget(gzc.tabs)
         #gzc.setSizePolicy(gzc.tabs.sizePolicy())

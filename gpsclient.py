@@ -67,7 +67,10 @@ class ImportThread(QtCore.QThread):
 class GPSGuiWidget(GPS_WIDGET_BASE):
     def __init__(gpswgt, parent=None, flags=0):
         GPS_WIDGET_BASE.__init__(gpswgt)
-        gpswgt.parent = parent
+        if parent is not None:
+            gpswgt.parent = parent
+        else:
+            gpswgt.parent = gpswgt
         gpswgt.buttonList = []
         #gpswgt.map_image_file = "map.png"
         #gpswgt.map_image_file = "troy_map.png"
@@ -96,14 +99,15 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         gpswgt.ibeisLogoLabel.setPixmap(ibeisLogoImg.scaled(100, 100))
 
         # 1) Car Input Widgets
-        gpswgt.carLabel = QtGui.QLabel(QtCore.QString("1) Input Identification Info:"))
+        gpswgt.carLabel = QtGui.QLabel(QtCore.QString("1) Input Identification Information"))
         gpswgt.numberLabel = QtGui.QLabel(QtCore.QString("Car Number:"))
         gpswgt.carNumberSelect = QtGui.QSpinBox()
         gpswgt.carNumberSelect.setMinimum(1)
         gpswgt.carNumberSelect.setMaximum(5000)
 
         # 2) Sync / Start Time Selection Widgets
-        gpswgt.timeLabel = QtGui.QLabel(QtCore.QString("2) Select Car Start Time:"))
+        gpswgt.timeWidgetLabel = QtGui.QLabel(QtCore.QString("2) Synchronize GPS Information:"))
+        gpswgt.timeLabel = QtGui.QLabel(QtCore.QString("Car Start Time:"))
         gpswgt.timeEdit = QtGui.QTimeEdit()
         gpswgt.timeEdit.setDisplayFormat("h:mm AP")
 
@@ -144,13 +148,17 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         numberBox.addStretch()
 
         colorBoxTop.addWidget(gpswgt.colorBox)
+        colorBoxTop.addWidget(gpswgt.numberLabel)
         colorBoxTop.addWidget(gpswgt.carNumberSelect)
         colorBoxTop.addStretch()
         # 2) Sync / Start Time Selection Widgets
+        timeWidgetBox = QtGui.QVBoxLayout()
+        timeWidgetBox.addWidget(gpswgt.timeWidgetLabel)
         timeBox = QtGui.QHBoxLayout()
         timeBox.addWidget(gpswgt.timeLabel)
         timeBox.addWidget(gpswgt.timeEdit)
         timeBox.addStretch()
+        timeWidgetBox.addLayout(timeBox)
         # 3) Import Button Widgets
         importBox = QtGui.QHBoxLayout()
         importBox.addWidget(gpswgt.importLabel)
@@ -179,7 +187,7 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         # Layout Widgets
         leftBox.addLayout(logoBox)
         leftBox.addLayout(carBox)
-        leftBox.addLayout(timeBox)
+        leftBox.addLayout(timeWidgetBox)
         leftBox.addLayout(importBox)
         leftBox.addStretch()
 
