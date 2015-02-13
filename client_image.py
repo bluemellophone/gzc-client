@@ -1,9 +1,13 @@
 from PyQt4 import QtCore, QtGui
 from clientfuncs import CopyThread, QwwColorComboBox
-from os import listdir
+from os import listdir, getcwd, path, chdir
+import simplejson as json
 import random
 import sys
 import copy
+import string
+import zipfile
+import requests
 
 #TODO:
 # add status bar to bottom -- WIP
@@ -75,7 +79,7 @@ class image_selection_box(QtGui.QWidget):
             self.select_group.setExclusive(True)
 
     def get_selection(self):
-        return (self.image.current_image, self.selection_group.checkedButton())
+        return (path.basename(self.image.current_image), self.select_group.checkedButton().text())
 
 
 class selection_group(QtGui.QWidget):
@@ -90,14 +94,17 @@ class selection_group(QtGui.QWidget):
         # self.init_connect()
 
     def init_widgets(self):
+        self.first_image = image_selection_box(self)
         self.image_boxes = []
-        for i in range(12):
+        for i in range(11):
             self.image_boxes.append(image_selection_box(self))
 
     def init_layout(self):
         grid = QtGui.QGridLayout()
+        grid.addWidget(self.first_image, 0, 0)
         for i, image_box in enumerate(self.image_boxes):
-            grid.addWidget(image_box, i / 3, i % 3)
+            grid.addWidget(image_box, (i + 1) / 3, (i + 1) % 3)
+        # grid.addWidget(last_image, 3, 2)
 
         self.setLayout(grid)
 
@@ -105,7 +112,10 @@ class selection_group(QtGui.QWidget):
         self.active_files.append(filename)
         self.stored_files.append(filename)
         #for the first couple of images to be copied, we will update the displayed photos
-        if len(self.active_files) < 2:
+        if len(self.stored_files) == 1:
+            #FIRST IMAGE, add to the first image box
+            self.first_image.reroll()
+        elif len(self.active_files) < 2:
             for IB in self.image_boxes:
                 if IB.image.current_image == IB.image.DEFAULT_IMAGE:
                     IB.reroll()
@@ -155,7 +165,9 @@ class user_input(QtGui.QWidget):
 
         self.id_car_number = QtGui.QSpinBox(self)
         self.id_car_number.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
-        self.id_person_text = QtGui.QLineEdit(self)
+
+        self.id_person = QtGui.QComboBox(self)
+        self.id_person.addItems(list(string.ascii_uppercase))
 
         self.sync_label = QtGui.QLabel("3) Synchronize Image Infromation", self)
         self.sync_number_label = QtGui.QLabel("First Image Number:", self)
@@ -196,13 +208,13 @@ class user_input(QtGui.QWidget):
         label_layout.addWidget(self.id_person_label)
 
         input_layout.addWidget(self.id_car_number)
-        input_layout.addWidget(self.id_person_text)
+        input_layout.addWidget(self.id_person)
 
         #id_grid.addWidget(self.colorBox, 0, 1)
         #id_grid.addWidget(self.id_car_label, 0, 2)
         #id_grid.addWidget(self.id_car_number, 0, 3)
         #id_grid.addWidget(self.id_person_label, 1, 2)
-        #id_grid.addWidget(self.id_person_text, 1, 3)
+        #id_grid.addWidget(self.id_person, 1, 3)
 
         id_group.addLayout(color_layout)
         id_group.addLayout(label_layout)
@@ -242,6 +254,7 @@ class user_input(QtGui.QWidget):
         self.left_hand_layout.addLayout(import_group)
 
         self.setLayout(self.left_hand_layout)
+        self.setFixedWidth(400)
 
     def init_connect(self):
         self.browse_button.clicked.connect(self.open_directory)
@@ -254,7 +267,8 @@ class user_input(QtGui.QWidget):
     def import_(self):
         directory = self.browse_text.text()
         files = listdir(directory)
-        self.copyThread = CopyThread(directory, files, ["testfolder"])
+        target_directory = path.join("user_photos", str(self.colorBox.currentText()) + str(self.id_car_number.value()), str(self.id_person.currentText()))
+        self.copyThread = CopyThread(directory, files, [target_directory])
         self.connect(self.copyThread, QtCore.SIGNAL("file_done"), self.parent().update_recent_file)
         self.copyThread.start()
 
@@ -265,6 +279,7 @@ class image_import_interface(QtGui.QWidget):
         QtGui.QWidget.__init__(self)
         self.init_widgets()
         self.init_layout()
+        self.init_connect()
 
     def init_widgets(self):
         self.image_selection_group = selection_group(self)
@@ -274,18 +289,72 @@ class image_import_interface(QtGui.QWidget):
         self.scroll_area.setWidget(self.image_selection_group)
         self.scroll_area.setHorizontalScrollBarPolicy(1)
         self.progress_bar = QtGui.QLineEdit(self)
+        self.submit_button = QtGui.QPushButton("Submit and Upload", self)
 
     def init_layout(self):
         self.uber_layout = QtGui.QVBoxLayout()
         self.main_layout = QtGui.QHBoxLayout()
         self.main_layout.addWidget(self.user_input_group)
-        #self.main_layout.addWidget(self.image_selection_group)
-        # Hack to get the image_selection_group to fit on the screen
         self.main_layout.addWidget(self.scroll_area)
         self.uber_layout.addLayout(self.main_layout)
+        self.uber_layout.addWidget(self.submit_button)
         self.uber_layout.addWidget(self.progress_bar)
 
         self.setLayout(self.uber_layout)
+
+    def init_connect(self):
+        self.submit_button.clicked.connect(self.submit)
+
+    def submit(self):
+        DOMAIN = 'http://localhost:5000/images/submit'
+        #Zip selected images: first, last, zebra/, giraffe/
+        chdir(path.dirname(path.realpath(__file__)))
+        pull_directory = path.join("user_photos", str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()), str(self.user_input_group.id_person.currentText()))
+        chdir(path.join(getcwd(), pull_directory))
+
+        first = self.image_selection_group.first_image.get_selection()[0]
+        zebra = []
+        giraffe = []
+        for IB in self.image_selection_group.image_boxes:
+            selection = IB.get_selection()
+            if selection[1] == "Zebra":
+                zebra.append(selection[0])
+            else:
+                giraffe.append(selection[0])
+
+        last = listdir(getcwd())[-1]
+
+        zip_archive = zipfile.ZipFile(str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()) + str(self.user_input_group.id_person.currentText()) + '.zip', 'w')
+        zip_archive.write(path.join(getcwd(), first), 'first.jpg')
+        zip_archive.write(path.join(getcwd(), last), 'last.jpg')
+        for filename in zebra:
+            zip_archive.write(path.join(getcwd(), filename), path.join('zebra', filename))
+        for filename in giraffe:
+            zip_archive.write(path.join(getcwd(), filename), path.join('giraffe', filename))
+
+        zip_archive.close()
+
+        #format data
+        data = {
+            'car_color': str(self.user_input_group.colorBox.currentText()),
+            'car_number': str(self.user_input_group.id_car_number.value()),
+            'person_letter': str(self.user_input_group.id_person.currentText()),
+            'image_first_time_hour': str(self.user_input_group.sync_time.time().hour()),
+            'image_first_time_minute': str(self.user_input_group.sync_time.time().minute()),
+        }
+
+        content = open(str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()) + str(self.user_input_group.id_person.currentText()) + '.zip', 'rb')
+        files = {
+            'image_archive': content,
+        }
+
+        # SEND POST REQUEST WITH data AND files PAYLOADS
+        r = requests.post(DOMAIN, data=data, files=files)
+
+        # Response
+        print("HTTP STATUS:", r.status_code)
+        response = json.loads(r.text)
+        print("RESPONSE:", response)
 
     def update_recent_file(self, filename):
         self.progress_bar.setText("Imported new image to " + filename)
