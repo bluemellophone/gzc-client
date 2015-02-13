@@ -1,6 +1,5 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-from gpsclient import colorSelectButton
 from fileprocessing_main_test import CopyThread
 from os import listdir, makedirs, getcwd
 import random
