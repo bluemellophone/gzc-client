@@ -1,14 +1,13 @@
 from PyQt4 import QtGui, QtCore
 import sys
 #import platform
-import import_gps_tracks
+import igotu
 #import matplotlib.pyplot as plt
 import numpy as np
-from coordinate_map import CoordinateMap
+from clientfuncs import CoordinateMap, QwwColorComboBox
 import requests
 import simplejson as json
 from os.path import join, exists  # NOQA
-from QwwColorComboBox import QwwColorComboBox
 
 GPS_WIDGET_BASE = QtGui.QWidget
 COLOR_BUTTON_BASE = QtGui.QPushButton
@@ -24,7 +23,7 @@ class ImportThread(QtCore.QThread):
         data = thrd.gpswgt.compile_data()
         thrd.gpswgt.parent.status_bar.showMessage(QtCore.QString("Importing GPS information"))
         try:
-            gpx_string = import_gps_tracks.import_gpx(data)
+            gpx_string = igotu.import_gpx(data)
         except IOError:
             thrd.gpswgt.parent.status_bar.showMessage(QtCore.QString("Couldn't import GPS info. Make sure the dongle is connected"))
             thrd.gpswgt.parent.status_bar.setPalette(thrd.gpswgt.error_palette)
@@ -35,22 +34,22 @@ class ImportThread(QtCore.QThread):
         #car_color  = data['car_color'].lower()
         #car_number = str(data['car_number'])
         ## Ensure the folder
-        #car_dir = import_gps_tracks.ensure_structure('data', 'gps', car_number, car_color)
+        #car_dir = igotu.ensure_structure('data', 'gps', car_number, car_color)
         #gps_path  = join(car_dir, 'track.gpx')
         #f = open(gps_path, 'w')
         #f.write(gpx_string)
         #f.close()
-        gps_json = import_gps_tracks.convert_gpx_to_json(gpx_string)
+        gps_json = igotu.convert_gpx_to_json(gpx_string)
         if len(gps_json['track']) == 0:
             thrd.gpswgt.parent.status_bar.showMessage(QtCore.QString("No Points found. Import again."))
             thrd.gpswgt.parent.status_bar.setPalette(thrd.gpswgt.error_palette)
             return
         pts = []
         img = cv2.imread(thrd.gpswgt.map_image_file)
-        #coord_map = CoordinateMap((-1.32504, 36.766777), (-1.442833, 36.965561), img)  # Nairobi (map.png)
-        #coord_map = CoordinateMap((42.789920, -73.759957), (42.673663, -73.592416), img)  # Troy (troy_map.png)
-        #coord_map = CoordinateMap((42.740739, -73.697043), (42.720154, -73.657561), img)  # Close up Troy (close_troy_map_small.png)
-        coord_map = CoordinateMap((42.735759, -73.686637), (42.726444, -73.664621), img)  # RPI Campus (rpi_map.png)
+        #coord_map = CoordinateMap((-1.32504, 36.766777), (-1.442833, 36.965561), img)     # Nairobi (assets/map_nairobi.png)
+        #coord_map = CoordinateMap((42.789920, -73.759957), (42.673663, -73.592416), img)  # Albany  (assets/map_albany.png)
+        #coord_map = CoordinateMap((42.740739, -73.697043), (42.720154, -73.657561), img)  # Troy    (assets/map_troy.png)
+        coord_map = CoordinateMap((42.735759, -73.686637), (42.726444, -73.664621), img)   # RPI     (assets/map_rpi.png)
         for point in gps_json['track']:
             lat = point['lat']
             lon = point['lon']
@@ -72,10 +71,10 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         else:
             gpswgt.parent = gpswgt
         gpswgt.buttonList = []
-        #gpswgt.map_image_file = "map.png"
-        #gpswgt.map_image_file = "troy_map.png"
-        #gpswgt.map_image_file = "close_troy_map_small.png"
-        gpswgt.map_image_file = "rpi_map.png"
+        #gpswgt.map_image_file = "assets/map_nairobi.png"
+        #gpswgt.map_image_file = "assets/map_albany.png"
+        #gpswgt.map_image_file = "assets/map_troy.png"
+        gpswgt.map_image_file = "assets/map_rpi.png"
         gpswgt._init_components()
         gpswgt._init_layout()
         gpswgt._init_signals()
@@ -94,7 +93,7 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         gpswgt.pageLayout = QtGui.QVBoxLayout(gpswgt)
 
         # 0) Logo Widgets
-        ibeisLogoImg = QtGui.QPixmap("ibeis_logo.png")
+        ibeisLogoImg = QtGui.QPixmap("assets/logo.png")
         gpswgt.ibeisLogoLabel = QtGui.QLabel()
         gpswgt.ibeisLogoLabel.setPixmap(ibeisLogoImg.scaled(100, 100))
 
@@ -239,7 +238,7 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         car_color  = data['car_color'].lower()
         car_number = str(data['car_number'])
         # Ensure the folder
-        car_dir = import_gps_tracks.ensure_structure(DEFAULT_DATA_DIR, 'gps', car_number, car_color)
+        car_dir = igotu.ensure_structure(DEFAULT_DATA_DIR, 'gps', car_number, car_color)
         gps_path  = join(car_dir, 'track.gpx')
 
         # gps data
