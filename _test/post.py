@@ -21,8 +21,8 @@ data = {
     'car_color': 'RED',
     'car_number': 1,
     'person_letter': 'A',
-    'image_first_time_hour': 10,
-    'image_first_time_minute': 36,
+    'image_first_time_hour': 11,
+    'image_first_time_minute': 43,
 }
 
 # LOAD THE ZIP FILE AND ADD TO THE PAYLOAD
@@ -47,8 +47,8 @@ print("RESPONSE:", response)
 data = {
     'car_color': 'RED',
     'car_number': 1,
-    'gps_first_time_hour': 10,
-    'gps_first_time_minute': 03,
+    'gps_first_time_hour': 11,
+    'gps_first_time_minute': 43,
 }
 
 # LOAD THE GPX FILE AND ADD TO THE PAYLOAD
