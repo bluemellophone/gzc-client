@@ -12,6 +12,10 @@ DOMAIN = 'http://localhost:5000'
 IMGURL = DOMAIN + '/images/submit'
 GPSURL = DOMAIN + '/gps/submit'
 
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
 # LOAD THE POST VARIABLES
 data = {
     'car_color': 'RED',
@@ -21,8 +25,7 @@ data = {
     'image_first_time_minute': 36,
 }
 
-# image data
-# LOAD THE ZIP AND ADD TO THE PAYLOAD
+# LOAD THE ZIP FILE AND ADD TO THE PAYLOAD
 content = open('test_image.zip', 'rb')
 files = {
     'image_archive': content,
@@ -31,18 +34,33 @@ files = {
 # SEND POST REQUEST WITH data AND files PAYLOADS
 r = requests.post(IMGURL, data=data, files=files)
 
-# Response
+# RESPONSE
 print("HTTP STATUS:", r.status_code)
 response = json.loads(r.text)
 print("RESPONSE:", response)
 
-# gps data
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+# LOAD THE POST VARIABLES
+data = {
+    'car_color': 'RED',
+    'car_number': 1,
+    'gps_first_time_hour': 10,
+    'gps_first_time_minute': 03,
+}
+
+# LOAD THE GPX FILE AND ADD TO THE PAYLOAD
 content = open(join('test_gps', 'track.gpx'), 'rb')
 files = {
     'gps_data': content,
 }
 
+# SEND POST REQUEST WITH data AND files PAYLOADS
 r = requests.post(GPSURL, data=data, files=files)
+
+# RESPONSE
 print("HTTP STATUS:", r.status_code)
 response = json.loads(r.text)
 print("RESPONSE:", response)
