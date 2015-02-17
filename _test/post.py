@@ -18,9 +18,9 @@ GPSURL = DOMAIN + '/gps/submit'
 
 # LOAD THE POST VARIABLES
 data = {
-    'car_color': 'RED',
+    'car_color': 'GREEN',
     'car_number': 1,
-    'person_letter': 'A',
+    'person_letter': 'D',
     'image_first_time_hour': 11,
     'image_first_time_minute': 43,
 }
@@ -45,7 +45,7 @@ print("RESPONSE:", response)
 
 # LOAD THE POST VARIABLES
 data = {
-    'car_color': 'RED',
+    'car_color': 'GREEN',
     'car_number': 1,
     'gps_first_time_hour': 11,
     'gps_first_time_minute': 43,
