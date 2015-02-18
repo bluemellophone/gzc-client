@@ -46,6 +46,7 @@ class GZCMainWindow(GZC_BASE_CLASS):
     def _init_layout(gzc):
         gzc.setCentralWidget(gzc.tabs)
         gzc.setWindowTitle("The Great Zebra Count")
+        gzc.setMinimumSize(1200,750)
         #gzc.centralWidget = QtGui.QVBoxLayout(gzc)
         #gzc.centralWidget.addWidget(gzc.tabs)
         #gzc.setSizePolicy(gzc.tabs.sizePolicy())
