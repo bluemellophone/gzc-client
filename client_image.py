@@ -50,8 +50,8 @@ class first_last_image(QtGui.QFrame):
         self.current_image = self.DEFAULT_IMAGE
 
         #border stuffff?
-        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised);
-        self.setLineWidth(2);
+        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
+        self.setLineWidth(2)
 
         self.image_time = QtGui.QLabel("Awaiting images...", self)
         self.image_time.setAlignment(QtCore.Qt.AlignCenter)
@@ -224,15 +224,6 @@ class selection_group(QtGui.QWidget):
         gridV.addStretch(1)
 
         self.setLayout(gridV)
-
-
-        # grid = QtGui.QGridLayout()
-        # grid.addWidget(self.first_image, 0, 0)
-        # for i, image_box in enumerate(self.image_boxes):
-        #     grid.addWidget(image_box, (i + 1) / 3, (i + 1) % 3)
-        # # grid.addWidget(last_image, 3, 2)
-
-        # self.setLayout(grid)
 
     def add_filename(self, filename):
         self.active_files.append(filename)
