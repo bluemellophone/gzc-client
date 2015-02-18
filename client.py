@@ -78,7 +78,11 @@ class GZCMainWindow(GZC_BASE_CLASS):
             print("Not correct")
 
     def manual_clicked(gzc, action):
-        print("test")
+        if str(action.text()) == "Select Files":
+            dialog = QtGui.QFileDialog()
+            dialog.setFileMode(QtGui.QFileDialog.ExistingFiles)
+            flist = dialog.getOpenFileNames(gzc, 'Open files', '/home')
+            gzc.image_client.user_input_group.import_file_list(flist)
 
     def set_domain(gzc):
         gzc.domain_dialog.setTextValue(gzc.domain)
