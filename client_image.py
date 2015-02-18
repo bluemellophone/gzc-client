@@ -38,10 +38,12 @@ class image_selection_roll(QtGui.QLabel):
     def __init__(self, *args):
         apply(QtGui.QLabel.__init__, (self, ) + args)
         QtGui.QLabel.__init__(self)
-        self.setScaledContents(True)
+        #self.setScaledContents(True) #<--this causes the image displayed to be centered, but stretched. Aspect ratio not maintained
         Pixmap = QtGui.QPixmap((self.DEFAULT_IMAGE)).scaled(QtCore.QSize(150, 150))
         self.desiredsize = Pixmap.size()
+        self.setAlignment(QtCore.Qt.AlignCenter)
         self.setPixmap(Pixmap)
+
         self.current_image = self.DEFAULT_IMAGE
 
     def mouseReleaseEvent(self, ev):
@@ -168,7 +170,7 @@ class selection_group(QtGui.QWidget):
         hor3.addStretch(1)
         hor3.addWidget(self.image_boxes[10])
         hor3.addStretch(1)
-        gridV.addStretch(.5)
+        gridV.addStretch(1)
         gridV.addLayout(hor1)
         gridV.addStretch(1)
         gridV.addLayout(hor2)
