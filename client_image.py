@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function
 from PyQt4 import QtCore, QtGui
-from clientfuncs import CopyThread, QwwColorComboBox
+from clientfuncs import CopyThread, QwwColorComboBox, find_candidates
 from os import listdir, getcwd, path, chdir
 import simplejson as json
 import time
@@ -235,11 +235,14 @@ class selection_group(QtGui.QWidget):
 
     def add_filename(self, filename):
         self.active_files.append(filename)
-        self.stored_files.append(filename)
+        # self.stored_files.append(filename)
         #for the first couple of images to be copied, we will update the displayed photos
-        if len(self.stored_files) == 1:
+        if filename == self.first_image.current_image:
             #FIRST IMAGE, add to the first image box
             self.first_image.update(filename)
+        elif filename == self.last_image.current_image:
+            self.last_image.update(filename)
+
             
         else:
             for IB in self.image_boxes:
@@ -247,7 +250,6 @@ class selection_group(QtGui.QWidget):
                     IB.reroll()
                     break
         #if we've filled the image boxes, update the last image
-        self.last_image.update(filename)
 
 
 
@@ -298,10 +300,10 @@ class user_input(QtGui.QWidget):
         self.id_person.addItems(PERSON_LETTERS)
 
         self.sync_label = QtGui.QLabel('3) Synchronize Image Infromation', self)
-        self.sync_number_label = QtGui.QLabel('First Image Number:', self)
+        self.sync_number_label = QtGui.QLabel('First Image Filename:', self)
         self.sync_time_label = QtGui.QLabel('First Image Timestamp:', self)
 
-        self.sync_number = QtGui.QSpinBox(self)
+        self.sync_number = QtGui.QLineEdit(self)
         self.sync_number.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
         self.sync_time = QtGui.QTimeEdit(self)
         self.sync_time.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
@@ -393,10 +395,13 @@ class user_input(QtGui.QWidget):
         self.browse_text.setText(directory)
 
     def import_(self):
-        directory = self.browse_text.text()
-        files = listdir(directory)
+        directory = str(self.browse_text.text())
+        self.files = find_candidates(directory, str(self.sync_number.text()))
+        #send this file list to the selection group i am a bad programmer
+        self.parent().move_file_list(self.files)
+
         target_directory = path.join('user_photos', str(self.colorBox.currentText()) + str(self.id_car_number.value()), str(self.id_person.currentText()))
-        self.copyThread = CopyThread(directory, files, [target_directory])
+        self.copyThread = CopyThread(directory, self.files, [target_directory])
         self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.parent().update_recent_file)
         self.copyThread.start()
 
@@ -435,6 +440,12 @@ class image_import_interface(QtGui.QWidget):
 
     def init_connect(self):
         self.submit_button.clicked.connect(self.submit)
+
+    def move_file_list(self, file_list):
+        self.image_selection_group.first_image.current_image = file_list.pop(0)
+        self.image_selection_group.last_image.current_image = file_list.pop()
+        self.image_selection_group.stored_files = file_list
+
 
     def submit(self):
         DOMAIN = 'http://localhost:5000/images/submit'
