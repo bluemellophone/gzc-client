@@ -5,12 +5,27 @@ import simplejson as json
 import random
 import sys
 import copy
-import string
 import zipfile
 import requests
 
 #TODO:
 # add status bar to bottom -- WIP
+
+
+CAR_COLORS = [
+    ('white',  '#FFFFFF'),
+    ('red',    '#D9534F'),
+    ('orange', '#EF7A4C'),
+    ('yellow', '#F0AD4E'),
+    ('green',  '#5CB85C'),
+    ('blue',   '#3071A9'),
+    ('purple', '#6F5499'),
+    ('black',  '#333333'),
+]
+CAR_NUMBER = map(str, range(1, 50))
+PERSON_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
+TIME_HOUR = map(str, range(0, 24))
+TIME_MINUTE = map(str, range(0, 60))
 
 
 class image_selection_roll(QtGui.QLabel):
@@ -150,18 +165,8 @@ class user_input(QtGui.QWidget):
         self.id_car_label = QtGui.QLabel('Car Number:', self)
         self.id_person_label = QtGui.QLabel('ID Letter:')
 
-        self.colorList = [
-            ('white',  '#FFFFFF'),
-            ('red',    '#D9534F'),
-            ('orange', '#EF7A4C'),
-            ('yellow', '#F0AD4E'),
-            ('green',  '#5CB85C'),
-            ('blue',   '#3071A9'),
-            ('purple', '#6F5499'),
-            ('black',  '#333333'),
-        ]
         self.colorBox = QwwColorComboBox()
-        for (color_name, color_hex) in self.colorList:
+        for (color_name, color_hex) in CAR_COLORS:
             color = QtGui.QColor(color_hex)
             self.colorBox.addColor(color, color_name)
         #self.id_car_color = QButtonGroup(self)
@@ -175,7 +180,7 @@ class user_input(QtGui.QWidget):
         self.id_car_number.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
 
         self.id_person = QtGui.QComboBox(self)
-        self.id_person.addItems(list(string.ascii_uppercase))
+        self.id_person.addItems(PERSON_LETTERS)
 
         self.sync_label = QtGui.QLabel('3) Synchronize Image Infromation', self)
         self.sync_number_label = QtGui.QLabel('First Image Number:', self)
