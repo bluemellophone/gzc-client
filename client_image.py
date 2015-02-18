@@ -33,7 +33,7 @@ TIME_MINUTE = map(str, range(0, 60))
 
 
 class first_last_image(QtGui.QFrame):
-    DEFAULT_IMAGE = 'assets/reroll.png'
+    DEFAULT_IMAGE = 'assets/placeholder.png'
     def __init__(self, *args):
         apply(QtGui.QWidget.__init__, (self, ) + args)
         QtGui.QWidget.__init__(self)
@@ -75,7 +75,7 @@ class first_last_image(QtGui.QFrame):
 
 class image_selection_roll(QtGui.QLabel):
     #Modify the QtGui.QLabel functionality to allow it to act like a button
-    DEFAULT_IMAGE = 'assets/reroll.png'
+    DEFAULT_IMAGE = 'assets/placeholder.png'
 
     def __init__(self, *args):
         apply(QtGui.QLabel.__init__, (self, ) + args)
