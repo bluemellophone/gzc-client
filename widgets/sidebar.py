@@ -4,10 +4,12 @@ from SidebarSkel import Ui_Sidebar
 from ImageFormSkel import Ui_ImageForm
 from GPSFormSkel import Ui_GPSForm
 from QwwColorComboBox import QwwColorComboBox
+from os.path import dirname, join
 
 LOGO_SIZE = 200
-LOGO_ONE = "../assets/logo.png"
-LOGO_TWO = "../assets/logo.png"
+FILE_DPATH = dirname(__file__)
+LOGO_ONE = join(FILE_DPATH, "../assets/logo.png")
+LOGO_TWO = join(FILE_DPATH, "../assets/logo.png")
 
 class Sidebar(QtGui.QWidget, Ui_Sidebar):
   def __init__(self):
@@ -51,7 +53,6 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
       self.gpsForm.clear()
 
   def submit_clicked(self):
-    
     pass
 
 
