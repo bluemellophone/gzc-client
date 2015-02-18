@@ -1,7 +1,9 @@
+from __future__ import absolute_import, division, print_function
 from PyQt4 import QtCore, QtGui
 from clientfuncs import CopyThread, QwwColorComboBox
 from os import listdir, getcwd, path, chdir
 import simplejson as json
+import time
 import random
 import sys
 import copy
@@ -10,6 +12,8 @@ import requests
 
 #TODO:
 # add status bar to bottom -- WIP
+
+# class first_last_image(QtGui.QWidget):
 
 
 CAR_COLORS = [
@@ -28,6 +32,47 @@ TIME_HOUR = map(str, range(0, 24))
 TIME_MINUTE = map(str, range(0, 60))
 
 
+class first_last_image(QtGui.QFrame):
+    DEFAULT_IMAGE = 'assets/reroll.png'
+    def __init__(self, *args):
+        apply(QtGui.QWidget.__init__, (self, ) + args)
+        QtGui.QWidget.__init__(self)
+        self.init_widgets()
+        self.init_layout()
+
+    def init_widgets(self):
+        self.image = QtGui.QLabel()
+        self.image.setScaledContents(True)
+        Pixmap = QtGui.QPixmap((self.DEFAULT_IMAGE)).scaled(QtCore.QSize(150, 150))
+        self.desiredsize = Pixmap.size()
+        self.image.setAlignment(QtCore.Qt.AlignCenter)
+        self.image.setPixmap(Pixmap)
+        self.current_image = self.DEFAULT_IMAGE
+
+        #border stuffff?
+        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
+        self.setLineWidth(2)
+
+        self.image_time = QtGui.QLabel("Awaiting images...", self)
+        self.image_time.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.info_text = QtGui.QLabel("", self)
+        self.info_text.setAlignment(QtCore.Qt.AlignCenter)
+
+    def init_layout(self):
+        grid = QtGui.QGridLayout()
+        grid.addWidget(self.image, 0, 0, 1, 0)
+        grid.addWidget(self.image_time, 2, 0, 1, 2)
+        grid.addWidget(self.info_text, 3, 0, 1, 2)
+
+        self.setLayout(grid)
+
+    def update(self, filename):
+        self.image.setPixmap(QtGui.QPixmap(filename).scaled(self.desiredsize))
+        self.current_image = filename
+        self.image_time.setText(time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image))))
+
+
 class image_selection_roll(QtGui.QLabel):
     #Modify the QtGui .QLabel functionality to allow it to act like a button
     DEFAULT_IMAGE = 'assets/reroll.png'
@@ -35,11 +80,13 @@ class image_selection_roll(QtGui.QLabel):
     def __init__(self, *args):
         apply(QtGui.QLabel.__init__, (self, ) + args)
         QtGui.QLabel.__init__(self)
-        self.setScaledContents(True)
+        #self.setScaledContents(True) #<--this causes the image displayed to be centered, but stretched. Aspect ratio not maintained
         Pixmap = QtGui.QPixmap((self.DEFAULT_IMAGE)).scaled(QtCore.QSize(150, 150))
         self.desiredsize = Pixmap.size()
+        self.setAlignment(QtCore.Qt.AlignCenter)
         self.setPixmap(Pixmap)
-        self.current_image =  self.DEFAULT_IMAGE
+
+        self.current_image = self.DEFAULT_IMAGE
 
     def mouseReleaseEvent(self, ev):
         self.emit(QtCore.SIGNAL('clicked()'))
@@ -47,6 +94,15 @@ class image_selection_roll(QtGui.QLabel):
     def changeImage(self, image_file):
         self.setPixmap(QtGui.QPixmap(image_file).scaled(self.desiredsize))
         self.current_image = image_file
+
+    def get_timestamp(self):
+        #lol need to ensure path consistancy!
+        chdir(path.dirname(path.realpath(__file__)))
+
+        if self.current_image == self.DEFAULT_IMAGE:
+            return "Awaiting images..."
+        else:
+            return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
 
 
 class image_selection_box(QtGui.QWidget):
@@ -61,18 +117,24 @@ class image_selection_box(QtGui.QWidget):
 
     def init_widgets(self):
         self.image = image_selection_roll(self)
-        self.select_zebra = QtGui.QRadioButton('Zebra', self)
-        self.select_giraffe = QtGui.QRadioButton('Giraffe', self)
+        self.select_zebra = QtGui.QPushButton('Zebra', self)
+        self.select_giraffe = QtGui.QPushButton('Giraffe', self)
+        self.select_zebra.setCheckable(True)
+        self.select_giraffe.setCheckable(True)
 
         self.select_group = QtGui.QButtonGroup(self)
         self.select_group.addButton(self.select_zebra)
         self.select_group.addButton(self.select_giraffe)
 
+        self.image_time = QtGui.QLabel(self.image.get_timestamp(), self)
+        self.image_time.setAlignment(QtCore.Qt.AlignCenter)
+
     def init_layout(self):
         grid = QtGui.QGridLayout()
         grid.addWidget(self.image, 0, 0, 1, 0)
-        grid.addWidget(self.select_zebra, 2, 0)
-        grid.addWidget(self.select_giraffe, 2, 1)
+        grid.addWidget(self.image_time, 2, 0, 1, 2)
+        grid.addWidget(self.select_zebra, 3, 0)
+        grid.addWidget(self.select_giraffe, 3, 1)
 
         self.setLayout(grid)
 
@@ -84,6 +146,8 @@ class image_selection_box(QtGui.QWidget):
         filename = self.parent().get_filename()
 
         self.image.changeImage(filename)
+
+        self.image_time.setText(self.image.get_timestamp())
         #uncheck the buttons if image is rerolled
         checked = self.select_group.checkedButton()
         # print checked
@@ -109,19 +173,57 @@ class selection_group(QtGui.QWidget):
         # self.init_connect()
 
     def init_widgets(self):
-        self.first_image = image_selection_box(self)
+        self.first_image = first_last_image(self)
+        self.first_image.info_text.setText("First Image in Directory")
         self.image_boxes = []
-        for i in range(11):
+        for i in range(10):
             self.image_boxes.append(image_selection_box(self))
 
-    def init_layout(self):
-        grid = QtGui.QGridLayout()
-        grid.addWidget(self.first_image, 0, 0)
-        for i, image_box in enumerate(self.image_boxes):
-            grid.addWidget(image_box, (i + 1) / 3, (i + 1) % 3)
-        # grid.addWidget(last_image, 3, 2)
+        self.last_image = first_last_image(self)
+        self.last_image.info_text.setText("Last Image in Directory")
 
-        self.setLayout(grid)
+    def init_layout(self):
+
+        gridV = QtGui.QVBoxLayout()
+        hor1 = QtGui.QHBoxLayout()
+        hor2 = QtGui.QHBoxLayout()
+        hor3 = QtGui.QHBoxLayout()
+        hor1.addStretch(1)
+        hor1.addWidget(self.first_image)
+        hor1.addStretch(1)
+        hor1.addWidget(self.image_boxes[0])
+        hor1.addStretch(1)
+        hor1.addWidget(self.image_boxes[1])
+        hor1.addStretch(1)
+        hor1.addWidget(self.image_boxes[2])
+        hor1.addStretch(1)
+        hor2.addStretch(1)
+        hor2.addWidget(self.image_boxes[3])
+        hor2.addStretch(1)
+        hor2.addWidget(self.image_boxes[4])
+        hor2.addStretch(1)
+        hor2.addWidget(self.image_boxes[5])
+        hor2.addStretch(1)
+        hor2.addWidget(self.image_boxes[6])
+        hor2.addStretch(1)
+        hor3.addStretch(1)
+        hor3.addWidget(self.image_boxes[7])
+        hor3.addStretch(1)
+        hor3.addWidget(self.image_boxes[8])
+        hor3.addStretch(1)
+        hor3.addWidget(self.image_boxes[9])
+        hor3.addStretch(1)
+        hor3.addWidget(self.last_image)
+        hor3.addStretch(1)
+        gridV.addStretch(1)
+        gridV.addLayout(hor1)
+        gridV.addStretch(1)
+        gridV.addLayout(hor2)
+        gridV.addStretch(1)
+        gridV.addLayout(hor3)
+        gridV.addStretch(1)
+
+        self.setLayout(gridV)
 
     def add_filename(self, filename):
         self.active_files.append(filename)
@@ -129,12 +231,15 @@ class selection_group(QtGui.QWidget):
         #for the first couple of images to be copied, we will update the displayed photos
         if len(self.stored_files) == 1:
             #FIRST IMAGE, add to the first image box
-            self.first_image.reroll()
-        elif len(self.active_files) < 2:
+            self.first_image.update(filename)
+
+        else:
             for IB in self.image_boxes:
                 if IB.image.current_image == IB.image.DEFAULT_IMAGE:
                     IB.reroll()
                     break
+        #if we've filled the image boxes, update the last image
+        self.last_image.update(filename)
 
     def get_filename(self):
         if len(self.active_files) ==  0:
@@ -298,9 +403,12 @@ class image_import_interface(QtGui.QWidget):
         self.image_selection_group = selection_group(self)
         self.user_input_group = user_input(self)
         # Hack to get the image_selection_group to fit on the screen
-        self.scroll_area = QtGui.QScrollArea()
-        self.scroll_area.setWidget(self.image_selection_group)
-        self.scroll_area.setHorizontalScrollBarPolicy(1)
+
+        # self.scroll_area = QtGui.QScrollArea()
+        # self.scroll_area.setWidget(self.image_selection_group)
+        # self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        # self.scroll_area.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        # self.scroll_area.setWidgetResizable(True)
         self.progress_bar = QtGui.QLineEdit(self)
         self.submit_button = QtGui.QPushButton('Submit and Upload', self)
 
@@ -308,7 +416,7 @@ class image_import_interface(QtGui.QWidget):
         self.uber_layout = QtGui.QVBoxLayout()
         self.main_layout = QtGui.QHBoxLayout()
         self.main_layout.addWidget(self.user_input_group)
-        self.main_layout.addWidget(self.scroll_area)
+        self.main_layout.addWidget(self.image_selection_group)
         self.uber_layout.addLayout(self.main_layout)
         self.uber_layout.addWidget(self.submit_button)
         self.uber_layout.addWidget(self.progress_bar)
@@ -325,7 +433,7 @@ class image_import_interface(QtGui.QWidget):
         pull_directory = path.join('user_photos', str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()), str(self.user_input_group.id_person.currentText()))
         chdir(path.join(getcwd(), pull_directory))
 
-        first = self.image_selection_group.first_image.get_selection()[0]
+        first = self.image_selection_group.first_image.current_image
         zebra = []
         giraffe = []
         for IB in self.image_selection_group.image_boxes:
@@ -335,7 +443,7 @@ class image_import_interface(QtGui.QWidget):
             else:
                 giraffe.append(selection[0])
 
-        last = listdir(getcwd())[-1]
+        last = self.image_selection_group.last_image.current_image
 
         zip_archive = zipfile.ZipFile(str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()) + str(self.user_input_group.id_person.currentText()) + '.zip', 'w')
         zip_archive.write(path.join(getcwd(), first), 'first.jpg')
