@@ -24,6 +24,8 @@ class GZCMainWindow(GZC_BASE_CLASS):
         gzc._init_menus()
         gzc.domain = "http://localhost:5000"
 
+        gzc.setStyleSheet("background-color: white;")
+
     def _init_widgets(gzc):
         gzc.tabs = QtGui.QTabWidget()
         gzc.status_bar = QtGui.QStatusBar()
@@ -78,7 +80,18 @@ class GZCMainWindow(GZC_BASE_CLASS):
             print("Not correct")
 
     def manual_clicked(gzc, action):
-        print("test")
+        if str(action.text()) == "Select Files":
+            dialog = QtGui.QFileDialog()
+            dialog.setFileMode(QtGui.QFileDialog.ExistingFiles)
+            flist = dialog.getOpenFileNames(gzc, 'Open files', '/home')
+            gzc.image_client.user_input_group.import_file_list(flist)
+        if str(action.text()) == "Select GPS":
+            dialog = QtGui.QFileDialog()
+            dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
+            fname = dialog.getOpenFileName(gzc, 'Open file', '/home')
+            #Enter code to execute with gps file name here
+            print("Code needed, gps client must be attached to this method", fname)
+            gzc.gps_client.user_input_group.import_file_list(flist)
 
     def set_domain(gzc):
         gzc.domain_dialog.setTextValue(gzc.domain)

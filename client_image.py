@@ -446,6 +446,20 @@ class user_input(QtGui.QWidget):
         self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.parent().update_recent_file)
         self.copyThread.start()
 
+    def import_file_list(self, list_):
+        # Used for manual import
+        # directory = path.dirname(str(list_[0]))
+        self.files = [None] * len(list_)
+        for i, f in enumerate(list_):
+            self.files[i] = str(f)
+        self.file_bases = [path.basename(f) for f in self.files]
+        self.parent().move_file_list(self.file_bases)
+
+        target_directory = path.join('user_photos', str(self.colorBox.currentText()) + str(self.id_car_number.value()), str(self.id_person.currentText()))
+        self.copyThread = CopyThread(self.files, [target_directory])
+        self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.parent().update_recent_file)
+        self.copyThread.start()
+
 
 class image_import_interface(QtGui.QWidget):
     def __init__(self, *args):
