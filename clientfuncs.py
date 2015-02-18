@@ -1,8 +1,10 @@
+from __future__ import absolute_import, division, print_function
 import shutil
 import PyQt4
 from PyQt4 import QtCore, QtGui
 from os import makedirs
-from os.path import isfile, join, exists
+from os.path import isfile, join, exists, splitext, basename
+from detecttools.directory import Directory
 
 
 try:
@@ -323,3 +325,56 @@ class CoordinateMap:
             print("Error: point outside image")
             #return (-1, -1)
         return (x_loc, y_loc)
+
+
+def find_candidates(search_path, search_str, verbose=True):
+    direct = Directory(search_path, recursive=True, include_file_extensions='images')
+    transform_list = [
+        (lambda x: x),                       # Search for original
+        (lambda x: x.lower()),               # Search for lowercase version
+        (lambda x: x.upper()),               # Search for uppercase version
+        (lambda x: splitext(x)[0]),          # Search without extension
+        (lambda x: splitext(x.lower())[0]),  # Search without extension (lowercase)
+        (lambda x: splitext(x.upper())[0]),  # Search without extension (uppercase)
+        (lambda x: x.replace('.', '')),      # Remove periods
+        (lambda x: x.replace('_', '')),      # Remove underscore
+        (lambda x: x.replace('-', '')),      # Remove hyphen
+        (lambda x: x.replace(' ', '')),      # Remove hyphen
+    ]
+    found_list = []
+    found = False
+    for candidate_path in direct.files():
+        candidate_str = basename(candidate_path)
+        if verbose:
+            print("Testing %r" % (candidate_path, ))
+        if found:
+            if verbose:
+                print("    Appending %r" % (candidate_path, ))
+            found_list.append(candidate_path)
+        else:
+            for candidate_transform in transform_list:
+                for search_transform in transform_list:
+                    candidate_ = candidate_transform(candidate_str)
+                    search_    = search_transform(search_str)
+                    if candidate_ == search_:
+                        if verbose:
+                            print("    Trying %r == %r - FOUND!" % (candidate_, search_, ))
+                        found = True
+                        found_list.append(candidate_path)
+                        break
+                    else:
+                        if verbose:
+                            print("    Trying %r == %r" % (candidate_, search_, ))
+            else:
+                continue
+    return found_list
+
+
+if __name__ == "__main__":
+    found = find_candidates('/Users/bluemellophone/Desktop/SD1', 'IMg_1283.jpg')
+    print(found)
+    print(len(found))
+
+    found = find_candidates('/Users/bluemellophone/Desktop/SD1', 'img_1283.jpg')
+    print(found)
+    print(len(found))

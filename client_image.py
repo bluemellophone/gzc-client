@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 from PyQt4 import QtCore, QtGui
 from clientfuncs import CopyThread, QwwColorComboBox
 from os import listdir, getcwd, path, chdir
@@ -52,7 +53,7 @@ class image_selection_roll(QtGui.QLabel):
     def changeImage(self, image_file):
         self.setPixmap(QtGui.QPixmap(image_file).scaled(self.desiredsize))
         self.current_image = image_file
-        
+
     def get_timestamp(self):
         #lol need to ensure path consistancy!
         chdir(path.dirname(path.realpath(__file__)))
@@ -61,7 +62,6 @@ class image_selection_roll(QtGui.QLabel):
             return "Awaiting images..."
         else:
             return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
-
 
 
 class image_selection_box(QtGui.QWidget):
