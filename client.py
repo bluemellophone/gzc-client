@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, division, print_function
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 import sys
@@ -45,6 +46,7 @@ class GZCMainWindow(GZC_BASE_CLASS):
     def _init_layout(gzc):
         gzc.setCentralWidget(gzc.tabs)
         gzc.setWindowTitle("The Great Zebra Count")
+        gzc.setMinimumSize(1200,750)
         #gzc.centralWidget = QtGui.QVBoxLayout(gzc)
         #gzc.centralWidget.addWidget(gzc.tabs)
         #gzc.setSizePolicy(gzc.tabs.sizePolicy())
@@ -69,7 +71,7 @@ class GZCMainWindow(GZC_BASE_CLASS):
         if str(action.text()) == "Set Domain":
             gzc.set_domain()
         else:
-            print "Not correct"
+            print("Not correct")
 
     def set_domain(gzc):
         gzc.domain_dialog.setTextValue(gzc.domain)
