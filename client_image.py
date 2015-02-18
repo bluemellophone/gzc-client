@@ -29,7 +29,7 @@ TIME_MINUTE = map(str, range(0, 60))
 
 
 class image_selection_roll(QtGui.QLabel):
-    #Modify the QtGui.QLabel functionality to allow it to act like a button
+    #Modify the QtGui .QLabel functionality to allow it to act like a button
     DEFAULT_IMAGE = 'assets/reroll.png'
 
     def __init__(self, *args):
