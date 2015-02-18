@@ -100,13 +100,38 @@ class selection_group(QtGui.QWidget):
             self.image_boxes.append(image_selection_box(self))
 
     def init_layout(self):
-        grid = QtGui.QGridLayout()
-        grid.addWidget(self.first_image, 0, 0)
-        for i, image_box in enumerate(self.image_boxes):
-            grid.addWidget(image_box, (i + 1) / 3, (i + 1) % 3)
-        # grid.addWidget(last_image, 3, 2)
 
-        self.setLayout(grid)
+        gridV = QtGui.QVBoxLayout()
+        hor1 = QtGui.QHBoxLayout()
+        hor2 = QtGui.QHBoxLayout()
+        hor3 = QtGui.QHBoxLayout()
+        print("rangE: ", len(self.image_boxes))
+        hor1.addWidget(self.image_boxes[0])
+        hor1.addWidget(self.image_boxes[1])
+        hor1.addWidget(self.image_boxes[2])
+        hor1.addWidget(self.image_boxes[3])
+        hor2.addWidget(self.image_boxes[4])
+        hor2.addWidget(self.image_boxes[5])
+        hor2.addWidget(self.image_boxes[6])
+        hor2.addWidget(self.image_boxes[7])
+        hor3.addWidget(self.image_boxes[8])
+        hor3.addWidget(self.image_boxes[9])
+        hor3.addWidget(self.image_boxes[10])
+        # hor3.addWidget(self.image_boxes[11])
+        gridV.addLayout(hor1)
+        gridV.addLayout(hor2)
+        gridV.addLayout(hor3)
+
+        self.setLayout(gridV)
+
+
+        # grid = QtGui.QGridLayout()
+        # grid.addWidget(self.first_image, 0, 0)
+        # for i, image_box in enumerate(self.image_boxes):
+        #     grid.addWidget(image_box, (i + 1) / 3, (i + 1) % 3)
+        # # grid.addWidget(last_image, 3, 2)
+
+        # self.setLayout(grid)
 
     def add_filename(self, filename):
         self.active_files.append(filename)
@@ -287,7 +312,8 @@ class image_import_interface(QtGui.QWidget):
         # Hack to get the image_selection_group to fit on the screen
         self.scroll_area = QtGui.QScrollArea()
         self.scroll_area.setWidget(self.image_selection_group)
-        self.scroll_area.setHorizontalScrollBarPolicy(1)
+        self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.progress_bar = QtGui.QLineEdit(self)
         self.submit_button = QtGui.QPushButton("Submit and Upload", self)
 
