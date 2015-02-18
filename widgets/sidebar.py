@@ -34,7 +34,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     self.gpsForm.hide()
 
   def initConnect(self):
-    self.submit.clicked.connect(self.switchWidgets)
+    self.submit.clicked.connect(self.submit_clicked)
     self.clear.clicked.connect(self.clear_clicked)
 
   def switchWidgets(self):
