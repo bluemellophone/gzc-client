@@ -327,20 +327,41 @@ class CoordinateMap:
         return (x_loc, y_loc)
 
 
-def find_candidates(search_path, search_str, verbose=True):
-    direct = Directory(search_path, recursive=True, include_file_extensions='images')
-    transform_list = [
+def find_candidates(search_path, search_str, verbose=False):
+    transform_one_list = [
         (lambda x: x),                       # Search for original
         (lambda x: x.lower()),               # Search for lowercase version
         (lambda x: x.upper()),               # Search for uppercase version
-        (lambda x: splitext(x)[0]),          # Search without extension
-        (lambda x: splitext(x.lower())[0]),  # Search without extension (lowercase)
-        (lambda x: splitext(x.upper())[0]),  # Search without extension (uppercase)
-        (lambda x: x.replace('.', '')),      # Remove periods
-        (lambda x: x.replace('_', '')),      # Remove underscore
-        (lambda x: x.replace('-', '')),      # Remove hyphen
-        (lambda x: x.replace(' ', '')),      # Remove hyphen
     ]
+    transform_two_list = [
+        (lambda y: y),                       # Search for original
+        (lambda y: splitext(y)[0]),          # Search without extension
+    ]
+    transform_three_list = [
+        (lambda z: z),                       # Search for original
+        (lambda z: z.replace('.', '')),      # Remove periods
+        (lambda z: z.replace('_', '')),      # Remove underscore
+        (lambda z: z.replace('-', '')),      # Remove hyphen
+        (lambda z: z.replace(' ', '')),      # Remove hyphen
+        (lambda z: z.replace('_', '-')),     # Flipped underscore with hyphen
+        (lambda z: z.replace('-', '_')),     # Flipped hyphen with underscore
+    ]
+    transform_list = []
+    for transform_three in transform_three_list:
+        for transform_two in transform_two_list:
+            for transform_one in transform_one_list:
+                transform_list.append([transform_three, transform_two, transform_one])
+
+    def transform(string):
+        temp = set()
+        for transform in transform_list:
+            a, b, c = transform
+            temp.add( a( b( c( string ) ) ) )
+        return sorted(temp)
+
+    direct = Directory(search_path, recursive=True, include_file_extensions='images')
+    if verbose:
+        print("TESTING FOR %d TRANSFORMS ON %d FILES" % (len(transform_list) ** 2, len(direct.files())))
     found_list = []
     found = False
     for candidate_path in direct.files():
@@ -352,29 +373,18 @@ def find_candidates(search_path, search_str, verbose=True):
                 print("    Appending %r" % (candidate_path, ))
             found_list.append(candidate_path)
         else:
-            for candidate_transform in transform_list:
-                for search_transform in transform_list:
-                    candidate_ = candidate_transform(candidate_str)
-                    search_    = search_transform(search_str)
+            for candidate_ in transform(candidate_str):
+                for search_ in transform(search_str):
                     if candidate_ == search_:
                         if verbose:
                             print("    Trying %r == %r - FOUND!" % (candidate_, search_, ))
                         found = True
                         found_list.append(candidate_path)
-                        break
                     else:
                         if verbose:
                             print("    Trying %r == %r" % (candidate_, search_, ))
-            else:
-                continue
+                    if found:
+                        break
+                if found:
+                    break
     return found_list
-
-
-if __name__ == "__main__":
-    found = find_candidates('/Users/bluemellophone/Desktop/SD1', 'IMg_1283.jpg')
-    print(found)
-    print(len(found))
-
-    found = find_candidates('/Users/bluemellophone/Desktop/SD1', 'img_1283.jpg')
-    print(found)
-    print(len(found))
