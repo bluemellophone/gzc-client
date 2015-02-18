@@ -413,11 +413,12 @@ class image_import_interface(QtGui.QWidget):
         self.image_selection_group = selection_group(self)
         self.user_input_group = user_input(self)
         # Hack to get the image_selection_group to fit on the screen
-        self.scroll_area = QtGui.QScrollArea()
-        self.scroll_area.setWidget(self.image_selection_group)
-        self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.scroll_area.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.scroll_area.setWidgetResizable(True)
+        
+        # self.scroll_area = QtGui.QScrollArea()
+        # self.scroll_area.setWidget(self.image_selection_group)
+        # self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        # self.scroll_area.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        # self.scroll_area.setWidgetResizable(True)
         self.progress_bar = QtGui.QLineEdit(self)
         self.submit_button = QtGui.QPushButton('Submit and Upload', self)
 
@@ -425,7 +426,7 @@ class image_import_interface(QtGui.QWidget):
         self.uber_layout = QtGui.QVBoxLayout()
         self.main_layout = QtGui.QHBoxLayout()
         self.main_layout.addWidget(self.user_input_group)
-        self.main_layout.addWidget(self.scroll_area)
+        self.main_layout.addWidget(self.image_selection_group)
         self.uber_layout.addLayout(self.main_layout)
         self.uber_layout.addWidget(self.submit_button)
         self.uber_layout.addWidget(self.progress_bar)
