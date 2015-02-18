@@ -51,6 +51,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
       self.gpsForm.clear()
 
   def submit_clicked(self):
+    
     pass
 
 
