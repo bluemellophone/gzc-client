@@ -31,6 +31,46 @@ TIME_HOUR = map(str, range(0, 24))
 TIME_MINUTE = map(str, range(0, 60))
 
 
+class first_last_image(QtGui.QFrame):
+    DEFAULT_IMAGE = 'assets/reroll.png'
+    def __init__(self, *args):
+        apply(QtGui.QWidget.__init__, (self, ) + args)
+        QtGui.QWidget.__init__(self)
+        self.init_widgets()
+        self.init_layout()
+
+    def init_widgets(self):
+        self.image = QtGui.QLabel()
+        self.image.setScaledContents(True)
+        Pixmap = QtGui.QPixmap((self.DEFAULT_IMAGE)).scaled(QtCore.QSize(150, 150))
+        self.desiredsize = Pixmap.size()
+        self.image.setPixmap(Pixmap)
+        self.current_image = self.DEFAULT_IMAGE
+
+        #border stuffff?
+        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised);
+        self.setLineWidth(2);
+
+        self.image_time = QtGui.QLabel("Awaiting images...", self)
+        self.image_time.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.info_text = QtGui.QLabel("", self)
+        self.info_text.setAlignment(QtCore.Qt.AlignCenter)
+
+    def init_layout(self):
+        grid = QtGui.QGridLayout()
+        grid.addWidget(self.image, 0, 0, 1, 0)
+        grid.addWidget(self.image_time, 2, 0, 1, 2)
+        grid.addWidget(self.info_text, 3, 0, 1, 2)
+
+        self.setLayout(grid)
+
+    def update(self, filename):
+        self.image.setPixmap(QtGui.QPixmap(filename).scaled(self.desiredsize))
+        self.current_image = filename
+        self.image_time.setText(time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image))))
+
+
 class image_selection_roll(QtGui.QLabel):
     #Modify the QtGui.QLabel functionality to allow it to act like a button
     DEFAULT_IMAGE = 'assets/reroll.png'
@@ -130,17 +170,21 @@ class selection_group(QtGui.QWidget):
         # self.init_connect()
 
     def init_widgets(self):
-        self.first_image = image_selection_box(self)
+        self.first_image = first_last_image(self)
+        self.first_image.info_text.setText("First Image in Directory")
         self.image_boxes = []
-        for i in range(11):
+        for i in range(10):
             self.image_boxes.append(image_selection_box(self))
+
+        self.last_image = first_last_image(self)
+        self.last_image.info_text.setText("Last Image in Directory")
 
     def init_layout(self):
         grid = QtGui.QGridLayout()
         grid.addWidget(self.first_image, 0, 0)
         for i, image_box in enumerate(self.image_boxes):
             grid.addWidget(image_box, (i + 1) / 3, (i + 1) % 3)
-        # grid.addWidget(last_image, 3, 2)
+        grid.addWidget(self.last_image, 3, 2)
 
         self.setLayout(grid)
 
@@ -150,12 +194,17 @@ class selection_group(QtGui.QWidget):
         #for the first couple of images to be copied, we will update the displayed photos
         if len(self.stored_files) == 1:
             #FIRST IMAGE, add to the first image box
-            self.first_image.reroll()
-        elif len(self.active_files) < 2:
+            self.first_image.update(filename)
+            
+        else:
             for IB in self.image_boxes:
                 if IB.image.current_image == IB.image.DEFAULT_IMAGE:
                     IB.reroll()
                     break
+        #if we've filled the image boxes, update the last image
+        self.last_image.update(filename)
+
+
 
     def get_filename(self):
         if len(self.active_files) ==  0:
@@ -346,7 +395,7 @@ class image_import_interface(QtGui.QWidget):
         pull_directory = path.join('user_photos', str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()), str(self.user_input_group.id_person.currentText()))
         chdir(path.join(getcwd(), pull_directory))
 
-        first = self.image_selection_group.first_image.get_selection()[0]
+        first = self.image_selection_group.first_image.current_image
         zebra = []
         giraffe = []
         for IB in self.image_selection_group.image_boxes:
@@ -356,7 +405,7 @@ class image_import_interface(QtGui.QWidget):
             else:
                 giraffe.append(selection[0])
 
-        last = listdir(getcwd())[-1]
+        last = self.image_selection_group.last_image.current_image
 
         zip_archive = zipfile.ZipFile(str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()) + str(self.user_input_group.id_person.currentText()) + '.zip', 'w')
         zip_archive.write(path.join(getcwd(), first), 'first.jpg')
