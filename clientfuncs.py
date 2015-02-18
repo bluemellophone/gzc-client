@@ -249,9 +249,8 @@ class Ui_Form(object):
 
 
 class CopyThread(QtCore.QThread):
-    def __init__(self, directory, filenames, destinations):
+    def __init__(self, filenames, destinations):
         QtCore.QThread.__init__(self)
-        self.directory = directory
         self.filenames = filenames
         self.destinations = destinations
 
@@ -260,7 +259,7 @@ class CopyThread(QtCore.QThread):
 
     def run(self):
         for f in self.filenames:
-            filepath = join(str(self.directory), str(f))
+            filepath = f
             if not isfile(filepath):
                 continue
             for outdir in self.destinations:
@@ -268,7 +267,7 @@ class CopyThread(QtCore.QThread):
                     makedirs(outdir)
                 # time.sleep(2)
                 shutil.copy2(filepath, outdir)
-                self.emit(QtCore.SIGNAL('file_done'), (outdir + "/" + f))
+                self.emit(QtCore.SIGNAL('file_done'), (join(outdir, f)))
         return None
 
 
