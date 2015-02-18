@@ -45,6 +45,7 @@ class first_last_image(QtGui.QFrame):
         self.image.setScaledContents(True)
         Pixmap = QtGui.QPixmap((self.DEFAULT_IMAGE)).scaled(QtCore.QSize(150, 150))
         self.desiredsize = Pixmap.size()
+        self.image.setAlignment(QtCore.Qt.AlignCenter)
         self.image.setPixmap(Pixmap)
         self.current_image = self.DEFAULT_IMAGE
 
