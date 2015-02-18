@@ -2,6 +2,7 @@ from PyQt4 import QtCore, QtGui
 from clientfuncs import CopyThread, QwwColorComboBox
 from os import listdir, getcwd, path, chdir
 import simplejson as json
+import time
 import random
 import sys
 import copy
@@ -10,6 +11,8 @@ import requests
 
 #TODO:
 # add status bar to bottom -- WIP
+
+# class first_last_image(QtGui.QWidget):
 
 
 CAR_COLORS = [
@@ -39,7 +42,7 @@ class image_selection_roll(QtGui.QLabel):
         Pixmap = QtGui.QPixmap((self.DEFAULT_IMAGE)).scaled(QtCore.QSize(150, 150))
         self.desiredsize = Pixmap.size()
         self.setPixmap(Pixmap)
-        self.current_image =  self.DEFAULT_IMAGE
+        self.current_image = self.DEFAULT_IMAGE
 
     def mouseReleaseEvent(self, ev):
         self.emit(QtCore.SIGNAL('clicked()'))
@@ -47,6 +50,16 @@ class image_selection_roll(QtGui.QLabel):
     def changeImage(self, image_file):
         self.setPixmap(QtGui.QPixmap(image_file).scaled(self.desiredsize))
         self.current_image = image_file
+        
+    def get_timestamp(self):
+        #lol need to ensure path consistancy!
+        chdir(path.dirname(path.realpath(__file__)))
+
+        if self.current_image == self.DEFAULT_IMAGE:
+            return "Awaiting images..."
+        else:
+            return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
+
 
 
 class image_selection_box(QtGui.QWidget):
@@ -61,18 +74,24 @@ class image_selection_box(QtGui.QWidget):
 
     def init_widgets(self):
         self.image = image_selection_roll(self)
-        self.select_zebra = QtGui.QRadioButton('Zebra', self)
-        self.select_giraffe = QtGui.QRadioButton('Giraffe', self)
+        self.select_zebra = QtGui.QPushButton('Zebra', self)
+        self.select_giraffe = QtGui.QPushButton('Giraffe', self)
+        self.select_zebra.setCheckable(True)
+        self.select_giraffe.setCheckable(True)
 
         self.select_group = QtGui.QButtonGroup(self)
         self.select_group.addButton(self.select_zebra)
         self.select_group.addButton(self.select_giraffe)
 
+        self.image_time = QtGui.QLabel(self.image.get_timestamp(), self)
+        self.image_time.setAlignment(QtCore.Qt.AlignCenter)
+
     def init_layout(self):
         grid = QtGui.QGridLayout()
         grid.addWidget(self.image, 0, 0, 1, 0)
-        grid.addWidget(self.select_zebra, 2, 0)
-        grid.addWidget(self.select_giraffe, 2, 1)
+        grid.addWidget(self.image_time, 2, 0, 1, 2)
+        grid.addWidget(self.select_zebra, 3, 0)
+        grid.addWidget(self.select_giraffe, 3, 1)
 
         self.setLayout(grid)
 
@@ -84,6 +103,8 @@ class image_selection_box(QtGui.QWidget):
         filename = self.parent().get_filename()
 
         self.image.changeImage(filename)
+
+        self.image_time.setText(self.image.get_timestamp())
         #uncheck the buttons if image is rerolled
         checked = self.select_group.checkedButton()
         # print checked
