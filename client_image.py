@@ -58,7 +58,6 @@ class image_selection_roll(QtGui.QLabel):
         if self.current_image == self.DEFAULT_IMAGE:
             return "Awaiting images..."
         else:
-            print time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
             return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
 
 
@@ -85,11 +84,12 @@ class image_selection_box(QtGui.QWidget):
         self.select_group.addButton(self.select_giraffe)
 
         self.image_time = QtGui.QLabel(self.image.get_timestamp(), self)
+        self.image_time.setAlignment(QtCore.Qt.AlignCenter)
 
     def init_layout(self):
         grid = QtGui.QGridLayout()
         grid.addWidget(self.image, 0, 0, 1, 0)
-        grid.addWidget(self.image_time, 2, 0)
+        grid.addWidget(self.image_time, 2, 0, 1, 2)
         grid.addWidget(self.select_zebra, 3, 0)
         grid.addWidget(self.select_giraffe, 3, 1)
 
