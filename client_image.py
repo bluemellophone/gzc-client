@@ -76,7 +76,6 @@ class first_last_image(QtGui.QFrame):
 class image_selection_roll(QtGui.QLabel):
     #Modify the QtGui.QLabel functionality to allow it to act like a button
     DEFAULT_IMAGE = 'assets/placeholder.png'
-
     def __init__(self, *args):
         apply(QtGui.QLabel.__init__, (self, ) + args)
         QtGui.QLabel.__init__(self)

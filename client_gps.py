@@ -96,7 +96,7 @@ class GPSGuiWidget(GPS_WIDGET_BASE):
         # 0) Logo Widgets
         ibeisLogoImg = QtGui.QPixmap("assets/logo.png")
         gpswgt.ibeisLogoLabel = QtGui.QLabel()
-        gpswgt.ibeisLogoLabel.setPixmap(ibeisLogoImg.scaled(100, 100))
+        gpswgt.ibeisLogoLabel.setPixmap(ibeisLogoImg.scaled(400, 400))
 
         # 1) Car Input Widgets
         gpswgt.carLabel = QtGui.QLabel(QtCore.QString("1) Input Identification Information"))
