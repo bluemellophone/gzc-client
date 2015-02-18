@@ -49,8 +49,8 @@ class first_last_image(QtGui.QFrame):
         self.current_image = self.DEFAULT_IMAGE
 
         #border stuffff?
-        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised);
-        self.setLineWidth(2);
+        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
+        self.setLineWidth(2)
 
         self.image_time = QtGui.QLabel("Awaiting images...", self)
         self.image_time.setAlignment(QtCore.Qt.AlignCenter)
@@ -224,7 +224,6 @@ class selection_group(QtGui.QWidget):
 
         self.setLayout(gridV)
 
-
         # grid = QtGui.QGridLayout()
         # grid.addWidget(self.first_image, 0, 0)
         # for i, image_box in enumerate(self.image_boxes):
@@ -240,7 +239,7 @@ class selection_group(QtGui.QWidget):
         if len(self.stored_files) == 1:
             #FIRST IMAGE, add to the first image box
             self.first_image.update(filename)
-            
+
         else:
             for IB in self.image_boxes:
                 if IB.image.current_image == IB.image.DEFAULT_IMAGE:
@@ -248,8 +247,6 @@ class selection_group(QtGui.QWidget):
                     break
         #if we've filled the image boxes, update the last image
         self.last_image.update(filename)
-
-
 
     def get_filename(self):
         if len(self.active_files) ==  0:
@@ -413,7 +410,7 @@ class image_import_interface(QtGui.QWidget):
         self.image_selection_group = selection_group(self)
         self.user_input_group = user_input(self)
         # Hack to get the image_selection_group to fit on the screen
-        
+
         # self.scroll_area = QtGui.QScrollArea()
         # self.scroll_area.setWidget(self.image_selection_group)
         # self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
