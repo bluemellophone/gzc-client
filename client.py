@@ -83,6 +83,13 @@ class GZCMainWindow(GZC_BASE_CLASS):
             dialog.setFileMode(QtGui.QFileDialog.ExistingFiles)
             flist = dialog.getOpenFileNames(gzc, 'Open files', '/home')
             gzc.image_client.user_input_group.import_file_list(flist)
+        if str(action.text()) == "Select GPS":
+            dialog = QtGui.QFileDialog()
+            dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
+            fname = dialog.getOpenFileName(gzc, 'Open file', '/home')
+            #Enter code to execute with gps file name here
+            print("Code needed, gps client must be attached to this method", fname)
+            gzc.gps_client.user_input_group.import_file_list(flist)
 
     def set_domain(gzc):
         gzc.domain_dialog.setTextValue(gzc.domain)
