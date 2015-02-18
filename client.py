@@ -33,7 +33,9 @@ class GZCMainWindow(GZC_BASE_CLASS):
         gzc.options_menu = QtGui.QMenu()
         gzc.options_menu.setTitle("Options")
         gzc.options_menu.addAction("Set Domain")
-
+        gzc.manual_menu = QtGui.QMenu()
+        gzc.manual_menu.setTitle("Manual")
+        gzc.manual_menu.addAction("Select Files")
         gzc.domain_dialog = QtGui.QInputDialog()
         gzc.domain_dialog.setLabelText(QtCore.QString("Enter server domain:"))
 
@@ -46,7 +48,7 @@ class GZCMainWindow(GZC_BASE_CLASS):
     def _init_layout(gzc):
         gzc.setCentralWidget(gzc.tabs)
         gzc.setWindowTitle("The Great Zebra Count")
-        gzc.setMinimumSize(1300,850)
+        gzc.setMinimumSize(1300, 850)
         #gzc.centralWidget = QtGui.QVBoxLayout(gzc)
         #gzc.centralWidget.addWidget(gzc.tabs)
         #gzc.setSizePolicy(gzc.tabs.sizePolicy())
@@ -61,10 +63,12 @@ class GZCMainWindow(GZC_BASE_CLASS):
 
     def _init_signals(gzc):
         gzc.options_menu.triggered.connect(gzc.options_clicked)
+        gzc.manual_menu.triggered.connect(gzc.manual_clicked)
         gzc.domain_dialog.accepted.connect(gzc.change_domain)
 
     def _init_menus(gzc):
         gzc.menu_bar.addMenu(gzc.options_menu)
+        gzc.menu_bar.addMenu(gzc.manual_menu)
         gzc.setMenuBar(gzc.menu_bar)
 
     def options_clicked(gzc, action):
@@ -72,6 +76,9 @@ class GZCMainWindow(GZC_BASE_CLASS):
             gzc.set_domain()
         else:
             print("Not correct")
+
+    def manual_clicked(gzc, action):
+        print("test")
 
     def set_domain(gzc):
         gzc.domain_dialog.setTextValue(gzc.domain)
