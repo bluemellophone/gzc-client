@@ -50,8 +50,8 @@ class first_last_image(QtGui.QFrame):
         self.current_image = self.DEFAULT_IMAGE
 
         #border stuffff?
-        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised);
-        self.setLineWidth(2);
+        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
+        self.setLineWidth(2)
 
         self.image_time = QtGui.QLabel("Awaiting images...", self)
         self.image_time.setAlignment(QtCore.Qt.AlignCenter)
