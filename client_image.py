@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 from PyQt4 import QtCore, QtGui
 from clientfuncs import CopyThread, QwwColorComboBox, find_candidates
-from os import listdir, getcwd, path, chdir
+from os import getcwd, path, chdir
 import simplejson as json
 import time
 import random
@@ -234,16 +234,17 @@ class selection_group(QtGui.QWidget):
         # self.setLayout(grid)
 
     def add_filename(self, filename):
-        self.active_files.append(filename)
+        # self.active_files.append(filename)
         # self.stored_files.append(filename)
         #for the first couple of images to be copied, we will update the displayed photos
-        if filename == self.first_image.current_image:
+        if path.basename(filename) == self.first_image.current_image:
             #FIRST IMAGE, add to the first image box
             self.first_image.update(filename)
-            
-        elif filename == self.last_image.current_image:
+        elif path.basename(filename) == self.last_image.current_image:
             self.last_image.update(filename)
         else:
+            self.active_files.append(filename)
+            self.stored_files.append(filename)
             for IB in self.image_boxes:
                 if IB.image.current_image == IB.image.DEFAULT_IMAGE:
                     IB.reroll()
@@ -395,10 +396,11 @@ class user_input(QtGui.QWidget):
         directory = str(self.browse_text.text())
         self.files = find_candidates(directory, str(self.sync_number.text()))
         #send this file list to the selection group i am a bad programmer
-        self.parent().move_file_list(self.files)
+        self.file_bases = [path.basename(f) for f in self.files]
+        self.parent().move_file_list(self.file_bases)
 
         target_directory = path.join('user_photos', str(self.colorBox.currentText()) + str(self.id_car_number.value()), str(self.id_person.currentText()))
-        self.copyThread = CopyThread(directory, self.files, [target_directory])
+        self.copyThread = CopyThread(self.files, [target_directory])
         self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.parent().update_recent_file)
         self.copyThread.start()
 
@@ -441,8 +443,7 @@ class image_import_interface(QtGui.QWidget):
     def move_file_list(self, file_list):
         self.image_selection_group.first_image.current_image = file_list.pop(0)
         self.image_selection_group.last_image.current_image = file_list.pop()
-        self.image_selection_group.stored_files = file_list
-
+        # self.image_selection_group.stored_files = file_list
 
     def submit(self):
         DOMAIN = 'http://localhost:5000/images/submit'
@@ -466,6 +467,14 @@ class image_import_interface(QtGui.QWidget):
         zip_archive = zipfile.ZipFile(str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()) + str(self.user_input_group.id_person.currentText()) + '.zip', 'w')
         zip_archive.write(path.join(getcwd(), first), 'first.jpg')
         zip_archive.write(path.join(getcwd(), last), 'last.jpg')
+        if len(zebra) == 0:
+            empty = open(".empty", 'w')
+            empty.close()
+            zip_archive.write(path.join(getcwd(), ".empty"), path.join('zebra', '.empty'))
+        if len(giraffe) == 0:
+            empty = open(".empty", 'w')
+            empty.close()
+            zip_archive.write(path.join(getcwd(), ".empty"), path.join('giraffe', '.empty'))
         for filename in zebra:
             zip_archive.write(path.join(getcwd(), filename), path.join('zebra', filename))
         for filename in giraffe:
