@@ -9,6 +9,7 @@ import sys
 import copy
 import zipfile
 import requests
+import traceback
 
 #TODO:
 # add status bar to bottom -- WIP
@@ -30,6 +31,37 @@ CAR_NUMBER = map(str, range(1, 50))
 PERSON_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
 TIME_HOUR = map(str, range(0, 24))
 TIME_MINUTE = map(str, range(0, 60))
+
+
+def ex_deco(action_func):
+    #import types
+    # import inspect
+    #import utool as ut
+    # #ut.embed()
+    # argspec = inspect.getargspec(action_func)
+
+    def logerr(ex, self=None):
+        print ("EXCEPTION RAISED! " + traceback.format_exc(ex))
+        log = open('error_log.txt', 'w')
+        log.write(traceback.format_exc(ex))
+        log.close()
+        msg_box = QtGui.QErrorMessage(self)
+        msg_box.showMessage(ex.message)
+    #is_method = isinstance(action_func, types.MethodType)
+    # is_method =  (len(argspec.args) > 0 and argspec.args[0] == 'self')
+    def func_wrapper(self, *args):
+        # print('+----------<2>')
+        # print(action_func)
+        # print(argspec)
+        # print('self=%r' % (self,))
+        # print('args=%r' % (args,))
+        # print('L__________')
+        try:
+            return action_func(self, *args)
+        except Exception as ex:
+            logerr(ex, self)
+
+    return func_wrapper
 
 
 class first_last_image(QtGui.QFrame):
@@ -67,6 +99,7 @@ class first_last_image(QtGui.QFrame):
 
         self.setLayout(grid)
 
+    @ex_deco
     def update(self, filename):
         self.image.setPixmap(QtGui.QPixmap(filename).scaled(self.desiredsize))
         self.current_image = filename
@@ -140,6 +173,7 @@ class image_selection_box(QtGui.QWidget):
     def init_connect(self):
         self.connect(self.image, QtCore.SIGNAL('clicked()'), self.reroll)
 
+    @ex_deco
     def reroll(self):
         #get new filename
         filename = self.parent().get_filename()
@@ -156,7 +190,10 @@ class image_selection_box(QtGui.QWidget):
             checked.setChecked(False)
             self.select_group.setExclusive(True)
 
+    # @ex_deco
     def get_selection(self):
+        if self.select_group.checkedButton() is None:
+            return (path.basename(self.image.current_image), 0)
         return (path.basename(self.image.current_image), self.select_group.checkedButton().text())
 
 
@@ -224,6 +261,7 @@ class selection_group(QtGui.QWidget):
 
         self.setLayout(gridV)
 
+    @ex_deco
     def add_filename(self, filename):
         # self.active_files.append(filename)
         # self.stored_files.append(filename)
@@ -383,9 +421,22 @@ class user_input(QtGui.QWidget):
         directory = str(QtGui.QFileDialog.getExistingDirectory(self, 'Select Directory'))
         self.browse_text.setText(directory)
 
-    def import_(self):
+    @ex_deco
+    def import_(self, *args):
+        print('IMPORT SELF %r' % (self,))
+        print('IMPORT ARGS %r' % (args,))
         directory = str(self.browse_text.text())
+        print (directory)
+        if directory == "":
+            raise IOError("Please select the directory that contains the photos you wish to import from.")
+            return
+        if str(self.sync_number.text()) == "":
+            raise IOError("The first image name must be defined.")
+            return
         self.files = find_candidates(directory, str(self.sync_number.text()))
+        if len(self.files) == 0:
+            raise IOError("Could not find any files for selected directory. Please check your first image name.")
+            return
         #send this file list to the selection group i am a bad programmer
         self.file_bases = [path.basename(f) for f in self.files]
         self.parent().move_file_list(self.file_bases)
@@ -450,7 +501,8 @@ class image_import_interface(QtGui.QWidget):
         self.image_selection_group.last_image.current_image = file_list.pop()
         # self.image_selection_group.stored_files = file_list
 
-    def submit(self):
+    @ex_deco
+    def submit(self, *args):
         DOMAIN = 'http://localhost:5000/images/submit'
         #Zip selected images: first, last, zebra/, giraffe/
         chdir(path.dirname(path.realpath(__file__)))
@@ -462,6 +514,9 @@ class image_import_interface(QtGui.QWidget):
         giraffe = []
         for IB in self.image_selection_group.image_boxes:
             selection = IB.get_selection()
+            if selection[1] == 0:
+                raise IOError("Please make sure all image boxes have been identified as either zebra of giraffe.")
+                return
             if selection[1] == 'Zebra':
                 zebra.append(selection[0])
             else:
@@ -505,12 +560,14 @@ class image_import_interface(QtGui.QWidget):
         r = requests.post(DOMAIN, data=data, files=files)
 
         # Response
-        print('HTTP STATUS:', r.status_code)
+        # print('HTTP STATUS:', r.status_code)
         response = json.loads(r.text)
-        print('RESPONSE:', response)
+        if response['status']['code'] != 0:
+            raise IOError("Server responded with an error" + response['status']['message'])
+        # print('RESPONSE:', response)
 
     def update_recent_file(self, filename):
-        self.progress_bar.setText('Imported new image to ' + filename)
+        self.progress_bar.setText('Imported new image from ' + filename)
         self.image_selection_group.add_filename(filename)
 
 
