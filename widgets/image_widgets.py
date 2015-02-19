@@ -12,6 +12,8 @@ PLACEHOLDER_IMAGE = join(FILE_DPATH, "../assets/placeholder.png")
 ZEBRA_ICON = join(FILE_DPATH, "../assets/icons/zebra_icon.png")
 GIRAFFE_ICON = join(FILE_DPATH, "../assets/icons/giraffe_icon.png")
 
+IMAGE_SIZE = 150
+
 
 class first_last_image(QtGui.QFrame):
     def __init__(self, *args):
@@ -23,8 +25,14 @@ class first_last_image(QtGui.QFrame):
     def init_widgets(self):
         self.image = QtGui.QLabel()
         self.image.setScaledContents(True)
-        Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE).scaled(QtCore.QSize(150, 150))
-        self.desiredsize = Pixmap.size()
+        Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE)
+        pxSizeX = Pixmap.size().width()
+        pxSizeY = Pixmap.size().height()
+        if pxSizeX > pxSizeY:
+            Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
+        else:
+            Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
+        self.desiredsize = QtCore.QSize(IMAGE_SIZE, IMAGE_SIZE)
         self.image.setAlignment(QtCore.Qt.AlignCenter)
         self.image.setPixmap(Pixmap)
         self.current_image = PLACEHOLDER_IMAGE
@@ -41,14 +49,23 @@ class first_last_image(QtGui.QFrame):
 
     def init_layout(self):
         grid = QtGui.QGridLayout()
-        grid.addWidget(self.image, 0, 0, 1, 0)
-        grid.addWidget(self.image_time, 2, 0, 1, 2)
-        grid.addWidget(self.info_text, 3, 0, 1, 2)
+        grid.addItem(QtGui.QSpacerItem(0, 0, vPolicy=QtGui.QSizePolicy.MinimumExpanding), 0, 0, 1, 0)
+        grid.addWidget(self.image, 1, 0, 1, 0)
+        grid.addItem(QtGui.QSpacerItem(0, 0, vPolicy=QtGui.QSizePolicy.MinimumExpanding), 2, 0, 1, 0)
+        grid.addWidget(self.image_time, 3, 0, 1, 0)
+        grid.addWidget(self.info_text, 4, 0, 1, 0)
 
         self.setLayout(grid)
 
     def update(self, filename):
-        self.image.setPixmap(QtGui.QPixmap(filename).scaled(self.desiredsize))
+        Pixmap = QtGui.QPixmap(filename)
+        pxSizeX = Pixmap.size().width()
+        pxSizeY = Pixmap.size().height()
+        if pxSizeX > pxSizeY:
+            Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
+        else:
+            Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
+        self.image.setPixmap(Pixmap)
         self.current_image = filename
         self.image_time.setText(time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image))))
 
@@ -59,8 +76,14 @@ class image_selection_roll(QtGui.QLabel):
         apply(QtGui.QLabel.__init__, (self, ) + args)
         QtGui.QLabel.__init__(self)
         #self.setScaledContents(True) #<--this causes the image displayed to be centered, but stretched. Aspect ratio not maintained
-        Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE).scaled(QtCore.QSize(150, 150))
-        self.desiredsize = Pixmap.size()
+        Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE)
+        pxSizeX = Pixmap.size().width()
+        pxSizeY = Pixmap.size().height()
+        if pxSizeX > pxSizeY:
+            Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
+        else:
+            Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
+        self.desiredsize = QtCore.QSize(IMAGE_SIZE, IMAGE_SIZE)
         self.setAlignment(QtCore.Qt.AlignCenter)
         self.setPixmap(Pixmap)
 
@@ -70,7 +93,14 @@ class image_selection_roll(QtGui.QLabel):
         self.emit(QtCore.SIGNAL('clicked()'))
 
     def changeImage(self, image_file):
-        self.setPixmap(QtGui.QPixmap(image_file).scaled(self.desiredsize))
+        Pixmap = QtGui.QPixmap(image_file)
+        pxSizeX = Pixmap.size().width()
+        pxSizeY = Pixmap.size().height()
+        if pxSizeX > pxSizeY:
+            Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
+        else:
+            Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
+        self.setPixmap(Pixmap)
         self.current_image = image_file
 
     def get_timestamp(self):
@@ -111,10 +141,12 @@ class image_selection_box(QtGui.QWidget):
 
     def init_layout(self):
         grid = QtGui.QGridLayout()
-        grid.addWidget(self.image, 0, 0, 1, 0)
-        grid.addWidget(self.image_time, 2, 0, 1, 2)
-        grid.addWidget(self.select_zebra, 3, 0)
-        grid.addWidget(self.select_giraffe, 3, 1)
+        grid.addItem(QtGui.QSpacerItem(0, 0, vPolicy=QtGui.QSizePolicy.MinimumExpanding), 0, 0, 1, 0)
+        grid.addWidget(self.image, 1, 0, 1, 0)
+        grid.addItem(QtGui.QSpacerItem(0, 0, vPolicy=QtGui.QSizePolicy.MinimumExpanding), 2, 0, 1, 0)
+        grid.addWidget(self.image_time, 3, 0, 1, 0)
+        grid.addWidget(self.select_zebra, 4, 0)
+        grid.addWidget(self.select_giraffe, 4, 1)
 
         self.setLayout(grid)
 

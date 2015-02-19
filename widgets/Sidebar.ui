@@ -10,6 +10,12 @@
     <height>598</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
   <property name="baseSize">
    <size>
     <width>100</width>
@@ -164,8 +170,17 @@
      </item>
      <item>
       <widget class="QLabel" name="sidebar_status">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: #666;</string>
+       </property>
        <property name="text">
-        <string>Status Bar</string>
+        <string/>
        </property>
       </widget>
      </item>

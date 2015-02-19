@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Main.ui'
 #
-# Created: Thu Feb 19 13:15:53 2015
+# Created: Thu Feb 19 13:43:34 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -51,6 +51,8 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.toggle.sizePolicy().hasHeightForWidth())
         self.toggle.setSizePolicy(sizePolicy)
+        self.toggle.setAutoDefault(False)
+        self.toggle.setFlat(False)
         self.toggle.setObjectName(_fromUtf8("toggle"))
         self.tabs_layout.addWidget(self.toggle)
         self.right_layout.addLayout(self.tabs_layout)

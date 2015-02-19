@@ -5,6 +5,8 @@ from PyQt4 import QtCore
 import sys
 import client_image as iic
 import client_gps as gc
+from os.path import dirname, join
+
 
 GZC_BASE_CLASS = QtGui.QMainWindow
 #GZC_BASE_CLASS = QtGui.QWidget
