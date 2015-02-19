@@ -9,6 +9,8 @@ from os.path import dirname, join
 
 FILE_DPATH = dirname(__file__)
 PLACEHOLDER_IMAGE = join(FILE_DPATH, "../assets/placeholder.png")
+ZEBRA_ICON = join(FILE_DPATH, "../assets/icons/zebra_icon.png")
+GIRAFFE_ICON = join(FILE_DPATH, "../assets/icons/giraffe_icon.png")
 
 
 class first_last_image(QtGui.QFrame):
@@ -94,7 +96,9 @@ class image_selection_box(QtGui.QWidget):
     def init_widgets(self):
         self.image = image_selection_roll(self)
         self.select_zebra = QtGui.QPushButton('Zebra', self)
+        self.select_zebra.setIcon(QtGui.QIcon(ZEBRA_ICON))
         self.select_giraffe = QtGui.QPushButton('Giraffe', self)
+        self.select_giraffe.setIcon(QtGui.QIcon(GIRAFFE_ICON))
         self.select_zebra.setCheckable(True)
         self.select_giraffe.setCheckable(True)
 

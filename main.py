@@ -12,37 +12,31 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.initWidgets()
         self.initConnect()
 
+        self.setWindowTitle("Great Zebra Count 2015")
         # self.setStyleSheet("background-color: white;")
 
     def initWidgets(self):
         self.sidebar = sb.Sidebar(parent=self)
         self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
         self.sidebar_space.addWidget(self.sidebar)
+        self.current_display = 0 # 0 -> image display, 1 -> gps display
         self.img_display = img.selection_group()
         self.display_space.addWidget(self.img_display)
 
     def initConnect(self):
-        self.image_tab.released.connect(self.imageClicked)
-        self.gps_tab.released.connect(self.gpsClicked)
+        self.toggle.released.connect(self.switchWidgets)
+        #self.gps_tab.released.connect(self.gpsClicked)
 
-    def imageClicked(self):
-        if self.image_tab.isChecked():
-            self.gps_tab.setChecked(False)
-            # do other switching to image stuff
-            self.sidebar.switchWidgets()
+    def switchWidgets(self):
+        self.current_display = (self.current_display + 1) % 2
+        self.sidebar.switchWidgets(self.current_display)
+        if self.current_display == 0:
+            self.img_display.show()
+            #self.gps_display.hide()
         else:
-            self.image_tab.setChecked(True)
+            self.img_display.hide()
+            #self.gps_display.show()
 
-    def gpsClicked(self):
-        if self.gps_tab.isChecked():
-            self.image_tab.setChecked(False)
-            # do other switching to gps stuff
-            self.sidebar.switchWidgets()
-        else:
-            self.gps_tab.setChecked(True)
-
-    def switchFunction(self):
-        self.sidebar.switchWidgets()
 
 
 if __name__ == '__main__':

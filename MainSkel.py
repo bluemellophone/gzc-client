@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Main.ui'
 #
-# Created: Wed Feb 18 17:08:55 2015
+# Created: Thu Feb 19 13:15:53 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,7 +22,6 @@ try:
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -44,28 +43,17 @@ class Ui_MainWindow(object):
         self.layout.addWidget(self.divider)
         self.right_layout = QtGui.QVBoxLayout()
         self.right_layout.setObjectName(_fromUtf8("right_layout"))
-        self.horizontalLayout = QtGui.QHBoxLayout()
-        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.image_tab = QtGui.QPushButton(self.centralwidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.MinimumExpanding)
+        self.tabs_layout = QtGui.QHBoxLayout()
+        self.tabs_layout.setObjectName(_fromUtf8("tabs_layout"))
+        self.toggle = QtGui.QPushButton(self.centralwidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.image_tab.sizePolicy().hasHeightForWidth())
-        self.image_tab.setSizePolicy(sizePolicy)
-        self.image_tab.setCheckable(True)
-        self.image_tab.setChecked(True)
-        self.image_tab.setObjectName(_fromUtf8("image_tab"))
-        self.horizontalLayout.addWidget(self.image_tab)
-        self.gps_tab = QtGui.QPushButton(self.centralwidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.MinimumExpanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.gps_tab.sizePolicy().hasHeightForWidth())
-        self.gps_tab.setSizePolicy(sizePolicy)
-        self.gps_tab.setCheckable(True)
-        self.gps_tab.setObjectName(_fromUtf8("gps_tab"))
-        self.horizontalLayout.addWidget(self.gps_tab)
-        self.right_layout.addLayout(self.horizontalLayout)
+        sizePolicy.setHeightForWidth(self.toggle.sizePolicy().hasHeightForWidth())
+        self.toggle.setSizePolicy(sizePolicy)
+        self.toggle.setObjectName(_fromUtf8("toggle"))
+        self.tabs_layout.addWidget(self.toggle)
+        self.right_layout.addLayout(self.tabs_layout)
         self.display_space = QtGui.QHBoxLayout()
         self.display_space.setObjectName(_fromUtf8("display_space"))
         self.right_layout.addLayout(self.display_space)
@@ -98,10 +86,10 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
-        self.image_tab.setText(_translate("MainWindow", "PushButton", None))
-        self.gps_tab.setText(_translate("MainWindow", "GPS", None))
+        self.toggle.setText(_translate("MainWindow", "Images / GPS", None))
         self.menuOptions.setTitle(_translate("MainWindow", "File", None))
         self.actionSpecify_Domain.setText(_translate("MainWindow", "Specify Domain", None))
         self.actionSpecify_Filepaths.setText(_translate("MainWindow", "Specify Filepaths", None))
         self.actionManually_Select_Images.setText(_translate("MainWindow", "Manually Select Images", None))
         self.actionManually_Select_GPS_Data.setText(_translate("MainWindow", "Manually Select GPS Data", None))
+

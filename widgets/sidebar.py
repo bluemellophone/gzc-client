@@ -11,8 +11,11 @@ from os import path
 
 LOGO_SIZE = 200
 FILE_DPATH = dirname(__file__)
-LOGO_ONE = join(FILE_DPATH, "../assets/logo.png")
-LOGO_TWO = join(FILE_DPATH, "../assets/logo.png")
+LOGO_ONE = join(FILE_DPATH, "../assets/logo_alpha.png")
+LOGO_TWO = join(FILE_DPATH, "../assets/logo_alpha.png")
+IMPORT_ICON = join(FILE_DPATH, "../assets/icons/import.png")
+BROWSE_ICON = join(FILE_DPATH, "../assets/icons/browse.png")
+CLEAR_ICON = join(FILE_DPATH, "../assets/icons/clear.png")
 
 CAR_COLORS = [
     ('white',    '#FFFFFF'),
@@ -75,6 +78,9 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.logo_2.setPixmap(logo2)
 
     def initWidgets(self):
+        self.submit.setIcon(QtGui.QIcon(IMPORT_ICON))
+        self.clear.setIcon(QtGui.QIcon(CLEAR_ICON))
+        self.clear.setText("")
         self.imageForm = ImageForm()
         self.gpsForm = GPSForm()
         self.currentForm = 0  # 0 -> imageForm, 1 -> gpsForm
@@ -86,14 +92,23 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.submit.clicked.connect(self.submit_clicked)
         self.clear.clicked.connect(self.clear_clicked)
 
-    def switchWidgets(self):
-        self.currentForm = (self.currentForm + 1) % 2
+    def switchWidgets(self, form):
+        self.currentForm = form
         if self.currentForm == 0:
             self.imageForm.show()
             self.gpsForm.hide()
-        else:
+        elif self.currentForm == 1:
             self.imageForm.hide()
             self.gpsForm.show()
+
+    # def switchWidgets(self):
+    #     self.currentForm = (self.currentForm + 1) % 2
+    #     if self.currentForm == 0:
+    #         self.imageForm.show()
+    #         self.gpsForm.hide()
+    #     else:
+    #         self.imageForm.hide()
+    #         self.gpsForm.show()
 
     def clear_clicked(self):
         if self.currentForm == 0:
@@ -156,6 +171,7 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
 
     def initConnect(self):
         self.drive_browse.clicked.connect(self.open_directory)
+        self.drive_browse.setIcon(QtGui.QIcon(BROWSE_ICON))
 
     def open_directory(self):
         directory = str(QtGui.QFileDialog.getExistingDirectory(self, 'Select Directory'))

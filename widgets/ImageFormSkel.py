@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ImageForm.ui'
 #
-# Created: Wed Feb 18 14:54:50 2015
+# Created: Thu Feb 19 13:34:34 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,7 +22,6 @@ try:
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
-
 
 class Ui_ImageForm(object):
     def setupUi(self, ImageForm):
@@ -60,7 +59,7 @@ class Ui_ImageForm(object):
         self.drive_display = QtGui.QLineEdit(self.drive_layout)
         self.drive_display.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
-        font.setPointSize(15)
+        font.setPointSize(12)
         self.drive_display.setFont(font)
         self.drive_display.setObjectName(_fromUtf8("drive_display"))
         self.formLayout.setWidget(2, QtGui.QFormLayout.SpanningRole, self.drive_display)
@@ -137,3 +136,4 @@ class Ui_ImageForm(object):
         self.name_label.setText(_translate("ImageForm", "First Image Name", None))
         self.time_label.setText(_translate("ImageForm", "First Image Time", None))
         self.time_input.setDisplayFormat(_translate("ImageForm", "HH:mm", None))
+

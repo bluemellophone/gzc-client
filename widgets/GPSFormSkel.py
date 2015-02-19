@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GPSForm.ui'
 #
-# Created: Wed Feb 18 14:54:50 2015
+# Created: Thu Feb 19 13:34:34 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,7 +22,6 @@ try:
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
-
 
 class Ui_GPSForm(object):
     def setupUi(self, GPSForm):
@@ -48,7 +47,7 @@ class Ui_GPSForm(object):
         self.numer_label.setObjectName(_fromUtf8("numer_label"))
         self.formLayout_4.setWidget(1, QtGui.QFormLayout.LabelRole, self.numer_label)
         self.number_input = QtGui.QSpinBox(self.id_layout)
-        self.number_input.setMinimumSize(QtCore.QSize(0, 40))
+        self.number_input.setMinimumSize(QtCore.QSize(0, 0))
         self.number_input.setObjectName(_fromUtf8("number_input"))
         self.formLayout_4.setWidget(1, QtGui.QFormLayout.FieldRole, self.number_input)
         self.color_input_space = QtGui.QVBoxLayout()
@@ -64,7 +63,7 @@ class Ui_GPSForm(object):
         self.time_label.setObjectName(_fromUtf8("time_label"))
         self.formLayout_6.setWidget(0, QtGui.QFormLayout.LabelRole, self.time_label)
         self.time_input = QtGui.QTimeEdit(self.sync_layout)
-        self.time_input.setMinimumSize(QtCore.QSize(0, 40))
+        self.time_input.setMinimumSize(QtCore.QSize(0, 0))
         self.time_input.setObjectName(_fromUtf8("time_input"))
         self.formLayout_6.setWidget(0, QtGui.QFormLayout.FieldRole, self.time_input)
         self.sync_status = QtGui.QLabel(self.sync_layout)
@@ -92,3 +91,4 @@ class Ui_GPSForm(object):
         self.sync_layout.setTitle(_translate("GPSForm", "2 - Synchronize GPS Information:", None))
         self.time_label.setText(_translate("GPSForm", "Car Start Time", None))
         self.time_input.setDisplayFormat(_translate("GPSForm", "HH:mm", None))
+

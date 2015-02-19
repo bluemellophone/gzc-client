@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Sidebar.ui'
 #
-# Created: Wed Feb 18 14:54:50 2015
+# Created: Thu Feb 19 13:34:34 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,7 +22,6 @@ try:
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
-
 
 class Ui_Sidebar(object):
     def setupUi(self, Sidebar):
@@ -47,11 +46,6 @@ class Ui_Sidebar(object):
         self.logo_2.setObjectName(_fromUtf8("logo_2"))
         self.logo_layout.addWidget(self.logo_2)
         self.layout.addLayout(self.logo_layout)
-        self.line_2 = QtGui.QFrame(Sidebar)
-        self.line_2.setFrameShape(QtGui.QFrame.HLine)
-        self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_2.setObjectName(_fromUtf8("line_2"))
-        self.layout.addWidget(self.line_2)
         self.form = QtGui.QVBoxLayout()
         self.form.setObjectName(_fromUtf8("form"))
         self.layout.addLayout(self.form)
@@ -60,6 +54,8 @@ class Ui_Sidebar(object):
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
         self.frame.setObjectName(_fromUtf8("frame"))
         self.layout.addWidget(self.frame)
+        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.layout.addItem(spacerItem)
         self.button_layout = QtGui.QHBoxLayout()
         self.button_layout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
         self.button_layout.setObjectName(_fromUtf8("button_layout"))
@@ -69,10 +65,11 @@ class Ui_Sidebar(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.submit.sizePolicy().hasHeightForWidth())
         self.submit.setSizePolicy(sizePolicy)
-        self.submit.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.submit.setMinimumSize(QtCore.QSize(0, 70))
+        self.submit.setMaximumSize(QtCore.QSize(16777215, 70))
         font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+        font.setBold(False)
+        font.setWeight(50)
         self.submit.setFont(font)
         self.submit.setObjectName(_fromUtf8("submit"))
         self.button_layout.addWidget(self.submit)
@@ -82,10 +79,11 @@ class Ui_Sidebar(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.clear.sizePolicy().hasHeightForWidth())
         self.clear.setSizePolicy(sizePolicy)
-        self.clear.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.clear.setMinimumSize(QtCore.QSize(0, 70))
+        self.clear.setMaximumSize(QtCore.QSize(16777215, 70))
         font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+        font.setBold(False)
+        font.setWeight(50)
         self.clear.setFont(font)
         self.clear.setAutoFillBackground(False)
         self.clear.setStyleSheet(_fromUtf8("color: red;"))
@@ -116,3 +114,4 @@ class Ui_Sidebar(object):
         self.submit.setText(_translate("Sidebar", "Import", None))
         self.clear.setText(_translate("Sidebar", "Clear", None))
         self.sidebar_status.setText(_translate("Sidebar", "Status Bar", None))
+
