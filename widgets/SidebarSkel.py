@@ -23,6 +23,7 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
 class Ui_Sidebar(object):
     def setupUi(self, Sidebar):
         Sidebar.setObjectName(_fromUtf8("Sidebar"))
@@ -115,4 +116,3 @@ class Ui_Sidebar(object):
         self.submit.setText(_translate("Sidebar", "Import", None))
         self.clear.setText(_translate("Sidebar", "Clear", None))
         self.sidebar_status.setText(_translate("Sidebar", "Status Bar", None))
-

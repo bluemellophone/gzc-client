@@ -1,19 +1,15 @@
 from __future__ import absolute_import, division, print_function
 from PyQt4 import QtCore, QtGui
-from clientfuncs import CopyThread, QwwColorComboBox, find_candidates
-from os import getcwd, path, chdir
-import simplejson as json
+from os import path, chdir
 import time
 import random
-import sys
 import copy
-import zipfile
-import requests
 from os.path import dirname, join
 
 
 FILE_DPATH = dirname(__file__)
 PLACEHOLDER_IMAGE = join(FILE_DPATH, "../assets/placeholder.png")
+
 
 class first_last_image(QtGui.QFrame):
     def __init__(self, *args):

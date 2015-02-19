@@ -23,6 +23,7 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
@@ -104,4 +105,3 @@ class Ui_MainWindow(object):
         self.actionSpecify_Filepaths.setText(_translate("MainWindow", "Specify Filepaths", None))
         self.actionManually_Select_Images.setText(_translate("MainWindow", "Manually Select Images", None))
         self.actionManually_Select_GPS_Data.setText(_translate("MainWindow", "Manually Select GPS Data", None))
-

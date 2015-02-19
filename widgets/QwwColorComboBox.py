@@ -1,4 +1,6 @@
+import PyQt4
 from PyQt4 import QtCore, QtGui
+
 
 class ColorModel(QtGui.QStandardItemModel):
     def __init__(self, parent=None, **kwargs):

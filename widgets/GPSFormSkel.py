@@ -23,6 +23,7 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
 class Ui_GPSForm(object):
     def setupUi(self, GPSForm):
         GPSForm.setObjectName(_fromUtf8("GPSForm"))
@@ -91,4 +92,3 @@ class Ui_GPSForm(object):
         self.sync_layout.setTitle(_translate("GPSForm", "2 - Synchronize GPS Information:", None))
         self.time_label.setText(_translate("GPSForm", "Car Start Time", None))
         self.time_input.setDisplayFormat(_translate("GPSForm", "HH:mm", None))
-

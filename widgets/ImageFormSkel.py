@@ -23,6 +23,7 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
 class Ui_ImageForm(object):
     def setupUi(self, ImageForm):
         ImageForm.setObjectName(_fromUtf8("ImageForm"))
@@ -136,4 +137,3 @@ class Ui_ImageForm(object):
         self.name_label.setText(_translate("ImageForm", "First Image Name", None))
         self.time_label.setText(_translate("ImageForm", "First Image Time", None))
         self.time_input.setDisplayFormat(_translate("ImageForm", "HH:mm", None))
-

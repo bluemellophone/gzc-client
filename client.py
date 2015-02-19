@@ -24,7 +24,7 @@ class GZCMainWindow(GZC_BASE_CLASS):
         gzc._init_menus()
         gzc.domain = "http://localhost:5000"
 
-        gzc.setStyleSheet("background-color: white;")
+        # gzc.setStyleSheet("background-color: white;")
 
     def _init_widgets(gzc):
         gzc.tabs = QtGui.QTabWidget()
