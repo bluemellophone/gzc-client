@@ -1,16 +1,18 @@
+#!/usr/bin/env python
 from PyQt4 import QtGui, QtCore
 from MainSkel import Ui_MainWindow
 import sys
+import signal
 from widgets import sidebar as sb
 from widgets import image_widgets as img
 from os.path import dirname, join
-
 
 
 FILE_DPATH = dirname(__file__)
 BUTTON_SIZE = 100
 TOGGLE_BUTTON_CAM = join(FILE_DPATH, "assets/icons/icon_camera.png")
 TOGGLE_BUTTON_GPS = join(FILE_DPATH, "assets/icons/icon_gps.png")
+
 
 class QLabelButton(QtGui.QLabel):
     def __init__(self, icon1=None, icon2=None):
@@ -26,8 +28,7 @@ class QLabelButton(QtGui.QLabel):
             self.setPixmap(self.icon1)
         else:
             self.setPixmap(self.icon2)
-        print("mouse clicked")
-        self.emit(SIGNAL('clicked()'))
+        # self.emit(QtCore.pyqtSignal(name='clicked'))
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
@@ -43,12 +44,11 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.setWindowTitle("Great Zebra Count 2015")
         # self.setStyleSheet("background-color: white;")
 
-
     def initWidgets(self):
         self.sidebar = sb.Sidebar(parent=self)
         self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
         self.sidebar_space.addWidget(self.sidebar)
-        self.current_display = 0 # 0 -> image display, 1 -> gps display
+        self.current_display = 0  # 0 -> image display, 1 -> gps display
         self.img_display = img.selection_group()
         self.display_space.addWidget(self.img_display)
 
@@ -75,10 +75,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             #self.gps_display.show()
 
 
-
-
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     window = MainWindow()
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
     window.show()
     sys.exit(app.exec_())

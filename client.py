@@ -3,9 +3,9 @@ from __future__ import absolute_import, division, print_function
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 import sys
+import signal
 import client_image as iic
 import client_gps as gc
-from os.path import dirname, join
 
 
 GZC_BASE_CLASS = QtGui.QMainWindow
@@ -134,6 +134,7 @@ def main():
 
     #tabs.setWindowTitle('\'The Great Zebra Count Image Upload\'')
     #tabs.show()
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
     MainWindow.show()
 
     sys.exit(app.exec_())
