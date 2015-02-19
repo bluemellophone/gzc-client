@@ -15,7 +15,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         # self.setStyleSheet("background-color: white;")
 
     def initWidgets(self):
-        self.sidebar = sb.Sidebar()
+        self.sidebar = sb.Sidebar(parent=self)
         self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
         self.sidebar_space.addWidget(self.sidebar)
         self.img_display = img.selection_group()

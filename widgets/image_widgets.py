@@ -214,7 +214,7 @@ class selection_group(QtGui.QWidget):
             self.active_files.append(filename)
             self.stored_files.append(filename)
             for IB in self.image_boxes:
-                if IB.image.current_image == IB.image.DEFAULT_IMAGE:
+                if IB.image.current_image == PLACEHOLDER_IMAGE:
                     IB.reroll()
                     break
         #if we've filled the image boxes, update the last image
