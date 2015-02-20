@@ -43,7 +43,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def resizeEvent(self, ev):
         self.toggle_button.move(self.width() - self.toggle_button.width(), 0)
 
-
     def initWidgets(self):
         self.sidebar = sb.Sidebar(parent=self)
         self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
@@ -58,7 +57,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.toggle_button.move(self.width(), 0)
         self.toggle_button.setParent(self.centralWidget())
         self.toggle_button.show()
-
 
     def initConnect(self):
         self.toggle_button.clicked.connect(self.switchWidgets)
