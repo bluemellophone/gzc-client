@@ -9,7 +9,7 @@ from os.path import dirname, join
 
 
 FILE_DPATH = dirname(__file__)
-BUTTON_SIZE = 100
+BUTTON_SIZE = 125
 TOGGLE_BUTTON_CAM = join(FILE_DPATH, "assets/icons/icon_camera.png")
 TOGGLE_BUTTON_GPS = join(FILE_DPATH, "assets/icons/icon_gps.png")
 
@@ -59,7 +59,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.display_space.addWidget(self.img_display)
 
         self.toggle_button = QLabelButton(icon1=self.toggle_button_cam_ic, icon2=self.toggle_button_gps_ic)
-        self.toggle_button.resize(100, 100)
+        self.toggle_button.resize(BUTTON_SIZE, BUTTON_SIZE)
         #self.toggle_button.setStyleSheet("background-color: red;")
         self.toggle_button.move(self.width(), 0)
         self.toggle_button.setParent(self.centralWidget())
