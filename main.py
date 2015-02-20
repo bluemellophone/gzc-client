@@ -25,12 +25,13 @@ class QLabelButton(QtGui.QLabel):
         self.current = 0
 
     def mouseReleaseEvent(self, ev):
-        self.current = (self.current + 1) % 2
-        if self.current == 0:
-            self.setPixmap(self.icon1)
-        else:
-            self.setPixmap(self.icon2)
-        self.clicked.emit()
+        if ev.button() == QtCore.Qt.LeftButton and ev.x() <= ev.y():
+            self.current = (self.current + 1) % 2
+            if self.current == 0:
+                self.setPixmap(self.icon1)
+            else:
+                self.setPixmap(self.icon2)
+            self.clicked.emit()
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
@@ -54,7 +55,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.display_space.addWidget(self.img_display)
 
         self.toggle_button = QLabelButton(icon1=self.toggle_button_cam_ic, icon2=self.toggle_button_gps_ic)
-        #self.toggle_button.resize(100, 100)
+        self.toggle_button.resize(100, 100)
         #self.toggle_button.setStyleSheet("background-color: red;")
         self.toggle_button.move(self.width(), 0)
         self.toggle_button.setParent(self.centralWidget())
