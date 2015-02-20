@@ -3,7 +3,7 @@ from PyQt4 import QtCore, QtGui
 from SidebarSkel import Ui_Sidebar
 from ImageFormSkel import Ui_ImageForm
 from GPSFormSkel import Ui_GPSForm
-from QwwColorComboBox import QwwColorComboBox
+from GZCQWidgets import QwwColorComboBox
 from os.path import dirname, join
 import traceback
 from clientfuncs import CopyThread, find_candidates
@@ -11,11 +11,11 @@ from os import path
 
 LOGO_SIZE = 200
 FILE_DPATH = dirname(__file__)
-LOGO_ONE = join(FILE_DPATH, "../assets/logo_alpha.png")
-LOGO_TWO = join(FILE_DPATH, "../assets/logo_alpha.png")
-IMPORT_ICON = join(FILE_DPATH, "../assets/icons/import.png")
-BROWSE_ICON = join(FILE_DPATH, "../assets/icons/browse.png")
-CLEAR_ICON = join(FILE_DPATH, "../assets/icons/clear.png")
+LOGO_ONE = join(FILE_DPATH, "../assets/logo_ibeis_alpha.png")
+LOGO_TWO = join(FILE_DPATH, "../assets/logo_kws_alpha.png")
+IMPORT_ICON = join(FILE_DPATH, "../assets/icons/icon_import.png")
+BROWSE_ICON = join(FILE_DPATH, "../assets/icons/icon_browse.png")
+CLEAR_ICON = join(FILE_DPATH, "../assets/icons/icon_trash.png")
 
 CAR_COLORS = [
     ('white',    '#FFFFFF'),
@@ -125,29 +125,38 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         #self.progress_bar.setText('Imported new image from ' + filename)
         self.parent.img_display.add_filename(filename)
 
-    def submit_clicked(self):
-        print('IMPORT SELF %r' % (self,))
+    def reset_cursor(self):
+        QtGui.QApplication.restoreOverrideCursor()
+
+    @ex_deco
+    def submit_clicked(self, *args):
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+        # print('IMPORT SELF %r' % (self,))
         #print('IMPORT ARGS %r' % (args,))
         directory = str(self.imageForm.drive_display.text())
-        print (directory)
+        # print (directory)
         if directory == "":
+            self.reset_cursor()
             raise IOError("Please select the directory that contains the photos you wish to import from.")
             return
         if str(self.imageForm.name_input.text()) == "":
+            self.reset_cursor()
             raise IOError("The first image name must be defined.")
             return
         self.files = find_candidates(directory, str(self.imageForm.name_input.text()))
         if len(self.files) == 0:
+            self.reset_cursor()
             raise IOError("Could not find any files for selected directory. Please check your first image name.")
             return
         #send this file list to the selection group i am a bad programmer
         self.file_bases = [path.basename(f) for f in self.files]
-        print self.file_bases
+        # print self.file_bases
         self.move_file_list(self.file_bases)
 
         target_directory = path.join('..', 'data', 'images', str(self.imageForm.color_input.currentText()) + str(self.imageForm.number_input.value()), str(self.imageForm.letter_input.currentText()))
         self.copyThread = CopyThread(self.files, [target_directory])
         self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
+        self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
         self.copyThread.start()
 
 

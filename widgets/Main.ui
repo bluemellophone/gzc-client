@@ -28,34 +28,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="right_layout">
-        <item>
-         <layout class="QHBoxLayout" name="tabs_layout">
-          <item>
-           <widget class="QPushButton" name="toggle">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Images / GPS</string>
-            </property>
-            <property name="autoDefault">
-             <bool>false</bool>
-            </property>
-            <property name="flat">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="display_space"/>
-        </item>
-       </layout>
+       <layout class="QVBoxLayout" name="display_space"/>
       </item>
      </layout>
     </item>

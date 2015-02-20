@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Sidebar.ui'
 #
-# Created: Thu Feb 19 13:34:34 2015
+# Created: Thu Feb 19 13:48:21 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,6 +27,7 @@ class Ui_Sidebar(object):
     def setupUi(self, Sidebar):
         Sidebar.setObjectName(_fromUtf8("Sidebar"))
         Sidebar.resize(282, 598)
+        Sidebar.setMinimumSize(QtCore.QSize(0, 0))
         Sidebar.setBaseSize(QtCore.QSize(100, 100))
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -101,6 +102,12 @@ class Ui_Sidebar(object):
         self.split_1.setObjectName(_fromUtf8("split_1"))
         self.layout.addWidget(self.split_1)
         self.sidebar_status = QtGui.QLabel(Sidebar)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setItalic(True)
+        self.sidebar_status.setFont(font)
+        self.sidebar_status.setStyleSheet(_fromUtf8("color: #666;"))
+        self.sidebar_status.setText(_fromUtf8(""))
         self.sidebar_status.setObjectName(_fromUtf8("sidebar_status"))
         self.layout.addWidget(self.sidebar_status)
         self.layout.setStretch(4, 2)
@@ -113,5 +120,4 @@ class Ui_Sidebar(object):
         Sidebar.setWindowTitle(_translate("Sidebar", "Form", None))
         self.submit.setText(_translate("Sidebar", "Import", None))
         self.clear.setText(_translate("Sidebar", "Clear", None))
-        self.sidebar_status.setText(_translate("Sidebar", "Status Bar", None))
 
