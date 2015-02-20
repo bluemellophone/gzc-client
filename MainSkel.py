@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Main.ui'
 #
-# Created: Thu Feb 19 13:43:34 2015
+# Created: Thu Feb 19 21:00:17 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,25 +41,9 @@ class Ui_MainWindow(object):
         self.divider.setFrameShadow(QtGui.QFrame.Sunken)
         self.divider.setObjectName(_fromUtf8("divider"))
         self.layout.addWidget(self.divider)
-        self.right_layout = QtGui.QVBoxLayout()
-        self.right_layout.setObjectName(_fromUtf8("right_layout"))
-        self.tabs_layout = QtGui.QHBoxLayout()
-        self.tabs_layout.setObjectName(_fromUtf8("tabs_layout"))
-        self.toggle = QtGui.QPushButton(self.centralwidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.toggle.sizePolicy().hasHeightForWidth())
-        self.toggle.setSizePolicy(sizePolicy)
-        self.toggle.setAutoDefault(False)
-        self.toggle.setFlat(False)
-        self.toggle.setObjectName(_fromUtf8("toggle"))
-        self.tabs_layout.addWidget(self.toggle)
-        self.right_layout.addLayout(self.tabs_layout)
-        self.display_space = QtGui.QHBoxLayout()
+        self.display_space = QtGui.QVBoxLayout()
         self.display_space.setObjectName(_fromUtf8("display_space"))
-        self.right_layout.addLayout(self.display_space)
-        self.layout.addLayout(self.right_layout)
+        self.layout.addLayout(self.display_space)
         self.horizontalLayout_2.addLayout(self.layout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
@@ -88,7 +72,6 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
-        self.toggle.setText(_translate("MainWindow", "Images / GPS", None))
         self.menuOptions.setTitle(_translate("MainWindow", "File", None))
         self.actionSpecify_Domain.setText(_translate("MainWindow", "Specify Domain", None))
         self.actionSpecify_Filepaths.setText(_translate("MainWindow", "Specify Filepaths", None))

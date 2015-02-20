@@ -46,6 +46,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.setWindowTitle("Great Zebra Count 2015")
         # self.setStyleSheet("background-color: white;")
 
+    def resizeEvent(self, ev):
+        self.toggle_button.move(self.width() - self.toggle_button.width(), 0)
+
+
     def initWidgets(self):
         self.sidebar = sb.Sidebar(parent=self)
         self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
@@ -64,8 +68,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def initConnect(self):
         self.toggle_button.clicked.connect(self.switchWidgets)
-        self.toggle.released.connect(self.switchWidgets)
-        #self.gps_tab.released.connect(self.gpsClicked)
 
     def switchWidgets(self):
         self.current_display = (self.current_display + 1) % 2
