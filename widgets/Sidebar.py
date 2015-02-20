@@ -3,7 +3,7 @@ from PyQt4 import QtCore, QtGui
 from SidebarSkel import Ui_Sidebar
 from ImageFormSkel import Ui_ImageForm
 from GPSFormSkel import Ui_GPSForm
-from QwwColorComboBox import QwwColorComboBox
+from GZCQWidgets import QwwColorComboBox
 from os.path import dirname, join
 import traceback
 from clientfuncs import CopyThread, find_candidates

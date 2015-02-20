@@ -3,8 +3,9 @@ from PyQt4 import QtGui, QtCore
 from MainSkel import Ui_MainWindow
 import sys
 import signal
-from widgets import sidebar as sb
-from widgets import image_widgets as img
+from widgets import Sidebar as sb
+from widgets import ImageWidgets as img
+from widgets.GZCQWidgets import QLabelButton
 from os.path import dirname, join
 
 
@@ -13,41 +14,6 @@ BUTTON_SIZE = 150
 TOGGLE_BUTTON_CAM = join(FILE_DPATH, "assets/icons/icon_camera.png")
 TOGGLE_BUTTON_GPS = join(FILE_DPATH, "assets/icons/icon_gps.png")
 TOGGLE_BITMAP = join(FILE_DPATH, "assets/icons/toggle_bitmap.png")
-
-
-class QLabelButton(QtGui.QLabel):
-    clicked = QtCore.pyqtSignal(name="toggle_clicked")
-
-    def __init__(self, icon1=None, icon2=None, bitmap=None):
-        QtGui.QLabel.__init__(self)
-        self.icon1 = icon1
-        self.icon2 = icon2
-        self.bitmap = bitmap
-        self.setPixmap(icon1)
-        color = self.palette().background().color().name()
-        self.setStyleSheet("background-color: %s;"%color)
-        self.setAutoFillBackground(True)
-        self.setMask(self.bitmap.mask())
-        self.current = 0
-        self.setMouseTracking(True)
-        self.pointerCursor = QtGui.QCursor(QtCore.Qt.PointingHandCursor)
-
-    def mouseReleaseEvent(self, ev):
-        if ev.button() == QtCore.Qt.LeftButton:
-            self.current = (self.current + 1) % 2
-            if self.current == 0:
-                self.setPixmap(self.icon1)
-            else:
-                self.setPixmap(self.icon2)
-            self.clicked.emit()
-
-    def enterEvent(self, ev):
-        QtGui.QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
-
-    def leaveEvent(self, event):
-        QtGui.QApplication.restoreOverrideCursor()
-
-
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
