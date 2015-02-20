@@ -25,7 +25,7 @@ class QLabelButton(QtGui.QLabel):
         self.current = 0
 
     def mouseReleaseEvent(self, ev):
-        if ev.button() == QtCore.Qt.LeftButton and ev.x() <= ev.y():
+        if ev.button() == QtCore.Qt.LeftButton and ev.x() >= ev.y():
             self.current = (self.current + 1) % 2
             if self.current == 0:
                 self.setPixmap(self.icon1)
