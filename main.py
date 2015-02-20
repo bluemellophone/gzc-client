@@ -29,6 +29,17 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.setWindowTitle("Great Zebra Count 2015")
         # self.setStyleSheet("background-color: white;")
 
+        self.shortcutFull = QtGui.QShortcut(self)
+        self.shortcutFull.setKey(QtGui.QKeySequence('F11'))
+        self.shortcutFull.setContext(QtCore.Qt.ApplicationShortcut)
+        self.shortcutFull.activated.connect(self.handleFullScreen)
+
+    def handleFullScreen(self):
+        if self.isFullScreen():
+            self.showNormal()
+        else:
+            self.showFullScreen()
+
     def resizeEvent(self, ev):
         self.toggle_button.move(self.width() - self.toggle_button.width(), 0)
 
