@@ -11,8 +11,8 @@ from os import path
 
 LOGO_SIZE = 200
 FILE_DPATH = dirname(__file__)
-LOGO_ONE = join(FILE_DPATH, "../assets/logo_alpha.png")
-LOGO_TWO = join(FILE_DPATH, "../assets/logo_alpha.png")
+LOGO_ONE = join(FILE_DPATH, "../assets/logo_ibeis_alpha.png")
+LOGO_TWO = join(FILE_DPATH, "../assets/logo_kws_alpha.png")
 IMPORT_ICON = join(FILE_DPATH, "../assets/icons/icon_import.png")
 BROWSE_ICON = join(FILE_DPATH, "../assets/icons/icon_browse.png")
 CLEAR_ICON = join(FILE_DPATH, "../assets/icons/icon_trash.png")
