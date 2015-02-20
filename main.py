@@ -10,7 +10,7 @@ from os.path import dirname, join
 
 
 FILE_DPATH = dirname(__file__)
-BUTTON_SIZE = 150
+BUTTON_SIZE = 100
 TOGGLE_BUTTON_CAM = join(FILE_DPATH, "assets/icons/icon_camera.png")
 TOGGLE_BUTTON_GPS = join(FILE_DPATH, "assets/icons/icon_gps.png")
 TOGGLE_BITMAP = join(FILE_DPATH, "assets/icons/toggle_bitmap.png")
