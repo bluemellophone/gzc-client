@@ -128,25 +128,29 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
 
-    def submit_clicked(self):
+    @ex_deco
+    def submit_clicked(self, *args):
         QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-        print('IMPORT SELF %r' % (self,))
+        # print('IMPORT SELF %r' % (self,))
         #print('IMPORT ARGS %r' % (args,))
         directory = str(self.imageForm.drive_display.text())
-        print (directory)
+        # print (directory)
         if directory == "":
+            self.reset_cursor()
             raise IOError("Please select the directory that contains the photos you wish to import from.")
             return
         if str(self.imageForm.name_input.text()) == "":
+            self.reset_cursor()
             raise IOError("The first image name must be defined.")
             return
         self.files = find_candidates(directory, str(self.imageForm.name_input.text()))
         if len(self.files) == 0:
+            self.reset_cursor()
             raise IOError("Could not find any files for selected directory. Please check your first image name.")
             return
         #send this file list to the selection group i am a bad programmer
         self.file_bases = [path.basename(f) for f in self.files]
-        print self.file_bases
+        # print self.file_bases
         self.move_file_list(self.file_bases)
 
         target_directory = path.join('..', 'data', 'images', str(self.imageForm.color_input.currentText()) + str(self.imageForm.number_input.value()), str(self.imageForm.letter_input.currentText()))
