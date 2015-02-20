@@ -9,9 +9,10 @@ from os.path import dirname, join
 
 
 FILE_DPATH = dirname(__file__)
-BUTTON_SIZE = 125
+BUTTON_SIZE = 150
 TOGGLE_BUTTON_CAM = join(FILE_DPATH, "assets/icons/icon_camera.png")
 TOGGLE_BUTTON_GPS = join(FILE_DPATH, "assets/icons/icon_gps.png")
+TOGGLE_BITMAP = join(FILE_DPATH, "assets/icons/toggle_bitmap.png")
 
 
 class QLabelButton(QtGui.QLabel):
@@ -22,6 +23,7 @@ class QLabelButton(QtGui.QLabel):
         self.icon1 = icon1
         self.icon2 = icon2
         self.setPixmap(icon1)
+        self.setMask(self.icon1.mask())
         self.current = 0
 
     def mouseReleaseEvent(self, ev):
@@ -29,8 +31,10 @@ class QLabelButton(QtGui.QLabel):
             self.current = (self.current + 1) % 2
             if self.current == 0:
                 self.setPixmap(self.icon1)
+                self.setMask(self.icon1.mask())
             else:
                 self.setPixmap(self.icon2)
+                self.setMask(self.icon1.mask())
             self.clicked.emit()
 
 
@@ -38,8 +42,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self):
         QtGui.QWidget.__init__(self)
         self.setupUi(self)
-        self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(BUTTON_SIZE, BUTTON_SIZE, QtCore.Qt.KeepAspectRatio)
-        self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE, QtCore.Qt.KeepAspectRatio)
+        self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(BUTTON_SIZE, BUTTON_SIZE)
+        self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE)
         self.initWidgets()
         self.initConnect()
 
