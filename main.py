@@ -15,6 +15,8 @@ TOGGLE_BUTTON_GPS = join(FILE_DPATH, "assets/icons/icon_gps.png")
 
 
 class QLabelButton(QtGui.QLabel):
+    clicked = QtCore.pyqtSignal(name="toggle_clicked")
+
     def __init__(self, icon1=None, icon2=None):
         QtGui.QLabel.__init__(self)
         self.icon1 = icon1
@@ -28,7 +30,7 @@ class QLabelButton(QtGui.QLabel):
             self.setPixmap(self.icon1)
         else:
             self.setPixmap(self.icon2)
-        # self.emit(QtCore.pyqtSignal(name='clicked'))
+        self.clicked.emit()
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
@@ -39,7 +41,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE, QtCore.Qt.KeepAspectRatio)
         self.initWidgets()
         self.initConnect()
-        self.addToggle()
 
         self.setWindowTitle("Great Zebra Count 2015")
         # self.setStyleSheet("background-color: white;")
@@ -52,7 +53,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.img_display = img.selection_group()
         self.display_space.addWidget(self.img_display)
 
-    def addToggle(self):
         self.toggle_button = QLabelButton(icon1=self.toggle_button_cam_ic, icon2=self.toggle_button_gps_ic)
         #self.toggle_button.resize(100, 100)
         #self.toggle_button.setStyleSheet("background-color: red;")
@@ -60,7 +60,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.toggle_button.setParent(self.centralWidget())
         self.toggle_button.show()
 
+
     def initConnect(self):
+        self.toggle_button.clicked.connect(self.switchWidgets)
         self.toggle.released.connect(self.switchWidgets)
         #self.gps_tab.released.connect(self.gpsClicked)
 
