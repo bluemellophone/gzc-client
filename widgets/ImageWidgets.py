@@ -9,8 +9,8 @@ from os.path import dirname, join
 
 FILE_DPATH = dirname(__file__)
 PLACEHOLDER_IMAGE = join(FILE_DPATH, "../assets/placeholder.png")
-ZEBRA_ICON = join(FILE_DPATH, "../assets/icons/zebra_icon.png")
-GIRAFFE_ICON = join(FILE_DPATH, "../assets/icons/giraffe_icon.png")
+ZEBRA_ICON = join(FILE_DPATH, "../assets/icons/icon_zebra.png")
+GIRAFFE_ICON = join(FILE_DPATH, "../assets/icons/icon_giraffe.png")
 
 IMAGE_SIZE = 150
 

@@ -1,144 +1,81 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, division, print_function
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from PyQt4 import QtGui, QtCore
 import sys
 import signal
-import client_image as iic
-import client_gps as gc
+from widgets import Sidebar as sb
+from widgets import ImageWidgets as img
+# from widgets import GPSWidgets as gps
+from widgets.MainSkel import Ui_MainWindow
+from widgets.GZCQWidgets import QLabelButton
+from os.path import dirname, join
 
 
-GZC_BASE_CLASS = QtGui.QMainWindow
-#GZC_BASE_CLASS = QtGui.QWidget
-#GZC_BASE_CLASS = QtGui.QTabWidget
+FILE_DPATH = dirname(__file__)
+BUTTON_SIZE = 100
+TOGGLE_BUTTON_CAM = join(FILE_DPATH, "assets/icons/icon_camera_small.png")
+TOGGLE_BUTTON_GPS = join(FILE_DPATH, "assets/icons/icon_gps_small.png")
+TOGGLE_BITMAP = join(FILE_DPATH, "assets/icons/bitmap_toggle_small.png")
 
 
-class GZCMainWindow(GZC_BASE_CLASS):
-    def __init__(gzc, parent=None):
-        GZC_BASE_CLASS.__init__(gzc, parent)
-        gzc.gps_client = gc.GPSGuiWidget(parent=gzc)
-        gzc.image_client = iic.image_import_interface(gzc)
-        gzc._init_widgets()
-        gzc._init_tabs()
-        gzc._init_status()
-        gzc._init_layout()
-        gzc._init_signals()
-        gzc._init_menus()
-        gzc.domain = "http://localhost:5000"
+class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
+        self.setupUi(self)
+        self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(BUTTON_SIZE, BUTTON_SIZE)
+        self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE)
+        self.toggle_button_bitmap = QtGui.QPixmap(TOGGLE_BITMAP).scaled(BUTTON_SIZE, BUTTON_SIZE)
+        self.initWidgets()
+        self.initConnect()
 
-        # gzc.setStyleSheet("background-color: white;")
+        self.setWindowTitle("Great Zebra Count 2015")
+        # self.setStyleSheet("background-color: white;")
 
-    def _init_widgets(gzc):
-        gzc.tabs = QtGui.QTabWidget()
-        gzc.status_bar = QtGui.QStatusBar()
+        self.shortcutFull = QtGui.QShortcut(self)
+        self.shortcutFull.setKey(QtGui.QKeySequence('F11'))
+        self.shortcutFull.setContext(QtCore.Qt.ApplicationShortcut)
+        self.shortcutFull.activated.connect(self.handleFullScreen)
 
-        gzc.menu_bar = QtGui.QMenuBar()
-
-        gzc.options_menu = QtGui.QMenu()
-        gzc.options_menu.setTitle("Options")
-        gzc.options_menu.addAction("Set Domain")
-        gzc.manual_menu = QtGui.QMenu()
-        gzc.manual_menu.setTitle("Manual")
-        gzc.manual_menu.addAction("Select Files")
-        gzc.domain_dialog = QtGui.QInputDialog()
-        gzc.domain_dialog.setLabelText(QtCore.QString("Enter server domain:"))
-
-    def _init_tabs(gzc):
-        gzc.tabs.addTab(gzc.image_client, "Images")
-        gzc.tabs.addTab(gzc.gps_client, "GPS")
-        #gzc.addTab(gzc.gps_client, "GPS")
-        #gzc.addTab(gzc.image_client, "Images")
-
-    def _init_layout(gzc):
-        gzc.setCentralWidget(gzc.tabs)
-        gzc.setWindowTitle("The Great Zebra Count")
-        gzc.setMinimumSize(1300, 850)
-        #gzc.centralWidget = QtGui.QVBoxLayout(gzc)
-        #gzc.centralWidget.addWidget(gzc.tabs)
-        #gzc.setSizePolicy(gzc.tabs.sizePolicy())
-        #gzc.gps_client.setSizePolicy(gzc.tabs.sizePolicy())
-        #gzc.image_client.setSizePolicy(gzc.tabs.sizePolicy())
-        #gzc.updateGeometry()
-
-    def _init_status(gzc):
-        gzc.setStatusBar(gzc.status_bar)
-        gzc.status_bar.showMessage(QtCore.QString("Ready"))
-        gzc.status_bar.setPalette(QtGui.QPalette(QtGui.QColor(255, 255, 255)))
-
-    def _init_signals(gzc):
-        gzc.options_menu.triggered.connect(gzc.options_clicked)
-        gzc.manual_menu.triggered.connect(gzc.manual_clicked)
-        gzc.domain_dialog.accepted.connect(gzc.change_domain)
-
-    def _init_menus(gzc):
-        gzc.menu_bar.addMenu(gzc.options_menu)
-        gzc.menu_bar.addMenu(gzc.manual_menu)
-        gzc.setMenuBar(gzc.menu_bar)
-
-    def options_clicked(gzc, action):
-        if str(action.text()) == "Set Domain":
-            gzc.set_domain()
+    def handleFullScreen(self):
+        if self.isFullScreen():
+            self.showNormal()
         else:
-            print("Not correct")
+            self.showFullScreen()
 
-    def manual_clicked(gzc, action):
-        if str(action.text()) == "Select Files":
-            dialog = QtGui.QFileDialog()
-            dialog.setFileMode(QtGui.QFileDialog.ExistingFiles)
-            flist = dialog.getOpenFileNames(gzc, 'Open files', '/home')
-            gzc.image_client.user_input_group.import_file_list(flist)
-        if str(action.text()) == "Select GPS":
-            dialog = QtGui.QFileDialog()
-            dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
-            fname = dialog.getOpenFileName(gzc, 'Open file', '/home')
-            #Enter code to execute with gps file name here
-            print("Code needed, gps client must be attached to this method", fname)
-            gzc.gps_client.user_input_group.import_file_list(flist)
+    def resizeEvent(self, ev):
+        self.toggle_button.move(self.width() - self.toggle_button.width(), 0)
 
-    def set_domain(gzc):
-        gzc.domain_dialog.setTextValue(gzc.domain)
-        gzc.domain_dialog.show()
+    def initWidgets(self):
+        self.sidebar = sb.Sidebar(parent=self)
+        self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
+        self.sidebar_space.addWidget(self.sidebar)
+        self.current_display = 0  # 0 -> image display, 1 -> gps display
+        self.img_display = img.selection_group()
+        self.display_space.addWidget(self.img_display)
 
-    def change_domain(gzc):
-        gzc.domain = str(gzc.domain_dialog.textValue())
+        self.toggle_button = QLabelButton(icon1=self.toggle_button_cam_ic, icon2=self.toggle_button_gps_ic, bitmap=self.toggle_button_bitmap)
+        self.toggle_button.resize(BUTTON_SIZE, BUTTON_SIZE)
+        #self.toggle_button.setStyleSheet("background-color: red;")
+        self.toggle_button.move(self.width(), 0)
+        self.toggle_button.setParent(self.centralWidget())
+        self.toggle_button.show()
 
+    def initConnect(self):
+        self.toggle_button.clicked.connect(self.switchWidgets)
 
-def main():
-    app = QtGui.QApplication(sys.argv)
-    #tabs = QtGui.QTabWidget()
-
-    MainWindow = GZCMainWindow()
-
-    # image_import tab
-    #MainWindow = QtGui.QMainWindow()
-    #ui = iic.image_import_interface(MainWindow)
-    # ui.setupUi(MainWindow)
-    #tabs.addTab(ui, "Images")
-
-    # GPS_import tab
-
-    # QAPP = QtGui.QApplication(sys.argv)
-    #wgt = gc.GPSGuiWidget()
-    #wgt.show()
-    ## QAPP.setActiveWindow(wgt)
-    ## QAPP.exec_()
-    #tabs.addTab(wgt, "GPS")
-    ##MainWindow.addTab(wgt, "GPS")
-    ##MainWindow.addTab(ui, "Images")
-
-    ###Resize width and height
-    #tabs.resize(800, 600)
-
-    ##Move QTabWidget to x:300,y:300
-    #tabs.move(300, 300)
-
-    #tabs.setWindowTitle('\'The Great Zebra Count Image Upload\'')
-    #tabs.show()
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-    MainWindow.show()
-
-    sys.exit(app.exec_())
+    def switchWidgets(self):
+        self.current_display = (self.current_display + 1) % 2
+        self.sidebar.switchWidgets(self.current_display)
+        if self.current_display == 0:
+            self.img_display.show()
+            #self.gps_display.hide()
+        else:
+            self.img_display.hide()
+            #self.gps_display.show()
 
 
 if __name__ == '__main__':
-    main()
+    app = QtGui.QApplication(sys.argv)
+    window = MainWindow()
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    window.show()
+    sys.exit(app.exec_())

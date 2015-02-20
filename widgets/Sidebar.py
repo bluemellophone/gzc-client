@@ -13,9 +13,9 @@ LOGO_SIZE = 200
 FILE_DPATH = dirname(__file__)
 LOGO_ONE = join(FILE_DPATH, "../assets/logo_alpha.png")
 LOGO_TWO = join(FILE_DPATH, "../assets/logo_alpha.png")
-IMPORT_ICON = join(FILE_DPATH, "../assets/icons/import.png")
-BROWSE_ICON = join(FILE_DPATH, "../assets/icons/browse.png")
-CLEAR_ICON = join(FILE_DPATH, "../assets/icons/clear.png")
+IMPORT_ICON = join(FILE_DPATH, "../assets/icons/icon_import.png")
+BROWSE_ICON = join(FILE_DPATH, "../assets/icons/icon_browse.png")
+CLEAR_ICON = join(FILE_DPATH, "../assets/icons/icon_trash.png")
 
 CAR_COLORS = [
     ('white',    '#FFFFFF'),
@@ -154,7 +154,6 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
         self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
         self.copyThread.start()
-
 
 
 class ImageForm(QtGui.QWidget, Ui_ImageForm):
