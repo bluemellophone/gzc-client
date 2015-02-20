@@ -125,7 +125,11 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         #self.progress_bar.setText('Imported new image from ' + filename)
         self.parent.img_display.add_filename(filename)
 
+    def reset_cursor(self):
+        QtGui.QApplication.restoreOverrideCursor()
+
     def submit_clicked(self):
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
         print('IMPORT SELF %r' % (self,))
         #print('IMPORT ARGS %r' % (args,))
         directory = str(self.imageForm.drive_display.text())
@@ -148,7 +152,9 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         target_directory = path.join('..', 'data', 'images', str(self.imageForm.color_input.currentText()) + str(self.imageForm.number_input.value()), str(self.imageForm.letter_input.currentText()))
         self.copyThread = CopyThread(self.files, [target_directory])
         self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
+        self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
         self.copyThread.start()
+
 
 
 class ImageForm(QtGui.QWidget, Ui_ImageForm):

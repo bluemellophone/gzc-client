@@ -130,7 +130,9 @@ class image_selection_box(QtGui.QWidget):
         self.select_giraffe = QtGui.QPushButton('Giraffe', self)
         self.select_giraffe.setIcon(QtGui.QIcon(GIRAFFE_ICON))
         self.select_zebra.setCheckable(True)
+        self.select_zebra.setEnabled(False)
         self.select_giraffe.setCheckable(True)
+        self.select_giraffe.setEnabled(False)
 
         self.select_group = QtGui.QButtonGroup(self)
         self.select_group.addButton(self.select_zebra)
@@ -154,12 +156,18 @@ class image_selection_box(QtGui.QWidget):
         self.connect(self.image, QtCore.SIGNAL('clicked()'), self.reroll)
 
     def reroll(self):
+
         #get new filename
-        filename = self.parent().get_filename()
+        try:
+            filename = self.parent().get_filename()
+        except ValueError:
+            return
 
         self.image.changeImage(filename)
 
         self.image_time.setText(self.image.get_timestamp())
+        self.select_zebra.setEnabled(True)
+        self.select_giraffe.setEnabled(True)
         #uncheck the buttons if image is rerolled
         checked = self.select_group.checkedButton()
         # print checked

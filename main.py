@@ -18,24 +18,36 @@ TOGGLE_BITMAP = join(FILE_DPATH, "assets/icons/toggle_bitmap.png")
 class QLabelButton(QtGui.QLabel):
     clicked = QtCore.pyqtSignal(name="toggle_clicked")
 
-    def __init__(self, icon1=None, icon2=None):
+    def __init__(self, icon1=None, icon2=None, bitmap=None):
         QtGui.QLabel.__init__(self)
         self.icon1 = icon1
         self.icon2 = icon2
+        self.bitmap = bitmap
         self.setPixmap(icon1)
-        self.setMask(self.icon1.mask())
+        color = self.palette().background().color().name()
+        self.setStyleSheet("background-color: %s;"%color)
+        self.setAutoFillBackground(True)
+        self.setMask(self.bitmap.mask())
         self.current = 0
+        self.setMouseTracking(True)
+        self.pointerCursor = QtGui.QCursor(QtCore.Qt.PointingHandCursor)
 
     def mouseReleaseEvent(self, ev):
-        if ev.button() == QtCore.Qt.LeftButton and ev.x() >= ev.y():
+        if ev.button() == QtCore.Qt.LeftButton:
             self.current = (self.current + 1) % 2
             if self.current == 0:
                 self.setPixmap(self.icon1)
-                self.setMask(self.icon1.mask())
             else:
                 self.setPixmap(self.icon2)
-                self.setMask(self.icon1.mask())
             self.clicked.emit()
+
+    def enterEvent(self, ev):
+        QtGui.QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
+
+    def leaveEvent(self, event):
+        QtGui.QApplication.restoreOverrideCursor()
+
+
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
@@ -44,6 +56,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(BUTTON_SIZE, BUTTON_SIZE)
         self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE)
+        self.toggle_button_bitmap = QtGui.QPixmap(TOGGLE_BITMAP).scaled(BUTTON_SIZE, BUTTON_SIZE)
         self.initWidgets()
         self.initConnect()
 
@@ -62,7 +75,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.img_display = img.selection_group()
         self.display_space.addWidget(self.img_display)
 
-        self.toggle_button = QLabelButton(icon1=self.toggle_button_cam_ic, icon2=self.toggle_button_gps_ic)
+        self.toggle_button = QLabelButton(icon1=self.toggle_button_cam_ic, icon2=self.toggle_button_gps_ic, bitmap=self.toggle_button_bitmap)
         self.toggle_button.resize(BUTTON_SIZE, BUTTON_SIZE)
         #self.toggle_button.setStyleSheet("background-color: red;")
         self.toggle_button.move(self.width(), 0)
