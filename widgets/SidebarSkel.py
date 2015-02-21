@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'Sidebar.ui'
 #
-# Created: Thu Feb 19 13:48:21 2015
-#      by: PyQt4 UI code generator 4.10.4
+# Created: Sat Feb 21 13:58:44 2015
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -36,16 +36,27 @@ class Ui_Sidebar(object):
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.layout = QtGui.QVBoxLayout()
         self.layout.setObjectName(_fromUtf8("layout"))
+        self.logo_layout_wide = QtGui.QHBoxLayout()
+        self.logo_layout_wide.setObjectName(_fromUtf8("logo_layout_wide"))
+        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.logo_layout_wide.addItem(spacerItem)
+        self.logo_0 = QtGui.QLabel(Sidebar)
+        self.logo_0.setText(_fromUtf8(""))
+        self.logo_0.setObjectName(_fromUtf8("logo_0"))
+        self.logo_layout_wide.addWidget(self.logo_0)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.logo_layout_wide.addItem(spacerItem1)
+        self.layout.addLayout(self.logo_layout_wide)
         self.logo_layout = QtGui.QHBoxLayout()
         self.logo_layout.setObjectName(_fromUtf8("logo_layout"))
         self.logo_1 = QtGui.QLabel(Sidebar)
         self.logo_1.setText(_fromUtf8(""))
         self.logo_1.setObjectName(_fromUtf8("logo_1"))
-        self.logo_layout.addWidget(self.logo_1)
+        self.logo_layout.addWidget(self.logo_1, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
         self.logo_2 = QtGui.QLabel(Sidebar)
         self.logo_2.setText(_fromUtf8(""))
         self.logo_2.setObjectName(_fromUtf8("logo_2"))
-        self.logo_layout.addWidget(self.logo_2)
+        self.logo_layout.addWidget(self.logo_2, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
         self.layout.addLayout(self.logo_layout)
         self.form = QtGui.QVBoxLayout()
         self.form.setObjectName(_fromUtf8("form"))
@@ -55,8 +66,8 @@ class Ui_Sidebar(object):
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
         self.frame.setObjectName(_fromUtf8("frame"))
         self.layout.addWidget(self.frame)
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.layout.addItem(spacerItem)
+        spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.layout.addItem(spacerItem2)
         self.button_layout = QtGui.QHBoxLayout()
         self.button_layout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
         self.button_layout.setObjectName(_fromUtf8("button_layout"))
@@ -110,7 +121,7 @@ class Ui_Sidebar(object):
         self.sidebar_status.setText(_fromUtf8(""))
         self.sidebar_status.setObjectName(_fromUtf8("sidebar_status"))
         self.layout.addWidget(self.sidebar_status)
-        self.layout.setStretch(4, 2)
+        self.layout.setStretch(5, 2)
         self.horizontalLayout.addLayout(self.layout)
 
         self.retranslateUi(Sidebar)

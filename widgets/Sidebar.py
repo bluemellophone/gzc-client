@@ -11,6 +11,7 @@ from os import path
 
 LOGO_SIZE = 200
 FILE_DPATH = dirname(__file__)
+LOGO_ZERO = join(FILE_DPATH, "../assets/logo_kwf_alpha.png")
 LOGO_ONE = join(FILE_DPATH, "../assets/logo_ibeis_alpha.png")
 LOGO_TWO = join(FILE_DPATH, "../assets/logo_kws_alpha.png")
 IMPORT_ICON = join(FILE_DPATH, "../assets/icons/icon_import.png")
@@ -72,8 +73,10 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.initConnect()
 
     def initLogos(self):
+        logo0 = QtGui.QPixmap(LOGO_ZERO).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
         logo1 = QtGui.QPixmap(LOGO_ONE).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
         logo2 = QtGui.QPixmap(LOGO_TWO).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
+        self.logo_0.setPixmap(logo0)
         self.logo_1.setPixmap(logo1)
         self.logo_2.setPixmap(logo2)
 
