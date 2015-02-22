@@ -1,10 +1,10 @@
 from __future__ import absolute_import, division, print_function
 import shutil
-import PyQt4
 from PyQt4 import QtCore, QtGui
 from os import makedirs
 from os.path import isfile, join, exists, splitext, basename
 from detecttools.directory import Directory
+import traceback
 
 
 class CopyThread(QtCore.QThread):
@@ -147,3 +147,34 @@ def find_candidates(search_path, search_str, verbose=False):
                 if found:
                     break
     return found_list
+
+
+def ex_deco(action_func):
+    #import types
+    # import inspect
+    #import utool as ut
+    # #ut.embed()
+    # argspec = inspect.getargspec(action_func)
+
+    def logerr(ex, self=None):
+        print ('EXCEPTION RAISED! ' + traceback.format_exc(ex))
+        log = open('error_log.txt', 'w')
+        log.write(traceback.format_exc(ex))
+        log.close()
+        msg_box = QtGui.QErrorMessage(self)
+        msg_box.showMessage(ex.message)
+    #is_method = isinstance(action_func, types.MethodType)
+    # is_method =  (len(argspec.args) > 0 and argspec.args[0] == 'self')
+    def func_wrapper(self, *args):
+        # print('+----------<2>')
+        # print(action_func)
+        # print(argspec)
+        # print('self=%r' % (self,))
+        # print('args=%r' % (args,))
+        # print('L__________')
+        try:
+            return action_func(self, *args)
+        except Exception as ex:
+            logerr(ex, self)
+
+    return func_wrapper

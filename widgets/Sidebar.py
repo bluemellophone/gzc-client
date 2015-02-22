@@ -6,8 +6,7 @@ from GPSFormSkel import Ui_GPSForm
 from GZCQWidgets import QwwColorComboBox
 from os.path import dirname, join, basename, exists
 from shutil import rmtree
-import traceback
-from clientfuncs import CopyThread, find_candidates
+from clientfuncs import CopyThread, find_candidates, ex_deco
 
 
 LOGO_SIZE = 150
@@ -16,6 +15,7 @@ LOGO_ZERO = join(FILE_DPATH, '../assets/logo_kwf_alpha.png')
 LOGO_ONE = join(FILE_DPATH, '../assets/logo_ibeis_alpha.png')
 LOGO_TWO = join(FILE_DPATH, '../assets/logo_kws_alpha.png')
 IMPORT_ICON = join(FILE_DPATH, '../assets/icons/icon_import.png')
+SUBMIT_ICON = join(FILE_DPATH, '../assets/icons/icon_upload.png')
 BROWSE_ICON = join(FILE_DPATH, '../assets/icons/icon_browse.png')
 CLEAR_ICON = join(FILE_DPATH, '../assets/icons/icon_trash.png')
 
@@ -29,50 +29,27 @@ CAR_COLORS = [('Select Color', '#F6F6F6')] + [
     ('purple', '#6F5499'),
     ('black',    '#333333'),
 ]
-CAR_NUMBER = ['Select Number'] + map(str, range(1, 26))  # 50
+CAR_NUMBER = ['Select Number'] + map(str, range(1, 26))  # 51
 PERSON_LETTERS = ['Select Letter'] + ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
-
-
-def ex_deco(action_func):
-    #import types
-    # import inspect
-    #import utool as ut
-    # #ut.embed()
-    # argspec = inspect.getargspec(action_func)
-
-    def logerr(ex, self=None):
-        print ('EXCEPTION RAISED! ' + traceback.format_exc(ex))
-        log = open('error_log.txt', 'w')
-        log.write(traceback.format_exc(ex))
-        log.close()
-        msg_box = QtGui.QErrorMessage(self)
-        msg_box.showMessage(ex.message)
-    #is_method = isinstance(action_func, types.MethodType)
-    # is_method =  (len(argspec.args) > 0 and argspec.args[0] == 'self')
-    def func_wrapper(self, *args):
-        # print('+----------<2>')
-        # print(action_func)
-        # print(argspec)
-        # print('self=%r' % (self,))
-        # print('args=%r' % (args,))
-        # print('L__________')
-        try:
-            return action_func(self, *args)
-        except Exception as ex:
-            logerr(ex, self)
-
-    return func_wrapper
 
 
 class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def __init__(self, parent):
-        QtGui.QWidget.__init__(self)
-        self.parent = parent
+        QtGui.QWidget.__init__(self, parent)
         self.setupUi(self)
-        self.initLogos()
         self.initWidgets()
         self.initConnect()
-        self.clear_clicked()
+        self.initVisuals()
+
+    def initWidgets(self):
+        # Load Image Form
+        self.imageForm = ImageForm(self)
+        self.form.addWidget(self.imageForm)
+        # Load GPS Form
+        self.gpsForm = GPSForm(self)
+        self.form.addWidget(self.gpsForm)
+        # Load logos
+        self.initLogos()
 
     def initLogos(self):
         logo0 = QtGui.QPixmap(LOGO_ZERO)
@@ -81,120 +58,124 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.logo_0.setPixmap(logo0)
         # self.logo_1.setPixmap(logo1)
         # self.logo_2.setPixmap(logo2)
-        self.logo_1.setMaximumHeight(0)
-        self.logo_2.setMaximumHeight(0)
-
-    def initWidgets(self):
-        self.submit.setIcon(QtGui.QIcon(IMPORT_ICON))
-        self.clear.setIcon(QtGui.QIcon(CLEAR_ICON))
-        self.clear.setText('')
-        self.imageForm = ImageForm(self)
-        self.gpsForm = GPSForm(self)
-        self.currentForm = 0  # 0 -> imageForm, 1 -> gpsForm
-        self.form.addWidget(self.imageForm)
-        self.form.addWidget(self.gpsForm)
-        self.gpsForm.hide()
 
     def initConnect(self):
-        self.submit.clicked.connect(self.submit_clicked)
-        self.clear.clicked.connect(self.clear_clicked)
+        self.submitButton.clicked.connect(self.submitClicked)
+        self.clearButton.clicked.connect(self.clearClicked)
 
-    def switchWidgets(self, form):
-        self.currentForm = form
-        if self.currentForm == 0:
+    def initVisuals(self):
+        # Setup clear icon
+        self.clearButton.setText('')
+        self.clearButton.setIcon(QtGui.QIcon(CLEAR_ICON))
+        # Hide non-visible icons
+        self.logo_1.setMaximumHeight(0)
+        self.logo_2.setMaximumHeight(0)
+        # Clear Sidebar
+        self.clear()
+
+    # Slots
+    @ex_deco
+    def submitClicked(self, *args):
+        if self.complete_image_step_4:
+            print('COMPILE ZIP')
+        else:
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+            # print('IMPORT SELF %r' % (self,))
+            #print('IMPORT ARGS %r' % (args,))
+            directory = self.import_directory
+            # print (directory)
+            if directory is None or directory == '':
+                self.reset_cursor()
+                raise IOError('Please select the directory that contains the photos you wish to import from.')
+                return
+            if str(self.imageForm.name_input.text()) == '':
+                self.reset_cursor()
+                raise IOError('The first image name must be defined.')
+                return
+            self.files = find_candidates(directory, str(self.imageForm.name_input.text()))
+            if len(self.files) == 0:
+                self.reset_cursor()
+                raise IOError('Could not find any files for selected directory. Please check your first image name.')
+                return
+            #send this file list to the selection group i am a bad programmer
+            self.file_bases = [basename(f) for f in self.files]
+            # print self.file_bases
+            self.move_file_list(self.file_bases)
+
+            target_directory = join('..', 'data', 'images', str(self.imageForm.number_input.currentText()) + str(self.imageForm.color_input.currentText()), str(self.imageForm.letter_input.currentText()))
+            if not exists:
+                print("Target directory already exists... deleting")
+                rmtree(target_directory)
+            self.copyThread = CopyThread(self.files, [target_directory])
+            self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
+            self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
+            self.copyThread.start()
+
+    def clearClicked(self):
+        self.clear()
+
+    # Functions
+    def clear(self):
+        # Clear Flags
+        self.import_directory = None
+        self.complete_image_step_1 = True
+        self.complete_image_step_2 = True
+        self.complete_image_step_3 = True
+        self.complete_image_step_4 = True
+        # Update overall display
+        if self.parent().current_display == 0:
+            # Clear imageForm and imageDisplay
+            self.imageForm.clear()
+            self.parent().clearImageDisplay()
             self.imageForm.show()
             self.gpsForm.hide()
-        elif self.currentForm == 1:
+        else:
+            # Clear gpsForm and gpsDisplay
+            self.gpsForm.clear()
+            self.parent().clearGPSDisplay()
             self.imageForm.hide()
             self.gpsForm.show()
+        # Update status
+        self.updateStatus()
 
-    # def switchWidgets(self):
-    #     self.currentForm = (self.currentForm + 1) % 2
-    #     if self.currentForm == 0:
-    #         self.imageForm.show()
-    #         self.gpsForm.hide()
-    #     else:
-    #         self.imageForm.hide()
-    #         self.gpsForm.show()
-
-    def clear_clicked(self):
-        self.complete_step_1 = False
-        self.complete_step_2 = False
-        self.complete_step_3 = False
-        self.complete_images = False
-        if self.currentForm == 0:
-            self.imageForm.clear()
-            self.parent.clear_image()
-        else:
-            self.gpsForm.clear()
-            self.parent.clear_gps()
-        self.update_status()
-        self.import_directory = None
-
-    def move_file_list(self, file_list):
-        self.parent.img_display.first_image.current_image = file_list.pop(0)
-        self.parent.img_display.last_image.current_image = file_list.pop()
-        # self.image_selection_group.stored_files = file_list
-
-    def update_recent_file(self, filename):
-        #self.progress_bar.setText('Imported new image from ' + filename)
-        self.parent.img_display.add_filename(filename)
-
-    def reset_cursor(self):
-        QtGui.QApplication.restoreOverrideCursor()
-
-    def update_status(self):
-        if self.complete_step_1:
+    def updateStatus(self):
+        # Image - Step 1
+        if self.complete_image_step_1:
             self.imageForm.id_layout.show()
         else:
             self.imageForm.id_layout.hide()
-
-        if self.complete_step_2:
+        # Image - Step 2
+        if self.complete_image_step_2:
             self.imageForm.sync_layout.show()
         else:
             self.imageForm.sync_layout.hide()
-
-        if self.complete_step_3:
-            self.submit.setEnabled(True)
+        # Image - Step 3
+        if self.complete_image_step_3:
+            self.submitButton.setEnabled(True)
         else:
-            self.submit.setEnabled(False)
+            self.submitButton.setEnabled(False)
+        # Image - Step 4 (Images)
+        if self.complete_image_step_4:
+            self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
+            self.submitButton.setText("Submit")
+        else:
+            self.submitButton.setIcon(QtGui.QIcon(IMPORT_ICON))
+            self.submitButton.setText("Import")
 
         # CHECK IMAGES
         # print("TODO:", self.parent().all_images_selected())
 
-    @ex_deco
-    def submit_clicked(self, *args):
-        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-        # print('IMPORT SELF %r' % (self,))
-        #print('IMPORT ARGS %r' % (args,))
-        directory = self.import_directory
-        # print (directory)
-        if directory is None or directory == '':
-            self.reset_cursor()
-            raise IOError('Please select the directory that contains the photos you wish to import from.')
-            return
-        if str(self.imageForm.name_input.text()) == '':
-            self.reset_cursor()
-            raise IOError('The first image name must be defined.')
-            return
-        self.files = find_candidates(directory, str(self.imageForm.name_input.text()))
-        if len(self.files) == 0:
-            self.reset_cursor()
-            raise IOError('Could not find any files for selected directory. Please check your first image name.')
-            return
-        #send this file list to the selection group i am a bad programmer
-        self.file_bases = [basename(f) for f in self.files]
-        # print self.file_bases
-        self.move_file_list(self.file_bases)
+    def move_file_list(self, file_list):
+        self.parent().img_display.first_image.current_image = file_list.pop(0)
+        self.parent().img_display.last_image.current_image = file_list.pop()
+        # self.image_selection_group.stored_files = file_list
 
-        target_directory = join('..', 'data', 'images', str(self.imageForm.number_input.currentText()) + str(self.imageForm.color_input.currentText()), str(self.imageForm.letter_input.currentText()))
-        if not exists:
-            print("Target directory already exists... deleting")
-            rmtree(target_directory)
-        self.copyThread = CopyThread(self.files, [target_directory])
-        self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
-        self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
-        self.copyThread.start()
+    def update_recent_file(self, filename):
+        #self.progress_bar.setText('Imported new image from ' + filename)
+        self.parent().img_display.add_filename(filename)
+
+    def reset_cursor(self):
+        QtGui.QApplication.restoreOverrideCursor()
 
 
 class ImageForm(QtGui.QWidget, Ui_ImageForm):
@@ -229,25 +210,25 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         else:
             directory_ = directory
         self.drive_display.setText(directory_)
-        self.parent().complete_step_1 = True
-        self.parent().update_status()
+        self.parent().complete_image_step_1 = True
+        self.parent().updateStatus()
 
     def check_identification(self, ignore):
         color_index  = self.color_input.currentIndex()
         number_index = self.number_input.currentIndex()
         letter_index = self.letter_input.currentIndex()
         if color_index > 0 and number_index > 0 and letter_index > 0:
-            self.parent().complete_step_2 = True
+            self.parent().complete_image_step_2 = True
         else:
-            self.parent().complete_step_2 = False
-        self.parent().update_status()
+            self.parent().complete_image_step_2 = False
+        self.parent().updateStatus()
 
     def check_sync(self, value):
         if len(value) > 0:
-            self.parent().complete_step_3 = True
+            self.parent().complete_image_step_3 = True
         else:
-            self.parent().complete_step_3 = False
-        self.parent().update_status()
+            self.parent().complete_image_step_3 = False
+        self.parent().updateStatus()
 
     def clear(self):
         self.drive_display.setText('Select a Directory...')

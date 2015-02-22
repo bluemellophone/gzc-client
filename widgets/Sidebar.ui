@@ -97,7 +97,7 @@
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
-        <widget class="QPushButton" name="submit">
+        <widget class="QPushButton" name="submitButton">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -142,7 +142,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="clear">
+        <widget class="QPushButton" name="clearButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>

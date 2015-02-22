@@ -14,27 +14,55 @@ FILE_DPATH = dirname(__file__)
 BUTTON_SIZE = 100
 TOGGLE_BUTTON_CAM = join(FILE_DPATH, "assets/icons/icon_camera_small.png")
 TOGGLE_BUTTON_GPS = join(FILE_DPATH, "assets/icons/icon_gps_small.png")
-TOGGLE_BITMAP = join(FILE_DPATH, "assets/icons/bitmap_toggle_small.png")
+TOGGLE_BITMAP     = join(FILE_DPATH, "assets/icons/bitmap_toggle_small.png")
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self):
         QtGui.QWidget.__init__(self)
+        self.current_display = 0  # 0 -> image display, 1 -> gps display
         self.setupUi(self)
+        self.initWidgets()
+        self.initConnect()
+        self.initVisuals()
+
+    def initWidgets(self):
+        # Init displays
+        self.img_display = img.selection_group()
+        self.display_space.addWidget(self.img_display)
+        # Init sidebar (must happen second)
+        self.sidebar = sb.Sidebar(parent=self)
+        self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
+        self.sidebar_space.addWidget(self.sidebar)
+        # Load toggle button icons and bitmap
         self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(BUTTON_SIZE, BUTTON_SIZE)
         self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE)
         self.toggle_button_bitmap = QtGui.QPixmap(TOGGLE_BITMAP).scaled(BUTTON_SIZE, BUTTON_SIZE)
-        self.initWidgets()
-        self.initConnect()
+        # Init toggle button
+        self.toggle_button = QLabelButton(
+            icon1=self.toggle_button_cam_ic,
+            icon2=self.toggle_button_gps_ic,
+            bitmap=self.toggle_button_bitmap
+        )
+        self.toggle_button.resize(BUTTON_SIZE, BUTTON_SIZE)
+        self.toggle_button.move(self.width(), 0)
+        self.toggle_button.setParent(self.centralWidget())
+        self.toggle_button.show()
 
-        self.setWindowTitle("Great Zebra Count 2015")
-        # self.setStyleSheet("background-color: white;")
-
+    def initConnect(self):
+        self.toggle_button.clicked.connect(self.switchWidgets)
+        # Shortcut for fullscreen
         self.shortcutFull = QtGui.QShortcut(self)
         self.shortcutFull.setKey(QtGui.QKeySequence('F11'))
         self.shortcutFull.setContext(QtCore.Qt.ApplicationShortcut)
         self.shortcutFull.activated.connect(self.handleFullScreen)
 
+    def initVisuals(self):
+        # Set window title
+        self.setWindowTitle("Great Zebra Count 2015")
+        # self.setStyleSheet("background-color: white;")
+
+    # Slots
     def handleFullScreen(self):
         if self.isFullScreen():
             self.showNormal()
@@ -44,43 +72,29 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def resizeEvent(self, ev):
         self.toggle_button.move(self.width() - self.toggle_button.width(), 0)
 
-    def initWidgets(self):
-        self.current_display = 0  # 0 -> image display, 1 -> gps display
-        self.img_display = img.selection_group()
-        self.display_space.addWidget(self.img_display)
-
-        self.sidebar = sb.Sidebar(parent=self)
-        self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
-        self.sidebar_space.addWidget(self.sidebar)
-
-        self.toggle_button = QLabelButton(icon1=self.toggle_button_cam_ic, icon2=self.toggle_button_gps_ic, bitmap=self.toggle_button_bitmap)
-        self.toggle_button.resize(BUTTON_SIZE, BUTTON_SIZE)
-        #self.toggle_button.setStyleSheet("background-color: red;")
-        self.toggle_button.move(self.width(), 0)
-        self.toggle_button.setParent(self.centralWidget())
-        self.toggle_button.show()
-
-    def initConnect(self):
-        self.toggle_button.clicked.connect(self.switchWidgets)
-
-    def all_images_selected(self):
-        return self.img_display.all_images_selected()
-
-    def clear_image(self):
+    # Functions
+    def clearImageDisplay(self):
         self.img_display.clear()
         pass
 
-    def clear_gps(self):
+    def clearGPSDisplay(self):
         # self.gps_display.clear()
         pass
 
+    def clear(self):
+        self.clearImageDisplay()
+        self.clearGPSDisplay()
+
+    def allImagesSelected(self):
+        return self.img_display.all_images_selected()
+
     def switchWidgets(self):
         self.current_display = (self.current_display + 1) % 2
-        self.sidebar.switchWidgets(self.current_display)
+        self.sidebar.clear()
         if self.current_display == 0:
             self.img_display.show()
             #self.gps_display.hide()
-        else:
+        elif self.current_display == 1:
             self.img_display.hide()
             #self.gps_display.show()
 
