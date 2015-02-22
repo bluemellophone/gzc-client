@@ -9,7 +9,7 @@ import traceback
 from clientfuncs import CopyThread, find_candidates
 from os import path
 
-LOGO_SIZE = 200
+LOGO_SIZE = 150
 FILE_DPATH = dirname(__file__)
 LOGO_ZERO = join(FILE_DPATH, "../assets/logo_kwf_alpha.png")
 LOGO_ONE = join(FILE_DPATH, "../assets/logo_ibeis_alpha.png")
@@ -18,7 +18,7 @@ IMPORT_ICON = join(FILE_DPATH, "../assets/icons/icon_import.png")
 BROWSE_ICON = join(FILE_DPATH, "../assets/icons/icon_browse.png")
 CLEAR_ICON = join(FILE_DPATH, "../assets/icons/icon_trash.png")
 
-CAR_COLORS = [
+CAR_COLORS = [('Select Color', '')] + [
     ('white',    '#FFFFFF'),
     ('red',        '#D9534F'),
     ('orange', '#EF7A4C'),
@@ -28,8 +28,8 @@ CAR_COLORS = [
     ('purple', '#6F5499'),
     ('black',    '#333333'),
 ]
-CAR_NUMBER = [1, 25]  # [1, 50]
-PERSON_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
+CAR_NUMBER = ['Select Number'] + map(str, range(1, 26))  # 50
+PERSON_LETTERS = ['Select Letter'] + ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
 
 
 def ex_deco(action_func):
@@ -71,21 +71,24 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.initLogos()
         self.initWidgets()
         self.initConnect()
+        self.clear_clicked()
 
     def initLogos(self):
-        logo0 = QtGui.QPixmap(LOGO_ZERO).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
-        logo1 = QtGui.QPixmap(LOGO_ONE).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
-        logo2 = QtGui.QPixmap(LOGO_TWO).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
+        logo0 = QtGui.QPixmap(LOGO_ZERO)
+        # logo1 = QtGui.QPixmap(LOGO_ONE).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
+        # logo2 = QtGui.QPixmap(LOGO_TWO).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
         self.logo_0.setPixmap(logo0)
-        self.logo_1.setPixmap(logo1)
-        self.logo_2.setPixmap(logo2)
+        # self.logo_1.setPixmap(logo1)
+        # self.logo_2.setPixmap(logo2)
+        self.logo_1.setMaximumHeight(0)
+        self.logo_2.setMaximumHeight(0)
 
     def initWidgets(self):
         self.submit.setIcon(QtGui.QIcon(IMPORT_ICON))
         self.clear.setIcon(QtGui.QIcon(CLEAR_ICON))
         self.clear.setText("")
-        self.imageForm = ImageForm()
-        self.gpsForm = GPSForm()
+        self.imageForm = ImageForm(self)
+        self.gpsForm = GPSForm(self)
         self.currentForm = 0  # 0 -> imageForm, 1 -> gpsForm
         self.form.addWidget(self.imageForm)
         self.form.addWidget(self.gpsForm)
@@ -114,10 +117,15 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     #         self.gpsForm.show()
 
     def clear_clicked(self):
+        self.complete_step_1 = False
+        self.complete_step_2 = False
+        self.complete_step_3 = False
+        self.complete_images = False
         if self.currentForm == 0:
             self.imageForm.clear()
         else:
             self.gpsForm.clear()
+        self.update_status()
 
     def move_file_list(self, file_list):
         self.parent.img_display.first_image.current_image = file_list.pop(0)
@@ -130,6 +138,22 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
+
+    def update_status(self):
+        if self.complete_step_1:
+            self.imageForm.id_layout.show()
+        else:
+            self.imageForm.id_layout.hide()
+
+        if self.complete_step_2:
+            self.imageForm.sync_layout.show()
+        else:
+            self.imageForm.sync_layout.hide()
+
+        if self.complete_step_3:
+            self.submit.setEnabled(True)
+        else:
+            self.submit.setEnabled(False)
 
     @ex_deco
     def submit_clicked(self, *args):
@@ -164,58 +188,79 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
 
 class ImageForm(QtGui.QWidget, Ui_ImageForm):
-    def __init__(self):
-        QtGui.QWidget.__init__(self)
+    def __init__(self, parent):
+        QtGui.QWidget.__init__(self, parent)
         self.setupUi(self)
         self.initWidgets()
         self.initConnect()
 
     def initWidgets(self):
         self.drive_display.setReadOnly(True)
-        self.number_input.setMinimum(CAR_NUMBER[0])
-        self.number_input.setMaximum(CAR_NUMBER[1])
+        self.number_input.addItems(CAR_NUMBER)
         self.letter_input.addItems(PERSON_LETTERS)
         self.color_input = QwwColorComboBox()
         self.color_input_space.addWidget(self.color_input)
         for (color_name, color_hex) in CAR_COLORS:
             color = QtGui.QColor(color_hex)
             self.color_input.addColor(color, color_name)
+        self.drive_browse.setIcon(QtGui.QIcon(BROWSE_ICON))
 
     def initConnect(self):
         self.drive_browse.clicked.connect(self.open_directory)
-        self.drive_browse.setIcon(QtGui.QIcon(BROWSE_ICON))
+        self.color_input.currentIndexChanged[int].connect(self.check_identification)
+        self.number_input.currentIndexChanged[int].connect(self.check_identification)
+        self.letter_input.currentIndexChanged[int].connect(self.check_identification)
+        self.name_input.textEdited.connect(self.check_synch)
 
     def open_directory(self):
         directory = str(QtGui.QFileDialog.getExistingDirectory(self, 'Select Directory'))
         self.drive_display.setText(directory)
+        self.parent().complete_step_1 = True
+        self.parent().update_status()
+
+    def check_identification(self, ignore):
+        color_index  = self.color_input.currentIndex()
+        number_index = self.number_input.currentIndex()
+        letter_index = self.letter_input.currentIndex()
+        if color_index > 0 and number_index > 0 and letter_index > 0:
+            self.parent().complete_step_2 = True
+        else:
+            self.parent().complete_step_2 = False
+        self.parent().update_status()
+
+    def check_synch(self, value):
+        if len(value) > 0:
+            self.parent().complete_step_3 = True
+        else:
+            self.parent().complete_step_3 = False
+        self.parent().update_status()
 
     def clear(self):
         self.drive_display.setText("")
         self.color_input.setCurrentIndex(0)
-        self.number_input.setValue(1)
+        self.number_input.setCurrentIndex(0)
         self.letter_input.setCurrentIndex(0)
         self.name_input.setText("")
         self.time_input.setTime(QtCore.QTime(0, 0, 0, 0))
 
 
 class GPSForm(QtGui.QWidget, Ui_GPSForm):
-    def __init__(self):
-        QtGui.QWidget.__init__(self)
+    def __init__(self, parent):
+        QtGui.QWidget.__init__(self, parent)
         self.setupUi(self)
         self.initWidgets()
 
     def initWidgets(self):
         self.color_input = QwwColorComboBox()
         self.color_input_space.addWidget(self.color_input)
-        self.number_input.setMinimum(CAR_NUMBER[0])
-        self.number_input.setMaximum(CAR_NUMBER[1])
+        self.number_input.addItems(CAR_NUMBER)
         for (color_name, color_hex) in CAR_COLORS:
             color = QtGui.QColor(color_hex)
             self.color_input.addColor(color, color_name)
 
     def clear(self):
         self.color_input.setCurrentIndex(0)
-        self.number_input.setValue(1)
+        self.number_input.setCurrentIndex(0)
         self.time_input.setTime(QtCore.QTime(0, 0, 0, 0))
 
 

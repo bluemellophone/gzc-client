@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>282</width>
-    <height>598</height>
+    <width>364</width>
+    <height>763</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -32,7 +32,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QVBoxLayout" name="layout" stretch="0,0,0,0,0,2,0,0">
+    <layout class="QVBoxLayout" name="layout" stretch="1,0,5,1,0,0">
      <item>
       <layout class="QHBoxLayout" name="logo_layout_wide" stretch="0,0,0">
        <item>
@@ -92,35 +92,15 @@
       <layout class="QVBoxLayout" name="form"/>
      </item>
      <item>
-      <widget class="QFrame" name="frame">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
       <layout class="QHBoxLayout" name="button_layout" stretch="5,1">
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
         <widget class="QPushButton" name="submit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
@@ -130,23 +110,34 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>70</height>
+           <height>100</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>70</height>
+           <height>100</height>
           </size>
          </property>
          <property name="font">
           <font>
-           <weight>50</weight>
-           <bold>false</bold>
+           <pointsize>-1</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font-size:32px;</string>
          </property>
          <property name="text">
           <string>Import</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -161,29 +152,34 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>70</height>
+           <height>100</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>70</height>
+           <height>100</height>
           </size>
          </property>
          <property name="font">
           <font>
-           <weight>50</weight>
-           <bold>false</bold>
+           <pointsize>-1</pointsize>
           </font>
          </property>
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
          <property name="styleSheet">
-          <string notr="true">color: red;</string>
+          <string notr="true">color: red; font-size:24px;</string>
          </property>
          <property name="text">
           <string>Clear</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
          </property>
          <property name="autoDefault">
           <bool>false</bool>

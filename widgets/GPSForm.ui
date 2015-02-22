@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>237</height>
+    <width>458</width>
+    <height>494</height>
    </rect>
   </property>
   <property name="font">
@@ -26,13 +26,36 @@
      </property>
      <item>
       <widget class="QGroupBox" name="id_layout">
+       <property name="font">
+        <font>
+         <pointsize>-1</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size:20px;color:#333;</string>
+       </property>
        <property name="title">
-        <string>1 - Input Identification Information:</string>
+        <string>Step 1 - Identification</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
        </property>
        <layout class="QFormLayout" name="formLayout_4">
         <property name="fieldGrowthPolicy">
          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
         </property>
+        <item row="0" column="1">
+         <layout class="QVBoxLayout" name="color_input_space"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="numer_label">
+          <property name="text">
+           <string>Car Number</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="color_label">
           <property name="text">
@@ -40,33 +63,52 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="numer_label">
-          <property name="text">
-           <string>Car #</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="1">
-         <widget class="QSpinBox" name="number_input">
+         <widget class="QComboBox" name="number_input">
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>0</height>
+            <height>30</height>
            </size>
           </property>
          </widget>
-        </item>
-        <item row="0" column="1">
-         <layout class="QVBoxLayout" name="color_input_space"/>
         </item>
        </layout>
       </widget>
      </item>
      <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Maximum</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QGroupBox" name="sync_layout">
+       <property name="font">
+        <font>
+         <pointsize>-1</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size:20px;color:#333;</string>
+       </property>
        <property name="title">
-        <string>2 - Synchronize GPS Information:</string>
+        <string>Step 2 - Synchronize</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
        </property>
        <layout class="QFormLayout" name="formLayout_6">
         <property name="fieldGrowthPolicy">
@@ -84,34 +126,35 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>0</height>
+            <height>30</height>
            </size>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
           </property>
           <property name="displayFormat">
            <string>HH:mm</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="sync_status">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>50</weight>
-            <italic>true</italic>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color: #666;</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>

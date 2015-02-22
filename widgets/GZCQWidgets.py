@@ -1,3 +1,4 @@
+import PyQt4
 from PyQt4 import QtCore, QtGui
 
 
@@ -39,6 +40,19 @@ class QwwColorComboBox(QtGui.QComboBox):
 
     activated = QtCore.pyqtSignal(QtGui.QColor)
 
+    def __init__(self, parent=None, **kwargs):
+        QtGui.QComboBox.__init__(self, parent, **kwargs)
+
+        self._dlgEnabled = False
+        self._model = ColorModel(self)
+
+        self.activated.connect(self._q_activated)
+
+        self.setModel(self._model)
+        self.view().installEventFilter(self)
+        self.setMinimumHeight(30)
+        self.setAcceptDrops(True)
+
     # ColorDialogEnabled property
     def isColorDialogEnabled(self):
         return self._dlgEnabled
@@ -78,18 +92,6 @@ class QwwColorComboBox(QtGui.QComboBox):
         self.update()
 
     colors = QtCore.pyqtProperty(list, fget=colors, fset=setColors)
-
-    def __init__(self, parent=None, **kwargs):
-        QtGui.QComboBox.__init__(self, parent, **kwargs)
-
-        self._dlgEnabled = False
-        self._model = ColorModel(self)
-
-        self.activated.connect(self._q_activated)
-
-        self.setModel(self._model)
-        self.view().installEventFilter(self)
-        self.setAcceptDrops(True)
 
     def _q_activated(self, i):
         if self.isColorDialogEnabled() and i == self.count() - 1:
@@ -208,7 +210,7 @@ class QLabelButton(QtGui.QLabel):
         self.bitmap = bitmap
         self.setPixmap(icon1)
         color = self.palette().background().color().name()
-        self.setStyleSheet("background-color: %s;"%color)
+        self.setStyleSheet("background-color: %s;" % (color, ))
         self.setAutoFillBackground(True)
         self.setMask(self.bitmap.mask())
         self.current = 0
