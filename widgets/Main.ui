@@ -47,30 +47,30 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionSpecify_Domain"/>
-    <addaction name="actionSpecify_Filepaths"/>
+    <addaction name="actionSpecifyDomain"/>
+    <addaction name="actionSpecifyFilepaths"/>
     <addaction name="separator"/>
-    <addaction name="actionManually_Select_Images"/>
-    <addaction name="actionManually_Select_GPS_Data"/>
+    <addaction name="actionManuallySelectImages"/>
+    <addaction name="actionManuallySelectGPS"/>
    </widget>
    <addaction name="menuOptions"/>
   </widget>
-  <action name="actionSpecify_Domain">
+  <action name="actionSpecifyDomain">
    <property name="text">
     <string>Specify Domain</string>
    </property>
   </action>
-  <action name="actionSpecify_Filepaths">
+  <action name="actionSpecifyFilepaths">
    <property name="text">
     <string>Specify Filepaths</string>
    </property>
   </action>
-  <action name="actionManually_Select_Images">
+  <action name="actionManuallySelectImages">
    <property name="text">
     <string>Manually Select Images</string>
    </property>
   </action>
-  <action name="actionManually_Select_GPS_Data">
+  <action name="actionManuallySelectGPS">
    <property name="text">
     <string>Manually Select GPS Data</string>
    </property>

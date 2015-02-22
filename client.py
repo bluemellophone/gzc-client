@@ -50,6 +50,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def initConnect(self):
         self.toggleButton.clicked.connect(self.switchWidgets)
+        self.actionSpecifyDomain.triggered.connect(self.specifyDomain)
+        self.actionSpecifyFilepaths.triggered.connect(self.specifyFilepaths)
+        self.actionManuallySelectImages.triggered.connect(self.manuallySelectImages)
+        self.actionManuallySelectGPS.triggered.connect(self.manuallySelectGPS)
         # Shortcut for fullscreen
         self.shortcutFull = QtGui.QShortcut(self)
         self.shortcutFull.setKey(QtGui.QKeySequence('F11'))
@@ -70,6 +74,18 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def resizeEvent(self, ev):
         self.toggleButton.move(self.width() - self.toggleButton.width(), 0)
+
+    def specifyDomain(self, checked):
+        print('specifyDomain')
+
+    def specifyFilepaths(self, checked):
+        print('specifyFilepaths')
+
+    def manuallySelectImages(self, checked):
+        print('manuallySelectImages')
+
+    def manuallySelectGPS(self, checked):
+        print('manuallySelectGPS')
 
     # Functions
     def allImagesSelected(self):

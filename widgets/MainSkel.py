@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Main.ui'
 #
-# Created: Sun Feb 22 14:48:44 2015
+# Created: Sun Feb 22 14:55:50 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -52,19 +52,19 @@ class Ui_MainWindow(object):
         self.menuOptions = QtGui.QMenu(self.menubar)
         self.menuOptions.setObjectName(_fromUtf8("menuOptions"))
         MainWindow.setMenuBar(self.menubar)
-        self.actionSpecify_Domain = QtGui.QAction(MainWindow)
-        self.actionSpecify_Domain.setObjectName(_fromUtf8("actionSpecify_Domain"))
-        self.actionSpecify_Filepaths = QtGui.QAction(MainWindow)
-        self.actionSpecify_Filepaths.setObjectName(_fromUtf8("actionSpecify_Filepaths"))
-        self.actionManually_Select_Images = QtGui.QAction(MainWindow)
-        self.actionManually_Select_Images.setObjectName(_fromUtf8("actionManually_Select_Images"))
-        self.actionManually_Select_GPS_Data = QtGui.QAction(MainWindow)
-        self.actionManually_Select_GPS_Data.setObjectName(_fromUtf8("actionManually_Select_GPS_Data"))
-        self.menuOptions.addAction(self.actionSpecify_Domain)
-        self.menuOptions.addAction(self.actionSpecify_Filepaths)
+        self.actionSpecifyDomain = QtGui.QAction(MainWindow)
+        self.actionSpecifyDomain.setObjectName(_fromUtf8("actionSpecifyDomain"))
+        self.actionSpecifyFilepaths = QtGui.QAction(MainWindow)
+        self.actionSpecifyFilepaths.setObjectName(_fromUtf8("actionSpecifyFilepaths"))
+        self.actionManuallySelectImages = QtGui.QAction(MainWindow)
+        self.actionManuallySelectImages.setObjectName(_fromUtf8("actionManuallySelectImages"))
+        self.actionManuallySelectGPS = QtGui.QAction(MainWindow)
+        self.actionManuallySelectGPS.setObjectName(_fromUtf8("actionManuallySelectGPS"))
+        self.menuOptions.addAction(self.actionSpecifyDomain)
+        self.menuOptions.addAction(self.actionSpecifyFilepaths)
         self.menuOptions.addSeparator()
-        self.menuOptions.addAction(self.actionManually_Select_Images)
-        self.menuOptions.addAction(self.actionManually_Select_GPS_Data)
+        self.menuOptions.addAction(self.actionManuallySelectImages)
+        self.menuOptions.addAction(self.actionManuallySelectGPS)
         self.menubar.addAction(self.menuOptions.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -73,8 +73,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.menuOptions.setTitle(_translate("MainWindow", "File", None))
-        self.actionSpecify_Domain.setText(_translate("MainWindow", "Specify Domain", None))
-        self.actionSpecify_Filepaths.setText(_translate("MainWindow", "Specify Filepaths", None))
-        self.actionManually_Select_Images.setText(_translate("MainWindow", "Manually Select Images", None))
-        self.actionManually_Select_GPS_Data.setText(_translate("MainWindow", "Manually Select GPS Data", None))
+        self.actionSpecifyDomain.setText(_translate("MainWindow", "Specify Domain", None))
+        self.actionSpecifyFilepaths.setText(_translate("MainWindow", "Specify Filepaths", None))
+        self.actionManuallySelectImages.setText(_translate("MainWindow", "Manually Select Images", None))
+        self.actionManuallySelectGPS.setText(_translate("MainWindow", "Manually Select GPS Data", None))
 
