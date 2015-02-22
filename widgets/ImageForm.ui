@@ -38,13 +38,13 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>139</height>
+         <height>129</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>139</height>
+         <height>129</height>
         </size>
        </property>
        <property name="sizeIncrement">
@@ -102,17 +102,18 @@
          </widget>
         </item>
         <item row="2" column="0" colspan="2">
-         <widget class="QLineEdit" name="drive_display">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>30</height>
-           </size>
+         <widget class="QLabel" name="drive_display">
+          <property name="styleSheet">
+           <string notr="true">color:#666;</string>
           </property>
-          <property name="font">
-           <font>
-            <pointsize>-1</pointsize>
-           </font>
+          <property name="text">
+           <string>Select a Directory</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -186,8 +187,17 @@
         </property>
         <item row="0" column="0">
          <widget class="QLabel" name="color_label">
+          <property name="minimumSize">
+           <size>
+            <width>159</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Car Color</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -196,8 +206,17 @@
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="id_label">
+          <property name="minimumSize">
+           <size>
+            <width>159</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Person Letter</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -223,8 +242,17 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="numer_label">
+          <property name="minimumSize">
+           <size>
+            <width>159</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Car Number</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -252,13 +280,13 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>126</height>
+         <height>154</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>126</height>
+         <height>154</height>
         </size>
        </property>
        <property name="font">
@@ -289,6 +317,9 @@
           <property name="text">
            <string>First Image Name</string>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -304,14 +335,23 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="time_label">
+          <property name="minimumSize">
+           <size>
+            <width>159</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>First Image Time</string>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <widget class="QTimeEdit" name="time_input">
           <property name="minimumSize">
            <size>
@@ -333,6 +373,25 @@
           </property>
           <property name="displayFormat">
            <string>HH:mm</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color:#666;</string>
+          </property>
+          <property name="text">
+           <string>Specify image name</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GPSForm.ui'
 #
-# Created: Sat Feb 21 23:22:14 2015
+# Created: Sun Feb 22 00:03:04 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -51,9 +51,13 @@ class Ui_GPSForm(object):
         self.color_input_space.setObjectName(_fromUtf8("color_input_space"))
         self.formLayout_4.setLayout(0, QtGui.QFormLayout.FieldRole, self.color_input_space)
         self.numer_label = QtGui.QLabel(self.id_layout)
+        self.numer_label.setMinimumSize(QtCore.QSize(159, 0))
+        self.numer_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.numer_label.setObjectName(_fromUtf8("numer_label"))
         self.formLayout_4.setWidget(1, QtGui.QFormLayout.LabelRole, self.numer_label)
         self.color_label = QtGui.QLabel(self.id_layout)
+        self.color_label.setMinimumSize(QtCore.QSize(159, 0))
+        self.color_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.color_label.setObjectName(_fromUtf8("color_label"))
         self.formLayout_4.setWidget(0, QtGui.QFormLayout.LabelRole, self.color_label)
         self.number_input = QtGui.QComboBox(self.id_layout)
@@ -76,6 +80,8 @@ class Ui_GPSForm(object):
         self.formLayout_6.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)
         self.formLayout_6.setObjectName(_fromUtf8("formLayout_6"))
         self.time_label = QtGui.QLabel(self.sync_layout)
+        self.time_label.setMinimumSize(QtCore.QSize(159, 0))
+        self.time_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.time_label.setObjectName(_fromUtf8("time_label"))
         self.formLayout_6.setWidget(0, QtGui.QFormLayout.LabelRole, self.time_label)
         self.time_input = QtGui.QTimeEdit(self.sync_layout)

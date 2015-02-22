@@ -24,18 +24,8 @@ class first_last_image(QtGui.QFrame):
 
     def init_widgets(self):
         self.image = QtGui.QLabel()
-        self.image.setScaledContents(True)
-        Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE)
-        pxSizeX = Pixmap.size().width()
-        pxSizeY = Pixmap.size().height()
-        if pxSizeX > pxSizeY:
-            Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
-        else:
-            Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
-        self.desiredsize = QtCore.QSize(IMAGE_SIZE, IMAGE_SIZE)
+        # self.image.setScaledContents(True)
         self.image.setAlignment(QtCore.Qt.AlignCenter)
-        self.image.setPixmap(Pixmap)
-        self.current_image = PLACEHOLDER_IMAGE
 
         #border stuffff?
         self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
@@ -46,6 +36,8 @@ class first_last_image(QtGui.QFrame):
 
         self.info_text = QtGui.QLabel("", self)
         self.info_text.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.clear()
 
     def init_layout(self):
         grid = QtGui.QGridLayout()
@@ -69,13 +61,8 @@ class first_last_image(QtGui.QFrame):
         self.current_image = filename
         self.image_time.setText(time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image))))
 
-
-class image_selection_roll(QtGui.QLabel):
-    #Modify the QtGui.QLabel functionality to allow it to act like a button
-    def __init__(self, *args):
-        apply(QtGui.QLabel.__init__, (self, ) + args)
-        QtGui.QLabel.__init__(self)
-        #self.setScaledContents(True) #<--this causes the image displayed to be centered, but stretched. Aspect ratio not maintained
+    def clear(self):
+        self.image_time.setText("Awaiting images...")
         Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE)
         pxSizeX = Pixmap.size().width()
         pxSizeY = Pixmap.size().height()
@@ -84,10 +71,18 @@ class image_selection_roll(QtGui.QLabel):
         else:
             Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
         self.desiredsize = QtCore.QSize(IMAGE_SIZE, IMAGE_SIZE)
-        self.setAlignment(QtCore.Qt.AlignCenter)
-        self.setPixmap(Pixmap)
-
+        self.image.setPixmap(Pixmap)
         self.current_image = PLACEHOLDER_IMAGE
+
+
+class image_selection_roll(QtGui.QLabel):
+    #Modify the QtGui.QLabel functionality to allow it to act like a button
+    def __init__(self, *args):
+        apply(QtGui.QLabel.__init__, (self, ) + args)
+        QtGui.QLabel.__init__(self)
+        # self.setScaledContents(True)  # <--this causes the image displayed to be centered, but stretched. Aspect ratio not maintained
+        self.setAlignment(QtCore.Qt.AlignCenter)
+        self.clear()
 
     def mouseReleaseEvent(self, ev):
         self.emit(QtCore.SIGNAL('clicked()'))
@@ -111,6 +106,18 @@ class image_selection_roll(QtGui.QLabel):
             return "Awaiting images..."
         else:
             return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
+
+    def clear(self):
+        Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE)
+        pxSizeX = Pixmap.size().width()
+        pxSizeY = Pixmap.size().height()
+        if pxSizeX > pxSizeY:
+            Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
+        else:
+            Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
+        self.desiredsize = QtCore.QSize(IMAGE_SIZE, IMAGE_SIZE)
+        self.setPixmap(Pixmap)
+        self.current_image = PLACEHOLDER_IMAGE
 
 
 class image_selection_box(QtGui.QWidget):
@@ -177,6 +184,21 @@ class image_selection_box(QtGui.QWidget):
             checked.setChecked(False)
             self.select_group.setExclusive(True)
 
+    def option_selected(self):
+        return self.select_group.checkedId() >= 0
+
+    def clear(self):
+        self.image.clear()
+        self.image_time.setText("Awaiting images...")
+        self.select_zebra.setEnabled(False)
+        self.select_giraffe.setEnabled(False)
+        checked = self.select_group.checkedButton()
+        if checked is not None:
+            #HACK to reset all checked states
+            self.select_group.setExclusive(False)
+            checked.setChecked(False)
+            self.select_group.setExclusive(True)
+
     def get_selection(self):
         return (path.basename(self.image.current_image), self.select_group.checkedButton().text())
 
@@ -202,46 +224,51 @@ class selection_group(QtGui.QWidget):
         self.last_image = first_last_image(self)
         self.last_image.info_text.setText("Last Image in Directory")
 
+    def all_images_selected(self):
+        for image_box in self.image_boxes:
+            if not image_box.option_selected():
+                return False
+        return True
     def init_layout(self):
 
         gridV = QtGui.QVBoxLayout()
         hor1 = QtGui.QHBoxLayout()
         hor2 = QtGui.QHBoxLayout()
         hor3 = QtGui.QHBoxLayout()
-        hor1.addStretch(1)
+        # hor1.addStretch(1)
         hor1.addWidget(self.first_image)
-        hor1.addStretch(1)
+        # hor1.addStretch(1)
         hor1.addWidget(self.image_boxes[0])
-        hor1.addStretch(1)
+        # hor1.addStretch(1)
         hor1.addWidget(self.image_boxes[1])
-        hor1.addStretch(1)
+        # hor1.addStretch(1)
         hor1.addWidget(self.image_boxes[2])
-        hor1.addStretch(1)
-        hor2.addStretch(1)
+        # hor1.addStretch(1)
+        # hor2.addStretch(1)
         hor2.addWidget(self.image_boxes[3])
-        hor2.addStretch(1)
+        # hor2.addStretch(1)
         hor2.addWidget(self.image_boxes[4])
-        hor2.addStretch(1)
+        # hor2.addStretch(1)
         hor2.addWidget(self.image_boxes[5])
-        hor2.addStretch(1)
+        # hor2.addStretch(1)
         hor2.addWidget(self.image_boxes[6])
-        hor2.addStretch(1)
-        hor3.addStretch(1)
+        # hor2.addStretch(1)
+        # hor3.addStretch(1)
         hor3.addWidget(self.image_boxes[7])
-        hor3.addStretch(1)
+        # hor3.addStretch(1)
         hor3.addWidget(self.image_boxes[8])
-        hor3.addStretch(1)
+        # hor3.addStretch(1)
         hor3.addWidget(self.image_boxes[9])
-        hor3.addStretch(1)
+        # hor3.addStretch(1)
         hor3.addWidget(self.last_image)
-        hor3.addStretch(1)
-        gridV.addStretch(1)
+        # hor3.addStretch(1)
+        # gridV.addStretch(1)
         gridV.addLayout(hor1)
-        gridV.addStretch(1)
+        # gridV.addStretch(1)
         gridV.addLayout(hor2)
-        gridV.addStretch(1)
+        # gridV.addStretch(1)
         gridV.addLayout(hor3)
-        gridV.addStretch(1)
+        # gridV.addStretch(1)
 
         self.setLayout(gridV)
 
@@ -262,6 +289,14 @@ class selection_group(QtGui.QWidget):
                     IB.reroll()
                     break
         #if we've filled the image boxes, update the last image
+
+    def clear(self):
+        self.stored_files = []
+        self.active_files = []
+        self.first_image.clear()
+        self.last_image.clear()
+        for image_box in self.image_boxes:
+            image_box.clear()
 
     def get_filename(self):
         if len(self.active_files) ==  0:

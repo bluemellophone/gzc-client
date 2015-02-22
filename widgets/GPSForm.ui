@@ -51,15 +51,33 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="numer_label">
+          <property name="minimumSize">
+           <size>
+            <width>159</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Car Number</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="color_label">
+          <property name="minimumSize">
+           <size>
+            <width>159</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Car Color</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -116,8 +134,17 @@
         </property>
         <item row="0" column="0">
          <widget class="QLabel" name="time_label">
+          <property name="minimumSize">
+           <size>
+            <width>159</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Car Start Time</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>

@@ -45,12 +45,13 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.toggle_button.move(self.width() - self.toggle_button.width(), 0)
 
     def initWidgets(self):
-        self.sidebar = sb.Sidebar(parent=self)
-        self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
-        self.sidebar_space.addWidget(self.sidebar)
         self.current_display = 0  # 0 -> image display, 1 -> gps display
         self.img_display = img.selection_group()
         self.display_space.addWidget(self.img_display)
+
+        self.sidebar = sb.Sidebar(parent=self)
+        self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
+        self.sidebar_space.addWidget(self.sidebar)
 
         self.toggle_button = QLabelButton(icon1=self.toggle_button_cam_ic, icon2=self.toggle_button_gps_ic, bitmap=self.toggle_button_bitmap)
         self.toggle_button.resize(BUTTON_SIZE, BUTTON_SIZE)
@@ -61,6 +62,17 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def initConnect(self):
         self.toggle_button.clicked.connect(self.switchWidgets)
+
+    def all_images_selected(self):
+        return self.img_display.all_images_selected()
+
+    def clear_image(self):
+        self.img_display.clear()
+        pass
+
+    def clear_gps(self):
+        # self.gps_display.clear()
+        pass
 
     def switchWidgets(self):
         self.current_display = (self.current_display + 1) % 2
