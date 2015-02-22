@@ -30,26 +30,26 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def initWidgets(self):
         # Init displays
-        self.img_display = img.selection_group()
-        self.display_space.addWidget(self.img_display)
+        self.imageDisplay = img.selection_group()
+        self.displaySpace.addWidget(self.imageDisplay)
         # Init sidebar (must happen second)
         self.currentDisplay = 0  # 0 -> image display, 1 -> gps display
         self.sidebar = sb.Sidebar(parent=self)
         self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
-        self.sidebar_space.addWidget(self.sidebar)
+        self.sidebarSpace.addWidget(self.sidebar)
         # Init toggle button
-        self.toggle_button = QLabelButton(
+        self.toggleButton = QLabelButton(
             icon1=self.toggle_button_cam_ic,
             icon2=self.toggle_button_gps_ic,
             bitmap=self.toggle_button_bitmap
         )
-        self.toggle_button.resize(BUTTON_SIZE, BUTTON_SIZE)
-        self.toggle_button.move(self.width(), 0)
-        self.toggle_button.setParent(self.centralWidget())
-        self.toggle_button.show()
+        self.toggleButton.resize(BUTTON_SIZE, BUTTON_SIZE)
+        self.toggleButton.move(self.width(), 0)
+        self.toggleButton.setParent(self.centralWidget())
+        self.toggleButton.show()
 
     def initConnect(self):
-        self.toggle_button.clicked.connect(self.switchWidgets)
+        self.toggleButton.clicked.connect(self.switchWidgets)
         # Shortcut for fullscreen
         self.shortcutFull = QtGui.QShortcut(self)
         self.shortcutFull.setKey(QtGui.QKeySequence('F11'))
@@ -69,28 +69,28 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             self.showFullScreen()
 
     def resizeEvent(self, ev):
-        self.toggle_button.move(self.width() - self.toggle_button.width(), 0)
+        self.toggleButton.move(self.width() - self.toggleButton.width(), 0)
 
     # Functions
     def allImagesSelected(self):
-        return self.img_display.all_images_selected()
+        return self.imageDisplay.allImagesSelected()
 
     def switchWidgets(self):
         self.currentDisplay = (self.currentDisplay + 1) % 2
         self.sidebar.clear()
         if self.currentDisplay == 0:
-            self.img_display.show()
-            #self.gps_display.hide()
+            self.imageDisplay.show()
+            #self.gpsDisplay.hide()
         elif self.currentDisplay == 1:
-            self.img_display.hide()
-            #self.gps_display.show()
+            self.imageDisplay.hide()
+            #self.gpsDisplay.show()
 
     def clearImageDisplay(self):
-        self.img_display.clear()
+        self.imageDisplay.clear()
         pass
 
     def clearGPSDisplay(self):
-        # self.gps_display.clear()
+        # self.gpsDisplay.clear()
         pass
 
     def clear(self):

@@ -57,9 +57,9 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         logo0 = QtGui.QPixmap(LOGO_ZERO)
         # logo1 = QtGui.QPixmap(LOGO_ONE).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
         # logo2 = QtGui.QPixmap(LOGO_TWO).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
-        self.logo_0.setPixmap(logo0)
-        # self.logo_1.setPixmap(logo1)
-        # self.logo_2.setPixmap(logo2)
+        self.logo0.setPixmap(logo0)
+        # self.logo1.setPixmap(logo1)
+        # self.logo2.setPixmap(logo2)
 
     def initConnect(self):
         self.submitButton.clicked.connect(self.submitClicked)
@@ -70,48 +70,54 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.clearButton.setText('')
         self.clearButton.setIcon(QtGui.QIcon(CLEAR_ICON))
         # Hide non-visible icons
-        self.logo_1.setMaximumHeight(0)
-        self.logo_2.setMaximumHeight(0)
+        self.logo1.setMaximumHeight(0)
+        self.logo2.setMaximumHeight(0)
         # Clear Sidebar
         self.clear()
 
     # Slots
     @ex_deco
     def submitClicked(self, *args):
-        if self.complete_image_step_4:
-            print('COMPILE ZIP')
-        else:
-            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-            # print('IMPORT SELF %r' % (self,))
-            #print('IMPORT ARGS %r' % (args,))
-            directory = self.import_directory
-            # print (directory)
-            if directory is None or directory == '':
-                self.reset_cursor()
-                raise IOError('Please select the directory that contains the photos you wish to import from.')
-                return
-            if str(self.imageForm.name_input.text()) == '':
-                self.reset_cursor()
-                raise IOError('The first image name must be defined.')
-                return
-            self.files = find_candidates(directory, str(self.imageForm.name_input.text()))
-            if len(self.files) == 0:
-                self.reset_cursor()
-                raise IOError('Could not find any files for selected directory. Please check your first image name.')
-                return
-            #send this file list to the selection group i am a bad programmer
-            self.file_bases = [basename(f) for f in self.files]
-            # print self.file_bases
-            self.move_file_list(self.file_bases)
+        if self.parent.currentDisplay == 0:
+            if self.complete_image_step_4:
+                print('COMPILE ZIP')
+            else:
+                car_number = str(self.imageForm.numberInput.currentText())
+                car_color = str(self.imageForm.colorInput.currentText())
+                person_letter = str(self.imageForm.letterInput.currentText())
+                QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+                # print('IMPORT SELF %r' % (self,))
+                #print('IMPORT ARGS %r' % (args,))
+                directory = self.import_directory
+                # print (directory)
+                if directory is None or directory == '':
+                    self.reset_cursor()
+                    raise IOError('Please select the directory that contains the photos you wish to import from.')
+                    return
+                if str(self.imageForm.nameInput.text()) == '':
+                    self.reset_cursor()
+                    raise IOError('The first image name must be defined.')
+                    return
+                self.files = find_candidates(directory, str(self.imageForm.nameInput.text()))
+                if len(self.files) == 0:
+                    self.reset_cursor()
+                    raise IOError('Could not find any files for selected directory. Please check your first image name.')
+                    return
+                #send this file list to the selection group i am a bad programmer
+                self.file_bases = [basename(f) for f in self.files]
+                # print self.file_bases
+                self.move_file_list(self.file_bases)
 
-            target_directory = join('..', 'data', 'images', str(self.imageForm.number_input.currentText()) + str(self.imageForm.color_input.currentText()), str(self.imageForm.letter_input.currentText()))
-            if not exists:
-                print("Target directory already exists... deleting")
-                rmtree(target_directory)
-            self.copyThread = CopyThread(self.files, [target_directory])
-            self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
-            self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
-            self.copyThread.start()
+                target_directory = join('..', 'data', 'images', car_number + car_color, person_letter)
+                if exists(target_directory):
+                    print("Target directory already exists... deleting")
+                    rmtree(target_directory)
+                self.copyThread = CopyThread(self.files, [target_directory])
+                self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
+                self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
+                self.copyThread.start()
+        elif self.parent.currentDisplay == 1:
+            print('START IMPORT')
 
     def clearClicked(self):
         self.clear()
@@ -120,17 +126,17 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def updateStatus(self):
         if self.parent.currentDisplay == 0:
             # Image - Step 0 (always show)
-            self.imageForm.drive_layout.show()
+            self.imageForm.driveLayout.show()
             # Image - Step 1
             if self.complete_image_step_1:
-                self.imageForm.id_layout.show()
+                self.imageForm.idLayout.show()
             else:
-                self.imageForm.id_layout.hide()
+                self.imageForm.idLayout.hide()
             # Image - Step 2
             if self.complete_image_step_2:
-                self.imageForm.sync_layout.show()
+                self.imageForm.syncLayout.show()
             else:
-                self.imageForm.sync_layout.hide()
+                self.imageForm.syncLayout.hide()
             # Image - Step 3
             if self.complete_image_step_3:
                 self.submitButton.setEnabled(True)
@@ -148,23 +154,23 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             # print("TODO:", self.parent.allImagesSelected())
         elif self.parent.currentDisplay == 1:
             # GPS - Step 0 (always show)
-            self.gpsForm.id_layout.show()
+            self.gpsForm.idLayout.show()
             # GPS - Step 1
             if self.complete_gps_step_1:
-                self.gpsForm.sync_layout.show()
+                self.gpsForm.syncLayout.show()
                 self.submitButton.setEnabled(True)
             else:
-                self.gpsForm.sync_layout.hide()
+                self.gpsForm.syncLayout.hide()
                 self.submitButton.setEnabled(False)
 
     def move_file_list(self, file_list):
-        self.parent.img_display.first_image.current_image = file_list.pop(0)
-        self.parent.img_display.last_image.current_image = file_list.pop()
+        self.parent.imageDisplay.first_image.current_image = file_list.pop(0)
+        self.parent.imageDisplay.last_image.current_image = file_list.pop()
         # self.image_selection_group.stored_files = file_list
 
     def update_recent_file(self, filename):
         #self.progress_bar.setText('Imported new image from ' + filename)
-        self.parent.img_display.add_filename(filename)
+        self.parent.imageDisplay.add_filename(filename)
 
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
@@ -204,27 +210,27 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         self.initConnect()
 
     def initWidgets(self):
-        self.number_input.addItems(CAR_NUMBER)
-        self.letter_input.addItems(PERSON_LETTERS)
-        self.color_input = QwwColorComboBox()
-        self.color_input_space.addWidget(self.color_input)
+        self.numberInput.addItems(CAR_NUMBER)
+        self.letterInput.addItems(PERSON_LETTERS)
+        self.colorInput = QwwColorComboBox()
+        self.colorInputContainer.addWidget(self.colorInput)
         for (color_name, color_hex) in CAR_COLORS:
             color = QtGui.QColor(color_hex)
-            self.color_input.addColor(color, color_name)
-        self.drive_browse.setIcon(QtGui.QIcon(BROWSE_ICON))
+            self.colorInput.addColor(color, color_name)
+        self.driveBrowse.setIcon(QtGui.QIcon(BROWSE_ICON))
 
     def initConnect(self):
-        self.drive_browse.clicked.connect(self.open_directory)
-        self.color_input.currentIndexChanged[int].connect(self.check_identification)
-        self.number_input.currentIndexChanged[int].connect(self.check_identification)
-        self.letter_input.currentIndexChanged[int].connect(self.check_identification)
-        self.name_input.textEdited.connect(self.check_sync)
+        self.driveBrowse.clicked.connect(self.open_directory)
+        self.colorInput.currentIndexChanged[int].connect(self.check_identification)
+        self.numberInput.currentIndexChanged[int].connect(self.check_identification)
+        self.letterInput.currentIndexChanged[int].connect(self.check_identification)
+        self.nameInput.textEdited.connect(self.check_sync)
 
     # Slots
     def check_identification(self, ignore):
-        color_index  = self.color_input.currentIndex()
-        number_index = self.number_input.currentIndex()
-        letter_index = self.letter_input.currentIndex()
+        color_index  = self.colorInput.currentIndex()
+        number_index = self.numberInput.currentIndex()
+        letter_index = self.letterInput.currentIndex()
         if color_index > 0 and number_index > 0 and letter_index > 0:
             self.parent.complete_image_step_2 = True
         else:
@@ -247,7 +253,7 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
                 return directory
         directory = str(QtGui.QFileDialog.getExistingDirectory(self, 'Select Directory'))
         if len(directory) > 0:
-            self.drive_display.setText(truncate(directory))
+            self.driveLabel.setText(truncate(directory))
             self.parent.complete_image_step_1 = True
         else:
             self.parent.complete_image_step_1 = False
@@ -255,12 +261,12 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         self.parent.updateStatus()
 
     def clear(self):
-        self.drive_display.setText('Select a Directory...')
-        self.color_input.setCurrentIndex(0)
-        self.number_input.setCurrentIndex(0)
-        self.letter_input.setCurrentIndex(0)
-        self.name_input.setText('')
-        self.time_input.setTime(QtCore.QTime(0, 0, 0, 0))
+        self.driveLabel.setText('Select a Directory...')
+        self.colorInput.setCurrentIndex(0)
+        self.numberInput.setCurrentIndex(0)
+        self.letterInput.setCurrentIndex(0)
+        self.nameInput.setText('')
+        self.timeInput.setTime(QtCore.QTime(0, 0, 0, 0))
 
 
 class GPSForm(QtGui.QWidget, Ui_GPSForm):
@@ -272,21 +278,21 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
         self.initConnect()
 
     def initWidgets(self):
-        self.color_input = QwwColorComboBox()
-        self.color_input_space.addWidget(self.color_input)
-        self.number_input.addItems(CAR_NUMBER)
+        self.colorInput = QwwColorComboBox()
+        self.colorInputContainer.addWidget(self.colorInput)
+        self.numberInput.addItems(CAR_NUMBER)
         for (color_name, color_hex) in CAR_COLORS:
             color = QtGui.QColor(color_hex)
-            self.color_input.addColor(color, color_name)
+            self.colorInput.addColor(color, color_name)
 
     def initConnect(self):
-        self.color_input.currentIndexChanged[int].connect(self.check_identification)
-        self.number_input.currentIndexChanged[int].connect(self.check_identification)
+        self.colorInput.currentIndexChanged[int].connect(self.check_identification)
+        self.numberInput.currentIndexChanged[int].connect(self.check_identification)
 
     # Slots
     def check_identification(self, ignore):
-        color_index  = self.color_input.currentIndex()
-        number_index = self.number_input.currentIndex()
+        color_index  = self.colorInput.currentIndex()
+        number_index = self.numberInput.currentIndex()
         if color_index > 0 and number_index > 0:
             self.parent.complete_gps_step_1 = True
         else:
@@ -295,9 +301,9 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
 
     # Functions
     def clear(self):
-        self.color_input.setCurrentIndex(0)
-        self.number_input.setCurrentIndex(0)
-        self.time_input.setTime(QtCore.QTime(0, 0, 0, 0))
+        self.colorInput.setCurrentIndex(0)
+        self.numberInput.setCurrentIndex(0)
+        self.timeInput.setTime(QtCore.QTime(0, 0, 0, 0))
 
 
 if __name__ == '__main__':

@@ -18,7 +18,7 @@
     <item>
      <layout class="QHBoxLayout" name="layout">
       <item>
-       <layout class="QVBoxLayout" name="sidebar_space"/>
+       <layout class="QVBoxLayout" name="sidebarSpace"/>
       </item>
       <item>
        <widget class="Line" name="divider">
@@ -28,7 +28,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="display_space"/>
+       <layout class="QVBoxLayout" name="displaySpace"/>
       </item>
      </layout>
     </item>

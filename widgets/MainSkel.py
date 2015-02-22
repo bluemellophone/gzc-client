@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'Main.ui'
 #
-# Created: Thu Feb 19 21:00:17 2015
-#      by: PyQt4 UI code generator 4.10.4
+# Created: Sun Feb 22 14:48:44 2015
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -33,21 +33,21 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.layout = QtGui.QHBoxLayout()
         self.layout.setObjectName(_fromUtf8("layout"))
-        self.sidebar_space = QtGui.QVBoxLayout()
-        self.sidebar_space.setObjectName(_fromUtf8("sidebar_space"))
-        self.layout.addLayout(self.sidebar_space)
+        self.sidebarSpace = QtGui.QVBoxLayout()
+        self.sidebarSpace.setObjectName(_fromUtf8("sidebarSpace"))
+        self.layout.addLayout(self.sidebarSpace)
         self.divider = QtGui.QFrame(self.centralwidget)
         self.divider.setFrameShape(QtGui.QFrame.VLine)
         self.divider.setFrameShadow(QtGui.QFrame.Sunken)
         self.divider.setObjectName(_fromUtf8("divider"))
         self.layout.addWidget(self.divider)
-        self.display_space = QtGui.QVBoxLayout()
-        self.display_space.setObjectName(_fromUtf8("display_space"))
-        self.layout.addLayout(self.display_space)
+        self.displaySpace = QtGui.QVBoxLayout()
+        self.displaySpace.setObjectName(_fromUtf8("displaySpace"))
+        self.layout.addLayout(self.displaySpace)
         self.horizontalLayout_2.addLayout(self.layout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuOptions = QtGui.QMenu(self.menubar)
         self.menuOptions.setObjectName(_fromUtf8("menuOptions"))

@@ -34,9 +34,9 @@
    <item>
     <layout class="QVBoxLayout" name="layout" stretch="1,0,5,1,0,0">
      <item>
-      <layout class="QHBoxLayout" name="logo_layout_wide" stretch="0,0,0">
+      <layout class="QHBoxLayout" name="logoLayoutWide" stretch="0,0,0">
        <item>
-        <spacer name="horizontalSpacer">
+        <spacer name="horizontalSpacerLeft">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -49,14 +49,14 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="logo_0">
+        <widget class="QLabel" name="logo0">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_2">
+        <spacer name="horizontalSpacerRight">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -71,16 +71,16 @@
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="logo_layout" stretch="0,0">
+      <layout class="QHBoxLayout" name="logoLayout" stretch="0,0">
        <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-        <widget class="QLabel" name="logo_1">
+        <widget class="QLabel" name="logo1">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-        <widget class="QLabel" name="logo_2">
+        <widget class="QLabel" name="logo2">
          <property name="text">
           <string/>
          </property>
@@ -92,7 +92,7 @@
       <layout class="QVBoxLayout" name="form"/>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="button_layout" stretch="5,1">
+      <layout class="QHBoxLayout" name="buttonLayout" stretch="5,1">
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
@@ -195,14 +195,14 @@
       </layout>
      </item>
      <item>
-      <widget class="Line" name="split_1">
+      <widget class="Line" name="split1">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="sidebar_status">
+      <widget class="QLabel" name="sidebarStatus">
        <property name="font">
         <font>
          <pointsize>10</pointsize>

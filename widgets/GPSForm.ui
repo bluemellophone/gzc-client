@@ -25,12 +25,10 @@
       <number>15</number>
      </property>
      <item>
-      <widget class="QGroupBox" name="id_layout">
+      <widget class="QGroupBox" name="idLayout">
        <property name="font">
         <font>
          <pointsize>-1</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -47,10 +45,10 @@
          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
         </property>
         <item row="0" column="1">
-         <layout class="QVBoxLayout" name="color_input_space"/>
+         <layout class="QVBoxLayout" name="colorInputContainer"/>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="numer_label">
+         <widget class="QLabel" name="numerLabel">
           <property name="minimumSize">
            <size>
             <width>159</width>
@@ -66,7 +64,7 @@
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="QLabel" name="color_label">
+         <widget class="QLabel" name="colorLabel">
           <property name="minimumSize">
            <size>
             <width>159</width>
@@ -82,7 +80,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QComboBox" name="number_input">
+         <widget class="QComboBox" name="numberInput">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -95,7 +93,7 @@
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer">
+      <spacer name="verticalSpacer1">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -111,12 +109,10 @@
       </spacer>
      </item>
      <item>
-      <widget class="QGroupBox" name="sync_layout">
+      <widget class="QGroupBox" name="syncLayout">
        <property name="font">
         <font>
          <pointsize>-1</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -133,7 +129,7 @@
          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
         </property>
         <item row="0" column="0">
-         <widget class="QLabel" name="time_label">
+         <widget class="QLabel" name="timeLabel">
           <property name="minimumSize">
            <size>
             <width>159</width>
@@ -149,7 +145,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QTimeEdit" name="time_input">
+         <widget class="QTimeEdit" name="timeInput">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -171,7 +167,7 @@
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_2">
+      <spacer name="verticalSpacer2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
