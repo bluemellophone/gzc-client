@@ -7,20 +7,22 @@ from widgets import ImageWidgets as img
 # from widgets import GPSWidgets as gps
 from widgets.MainSkel import Ui_MainWindow
 from widgets.GZCQWidgets import QLabelButton
-from os.path import dirname, join
 
 
-FILE_DPATH = dirname(__file__)
 BUTTON_SIZE = 100
-TOGGLE_BUTTON_CAM = join(FILE_DPATH, "assets/icons/icon_camera_small.png")
-TOGGLE_BUTTON_GPS = join(FILE_DPATH, "assets/icons/icon_gps_small.png")
-TOGGLE_BITMAP     = join(FILE_DPATH, "assets/icons/bitmap_toggle_small.png")
+TOGGLE_BUTTON_CAM = "assets/icons/icon_camera_small.png"
+TOGGLE_BUTTON_GPS = "assets/icons/icon_gps_small.png"
+TOGGLE_BITMAP     = "assets/icons/bitmap_toggle_small.png"
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self):
         QtGui.QWidget.__init__(self)
-        self.current_display = 0  # 0 -> image display, 1 -> gps display
+        # Load toggle button icons and bitmap
+        self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(BUTTON_SIZE, BUTTON_SIZE)
+        self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE)
+        self.toggle_button_bitmap = QtGui.QPixmap(TOGGLE_BITMAP).scaled(BUTTON_SIZE, BUTTON_SIZE)
+        # Init
         self.setupUi(self)
         self.initWidgets()
         self.initConnect()
@@ -31,13 +33,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.img_display = img.selection_group()
         self.display_space.addWidget(self.img_display)
         # Init sidebar (must happen second)
+        self.currentDisplay = 0  # 0 -> image display, 1 -> gps display
         self.sidebar = sb.Sidebar(parent=self)
         self.sidebar.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
         self.sidebar_space.addWidget(self.sidebar)
-        # Load toggle button icons and bitmap
-        self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(BUTTON_SIZE, BUTTON_SIZE)
-        self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE)
-        self.toggle_button_bitmap = QtGui.QPixmap(TOGGLE_BITMAP).scaled(BUTTON_SIZE, BUTTON_SIZE)
         # Init toggle button
         self.toggle_button = QLabelButton(
             icon1=self.toggle_button_cam_ic,
@@ -73,6 +72,19 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.toggle_button.move(self.width() - self.toggle_button.width(), 0)
 
     # Functions
+    def allImagesSelected(self):
+        return self.img_display.all_images_selected()
+
+    def switchWidgets(self):
+        self.currentDisplay = (self.currentDisplay + 1) % 2
+        self.sidebar.clear()
+        if self.currentDisplay == 0:
+            self.img_display.show()
+            #self.gps_display.hide()
+        elif self.currentDisplay == 1:
+            self.img_display.hide()
+            #self.gps_display.show()
+
     def clearImageDisplay(self):
         self.img_display.clear()
         pass
@@ -84,19 +96,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def clear(self):
         self.clearImageDisplay()
         self.clearGPSDisplay()
-
-    def allImagesSelected(self):
-        return self.img_display.all_images_selected()
-
-    def switchWidgets(self):
-        self.current_display = (self.current_display + 1) % 2
-        self.sidebar.clear()
-        if self.current_display == 0:
-            self.img_display.show()
-            #self.gps_display.hide()
-        elif self.current_display == 1:
-            self.img_display.hide()
-            #self.gps_display.show()
 
 
 if __name__ == '__main__':
