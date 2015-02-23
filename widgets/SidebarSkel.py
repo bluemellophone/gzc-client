@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Sidebar.ui'
 #
-# Created: Mon Feb 23 12:24:27 2015
+# Created: Mon Feb 23 12:55:28 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,8 +26,8 @@ except AttributeError:
 class Ui_Sidebar(object):
     def setupUi(self, Sidebar):
         Sidebar.setObjectName(_fromUtf8("Sidebar"))
-        Sidebar.resize(364, 763)
-        Sidebar.setMinimumSize(QtCore.QSize(0, 0))
+        Sidebar.resize(429, 763)
+        Sidebar.setMinimumSize(QtCore.QSize(429, 0))
         Sidebar.setBaseSize(QtCore.QSize(100, 100))
         font = QtGui.QFont()
         font.setPointSize(12)
