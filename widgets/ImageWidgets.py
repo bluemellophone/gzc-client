@@ -83,13 +83,17 @@ class image_selection_roll(QtGui.QLabel):
         self.clear()
 
     def mouseReleaseEvent(self, ev):
-        self.emit(QtCore.SIGNAL('clicked()'))
+        if self.current_image != PLACEHOLDER_IMAGE:
+            self.emit(QtCore.SIGNAL('clicked()'))
+
 
     def enterEvent(self, ev):
-        QtGui.QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
+        if self.current_image != PLACEHOLDER_IMAGE:
+            QtGui.QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
 
     def leaveEvent(self, event):
-        QtGui.QApplication.restoreOverrideCursor()
+        if self.current_image != PLACEHOLDER_IMAGE:
+            QtGui.QApplication.restoreOverrideCursor()
 
     def changeImage(self, image_file):
         Pixmap = QtGui.QPixmap(image_file)
@@ -166,6 +170,7 @@ class image_selection_box(QtGui.QWidget):
     def init_connect(self):
         self.connect(self.image, QtCore.SIGNAL('clicked()'), self.reroll)
         self.select_group.buttonClicked[int].connect(self.option_selected)
+
 
     def reroll(self, filename=None):
         #get new filename
@@ -323,6 +328,7 @@ class selection_group(QtGui.QWidget):
         if len(self.active_files) ==  0:
             # If we've run through all the filename, just blindly restart the q
             self.active_files = copy.deepcopy(self.stored_files)
-
+            for IB in self.image_boxes:
+                self.active_files.remove(IB.image.current_image)
         filename = self.active_files.pop((random.randrange(len(self.active_files))))
         return filename
