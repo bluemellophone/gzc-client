@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GPSForm.ui'
 #
-# Created: Sun Feb 22 14:55:50 2015
+# Created: Sun Feb 22 19:48:35 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -38,6 +38,8 @@ class Ui_GPSForm(object):
         self.idLayout = QtGui.QGroupBox(GPSForm)
         font = QtGui.QFont()
         font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.idLayout.setFont(font)
         self.idLayout.setStyleSheet(_fromUtf8("font-size:20px;color:#333;"))
         self.idLayout.setFlat(False)
@@ -68,6 +70,8 @@ class Ui_GPSForm(object):
         self.syncLayout = QtGui.QGroupBox(GPSForm)
         font = QtGui.QFont()
         font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.syncLayout.setFont(font)
         self.syncLayout.setStyleSheet(_fromUtf8("font-size:20px;color:#333;"))
         self.syncLayout.setFlat(False)

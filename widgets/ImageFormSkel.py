@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ImageForm.ui'
 #
-# Created: Sun Feb 22 14:55:50 2015
+# Created: Sun Feb 22 19:48:35 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,6 +43,8 @@ class Ui_ImageForm(object):
         self.driveLayout.setSizeIncrement(QtCore.QSize(0, 1))
         font = QtGui.QFont()
         font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.driveLayout.setFont(font)
         self.driveLayout.setStyleSheet(_fromUtf8("font-size:20px;"))
         self.driveLayout.setFlat(False)
@@ -76,6 +78,8 @@ class Ui_ImageForm(object):
         self.idLayout.setSizeIncrement(QtCore.QSize(0, 1))
         font = QtGui.QFont()
         font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.idLayout.setFont(font)
         self.idLayout.setStyleSheet(_fromUtf8("font-size:20px;"))
         self.idLayout.setFlat(False)
@@ -120,6 +124,8 @@ class Ui_ImageForm(object):
         self.syncLayout.setMaximumSize(QtCore.QSize(16777215, 154))
         font = QtGui.QFont()
         font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.syncLayout.setFont(font)
         self.syncLayout.setStyleSheet(_fromUtf8("font-size:20px;"))
         self.syncLayout.setFlat(False)

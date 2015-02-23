@@ -37,6 +37,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def __init__(self, parent):
         QtGui.QWidget.__init__(self)
         self.parent = parent
+        self.copyThread = None
         self.setupUi(self)
         self.initWidgets()
         self.initConnect()
@@ -64,6 +65,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def initConnect(self):
         self.submitButton.clicked.connect(self.submitClicked)
         self.clearButton.clicked.connect(self.clearClicked)
+        self.connect(self.parent.imageDisplay, QtCore.SIGNAL('images_modified'), self.updateStatus)
 
     def initVisuals(self):
         # Setup clear icon
@@ -82,6 +84,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             if self.complete_image_step_4:
                 print('COMPILE ZIP')
             else:
+                self.parent.clearImageDisplay()
                 car_number = str(self.imageForm.numberInput.currentText())
                 car_color = str(self.imageForm.colorInput.currentText())
                 person_letter = str(self.imageForm.letterInput.currentText())
@@ -140,8 +143,10 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             # Image - Step 3
             if self.complete_image_step_3:
                 self.submitButton.setEnabled(True)
+                self.complete_image_step_4 = self.parent.allImagesSelected()
             else:
                 self.submitButton.setEnabled(False)
+                self.complete_image_step_4 = False
             # Image - Step 4 (Images)
             if self.complete_image_step_4:
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
@@ -149,9 +154,6 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             else:
                 self.submitButton.setIcon(QtGui.QIcon(IMPORT_ICON))
                 self.submitButton.setText("Import")
-
-            # CHECK IMAGES
-            # print("TODO:", self.parent.allImagesSelected())
         elif self.parent.currentDisplay == 1:
             # GPS - Step 0 (always show)
             self.gpsForm.idLayout.show()
@@ -176,6 +178,9 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         QtGui.QApplication.restoreOverrideCursor()
 
     def clear(self):
+        # Stop any ongoing copy thread
+        if self.copyThread is not None:
+            self.copyThread.quit()
         # Clear Flags
         self.import_directory = None
         self.complete_image_step_1 = False

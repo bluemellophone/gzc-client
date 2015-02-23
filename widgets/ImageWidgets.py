@@ -161,9 +161,9 @@ class image_selection_box(QtGui.QWidget):
 
     def init_connect(self):
         self.connect(self.image, QtCore.SIGNAL('clicked()'), self.reroll)
+        self.select_group.buttonClicked[int].connect(self.option_selected)
 
     def reroll(self):
-
         #get new filename
         try:
             filename = self.parent().get_filename()
@@ -171,7 +171,6 @@ class image_selection_box(QtGui.QWidget):
             return
 
         self.image.changeImage(filename)
-
         self.image_time.setText(self.image.get_timestamp())
         self.select_zebra.setEnabled(True)
         self.select_giraffe.setEnabled(True)
@@ -183,9 +182,13 @@ class image_selection_box(QtGui.QWidget):
             self.select_group.setExclusive(False)
             checked.setChecked(False)
             self.select_group.setExclusive(True)
+        self.emit(QtCore.SIGNAL('images_modified'))
+
+    def is_selected(self):
+        return int(self.select_group.checkedId()) != -1
 
     def option_selected(self):
-        return self.select_group.checkedId() >= 0
+        self.emit(QtCore.SIGNAL('images_modified'))
 
     def clear(self):
         self.image.clear()
@@ -219,16 +222,22 @@ class selection_group(QtGui.QWidget):
         self.first_image.info_text.setText("First Image in Directory")
         self.image_boxes = []
         for i in range(10):
-            self.image_boxes.append(image_selection_box(self))
+            box = image_selection_box(self)
+            self.image_boxes.append(box)
+            self.connect(box, QtCore.SIGNAL('images_modified'), self.images_modified)
 
         self.last_image = first_last_image(self)
         self.last_image.info_text.setText("Last Image in Directory")
 
     def all_images_selected(self):
         for image_box in self.image_boxes:
-            if not image_box.option_selected():
+            if not image_box.is_selected():
                 return False
         return True
+
+    def images_modified(self):
+        self.emit(QtCore.SIGNAL('images_modified'))
+
     def init_layout(self):
 
         gridV = QtGui.QVBoxLayout()

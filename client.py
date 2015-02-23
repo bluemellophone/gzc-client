@@ -89,7 +89,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     # Functions
     def allImagesSelected(self):
-        return self.imageDisplay.allImagesSelected()
+        return self.imageDisplay.all_images_selected()
 
     def switchWidgets(self):
         self.currentDisplay = (self.currentDisplay + 1) % 2
