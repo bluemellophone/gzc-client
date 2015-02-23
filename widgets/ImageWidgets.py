@@ -85,6 +85,12 @@ class image_selection_roll(QtGui.QLabel):
     def mouseReleaseEvent(self, ev):
         self.emit(QtCore.SIGNAL('clicked()'))
 
+    def enterEvent(self, ev):
+        QtGui.QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
+
+    def leaveEvent(self, event):
+        QtGui.QApplication.restoreOverrideCursor()
+
     def changeImage(self, image_file):
         Pixmap = QtGui.QPixmap(image_file)
         pxSizeX = Pixmap.size().width()

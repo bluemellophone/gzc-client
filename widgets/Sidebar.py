@@ -33,6 +33,7 @@ CAR_COLORS = [('Select Color', '#F6F6F6')] + [
 ]
 CAR_NUMBER = ['Select Number'] + map(str, range(1, 26))  # 51
 PERSON_LETTERS = ['Select Letter'] + ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
+TIME_HOUR_RANGE = range(6, 23)
 
 
 class Sidebar(QtGui.QWidget, Ui_Sidebar):
@@ -84,7 +85,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             else:
                 self.copyImage()
         elif self.parent.currentDisplay == 1:
-            if self.complete_gps_step_2:
+            if self.complete_gps_step_3:
                 self.submitGPS()
             else:
                 self.copyGPS()
@@ -108,12 +109,12 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 if self.import_directory == "overridden":
                     self.imageForm.nameInput.setEnabled(False)
                     self.imageForm.nameInput.setText(basename(self.image_file_list[0]))
-                    self.complete_image_step_3 = True
+                    self.complete_image_step_3_name = True
                 self.imageForm.syncLayout.show()
             else:
                 self.imageForm.syncLayout.hide()
             # Image - Step 3
-            if self.complete_image_step_3:
+            if self.complete_image_step_3_name and self.complete_image_step_3_time:
                 self.submitButton.setEnabled(True)
             else:
                 self.submitButton.setEnabled(False)
@@ -135,12 +136,15 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             # GPS - Step 1
             if self.complete_gps_step_1:
                 self.gpsForm.syncLayout.show()
-                self.submitButton.setEnabled(True)
             else:
                 self.gpsForm.syncLayout.hide()
+            # GPS - Step 2
+            if self.complete_gps_step_2:
+                self.submitButton.setEnabled(True)
+            else:
                 self.submitButton.setEnabled(False)
             # Image - Step 5 (Images)
-            if self.complete_gps_step_2:
+            if self.complete_gps_step_3:
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
                 self.submitButton.setText('Submit')
             else:
@@ -166,7 +170,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         if self.parent.currentDisplay == 0 and len(self.image_file_list) > 0:
             self.complete_image_step_4 = True
         elif self.parent.currentDisplay == 1:
-            self.complete_gps_step_2 = True
+            self.complete_gps_step_3 = True
         self.updateStatus()
 
     @ex_deco
@@ -360,11 +364,13 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.import_directory = None
         self.complete_image_step_1 = False
         self.complete_image_step_2 = False
-        self.complete_image_step_3 = False
+        self.complete_image_step_3_name = False
+        self.complete_image_step_3_time = False
         self.complete_image_step_4 = False
         self.complete_image_step_5 = False
         self.complete_gps_step_1 = False
         self.complete_gps_step_2 = False
+        self.complete_gps_step_3 = False
         # Update overall display
         if self.parent.currentDisplay == 0:
             # Clear imageForm and imageDisplay
@@ -414,7 +420,8 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         self.colorInput.currentIndexChanged[int].connect(self.check_identification)
         self.numberInput.currentIndexChanged[int].connect(self.check_identification)
         self.letterInput.currentIndexChanged[int].connect(self.check_identification)
-        self.nameInput.textEdited.connect(self.check_sync)
+        self.nameInput.textEdited.connect(self.check_sync_name)
+        self.timeInput.timeChanged.connect(self.check_sync_time)
 
     # Slots
     def check_identification(self, ignore):
@@ -427,11 +434,19 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
             self.parent.complete_image_step_2 = False
         self.parent.updateStatus()
 
-    def check_sync(self, value):
+    def check_sync_name(self, value):
         if len(value) > 0:
-            self.parent.complete_image_step_3 = True
+            self.parent.complete_image_step_3_name = True
         else:
-            self.parent.complete_image_step_3 = False
+            self.parent.complete_image_step_3_name = False
+        self.parent.updateStatus()
+
+    def check_sync_time(self, value):
+        hour = int(str(value.hour()))
+        if hour in TIME_HOUR_RANGE:
+            self.parent.complete_image_step_3_time = True
+        else:
+            self.parent.complete_image_step_3_time = False
         self.parent.updateStatus()
 
     # Functions
@@ -478,6 +493,7 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
     def initConnect(self):
         self.colorInput.currentIndexChanged[int].connect(self.check_identification)
         self.numberInput.currentIndexChanged[int].connect(self.check_identification)
+        self.timeInput.timeChanged.connect(self.check_sync_time)
 
     # Slots
     def check_identification(self, ignore):
@@ -487,6 +503,14 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
             self.parent.complete_gps_step_1 = True
         else:
             self.parent.complete_gps_step_1 = False
+        self.parent.updateStatus()
+
+    def check_sync_time(self, value):
+        hour = int(str(value.hour()))
+        if hour in TIME_HOUR_RANGE:
+            self.parent.complete_gps_step_2 = True
+        else:
+            self.parent.complete_gps_step_2 = False
         self.parent.updateStatus()
 
     # Functions
