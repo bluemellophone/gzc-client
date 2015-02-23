@@ -120,12 +120,12 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.domainInput.setLabelText(QtCore.QString('Enter server domain'))
         value = str(value)
         try:
-            r = requests.get(value + '/status')
+            r = requests.get(value + '/status', timeout=0.1)
             response = json.loads(r.text)
             if response['status']['code'] == 0:
                 self.domainInput.setLabelText(QtCore.QString('Enter server domain - Valid Server Response'))
         except requests.exceptions.ConnectionError:
-            return
+            pass
 
     # Functions
     def domainChanged(self):

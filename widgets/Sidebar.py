@@ -349,9 +349,12 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             raise IOError('Server responded with an error' + response['status']['message'])
 
     def clear(self):
+        # Reset cursor
+        QtGui.QApplication.restoreOverrideCursor()
+        self.sidebarStatus.setText('')
         # Stop any ongoing copy thread
         if self.copyThread is not None:
-            self.sidebarStatus.setText('')
+            self.copyThread.terminate()
             self.copyThread.quit()
         # Clear Flags
         self.import_directory = None
