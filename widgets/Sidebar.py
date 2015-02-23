@@ -260,7 +260,17 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def submitGPS(self):
         self.parent.status_bar.showMessage('Submitting to server')
         self.parent.status_bar.setPalette(self.sending_palette)
-        data = self.compile_data()
+        car_number    = str(self.gpsForm.numberInput.currentText())
+        car_color     = str(self.gpsForm.colorInput.currentText())
+        time_hour     = str(self.gpsForm.timeInput.time().hour())
+        time_minute   = str(self.gpsForm.timeInput.time().minute())
+
+        data = {
+            'car_color': car_color,
+            'car_number': car_number,
+            'gps_start_time_hour': time_hour,
+            'gps_start_time_minute': time_minute,
+        }
 
         GPSURL = self.parent.domain + '/gps/submit'
         DEFAULT_DATA_DIR = 'data'

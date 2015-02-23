@@ -61,7 +61,7 @@
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">font-size:20px;</string>
+        <string notr="true">font-size:20px; color:#333;</string>
        </property>
        <property name="title">
         <string>Step 1 - SD Card</string>
@@ -164,7 +164,7 @@
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">font-size:20px;</string>
+        <string notr="true">font-size:20px; color:#333;</string>
        </property>
        <property name="title">
         <string>Step 2 - Identification</string>
@@ -297,7 +297,7 @@
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">font-size:20px;</string>
+        <string notr="true">font-size:20px; color:#333;</string>
        </property>
        <property name="title">
         <string>Step 3 - Synchronize</string>

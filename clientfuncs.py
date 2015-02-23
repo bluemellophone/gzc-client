@@ -9,6 +9,7 @@ from os.path import isfile, join, exists, splitext, basename
 from detecttools.directory import Directory
 import traceback
 import subprocess
+import numpy as np
 
 
 class CopyThread(QtCore.QThread):
@@ -33,6 +34,56 @@ class CopyThread(QtCore.QThread):
                 self.emit(QtCore.SIGNAL('file_done'), (join(outdir, f)))
         self.emit(QtCore.SIGNAL('completed'))
         return None
+
+
+class ImportThread(QtCore.QThread):
+    def __init__(thrd, gpswgt):
+        QtCore.QThread.__init__(thrd)
+        thrd.gpswgt = gpswgt
+
+    def run(thrd):
+        #When hooked up to a i-gotu gps dongle
+        data = thrd.gpswgt.compile_data()
+        thrd.gpswgt.parent.status_bar.showMessage(QtCore.QString("Importing GPS information"))
+        try:
+            gpx_string = import_gpx(data)
+        except IOError:
+            thrd.gpswgt.parent.status_bar.showMessage(QtCore.QString("Couldn't import GPS info. Make sure the dongle is connected"))
+            thrd.gpswgt.parent.status_bar.setPalette(thrd.gpswgt.error_palette)
+            return
+        import cv2
+        #gpx_string = open("test_gps/track.gpx", "r").read()
+        ## Process gps for car
+        #car_color  = data['car_color'].lower()
+        #car_number = str(data['car_number'])
+        ## Ensure the folder
+        #car_dir = igotu.ensure_structure('data', 'gps', car_number, car_color)
+        #gps_path  = join(car_dir, 'track.gpx')
+        #f = open(gps_path, 'w')
+        #f.write(gpx_string)
+        #f.close()
+        gps_json = convert_gpx_to_json(gpx_string)
+        if len(gps_json['track']) == 0:
+            thrd.gpswgt.parent.status_bar.showMessage(QtCore.QString("No Points found. Import again."))
+            thrd.gpswgt.parent.status_bar.setPalette(thrd.gpswgt.error_palette)
+            return
+        pts = []
+        img = cv2.imread(thrd.gpswgt.map_image_file)
+        #coord_map = CoordinateMap((-1.32504, 36.766777), (-1.442833, 36.965561), img)     # Nairobi (assets/map_nairobi.png)
+        #coord_map = CoordinateMap((42.789920, -73.759957), (42.673663, -73.592416), img)  # Albany  (assets/map_albany.png)
+        #coord_map = CoordinateMap((42.740739, -73.697043), (42.720154, -73.657561), img)  # Troy    (assets/map_troy.png)
+        coord_map = CoordinateMap((42.735759, -73.686637), (42.726444, -73.664621), img)   # RPI     (assets/map_rpi.png)
+        for point in gps_json['track']:
+            lat = point['lat']
+            lon = point['lon']
+            x, y = coord_map.map_point_float((lat, lon))
+            pts.append(np.array([x, y]))
+
+        cv2.polylines(img, [np.array(pts, dtype=np.int32)], False, (255, 0, 0), thickness=2)
+        cv2.imwrite("figure.png", img)
+
+    def begin(thrd):
+        thrd.start()
 
 
 class CoordinateMap:

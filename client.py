@@ -4,7 +4,7 @@ import sys
 import signal
 from widgets import Sidebar as sb
 from widgets import ImageWidgets as img
-# from widgets import GPSWidgets as gps
+from widgets import GPSWidgets as gps
 from widgets.MainSkel import Ui_MainWindow
 from widgets.GZCQWidgets import QLabelButton
 import simplejson as json
@@ -32,11 +32,14 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.initWidgets()
         self.initConnect()
         self.initVisuals()
+        self.clear()
 
     def initWidgets(self):
         # Init displays
         self.imageDisplay = img.selection_group()
+        self.gpsDisplay = gps.gps_map()
         self.displaySpace.addWidget(self.imageDisplay)
+        self.displaySpace.addWidget(self.gpsDisplay)
         # Init sidebar (must happen second)
         self.currentDisplay = 0  # 0 -> image display, 1 -> gps display
         self.sidebar = sb.Sidebar(parent=self)
@@ -135,23 +138,27 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def switchWidgets(self):
         self.currentDisplay = (self.currentDisplay + 1) % 2
+        self.clear()
+
+    def clearSidebar(self):
         self.sidebar.clear()
-        if self.currentDisplay == 0:
-            self.imageDisplay.show()
-            #self.gpsDisplay.hide()
-        elif self.currentDisplay == 1:
-            self.imageDisplay.hide()
-            #self.gpsDisplay.show()
 
     def clearImageDisplay(self):
         self.imageDisplay.clear()
-        pass
 
     def clearGPSDisplay(self):
-        # self.gpsDisplay.clear()
-        pass
+        self.gpsDisplay.clear()
 
     def clear(self):
+        self.imageDisplay.hide()
+        self.gpsDisplay.hide()
+        # Show correct display
+        if self.currentDisplay == 0:
+            self.imageDisplay.show()
+        elif self.currentDisplay == 1:
+            self.gpsDisplay.show()
+        # Clear children
+        self.clearSidebar()
         self.clearImageDisplay()
         self.clearGPSDisplay()
 

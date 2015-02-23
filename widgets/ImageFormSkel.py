@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ImageForm.ui'
 #
-# Created: Sun Feb 22 21:18:16 2015
+# Created: Mon Feb 23 09:15:42 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -46,7 +46,7 @@ class Ui_ImageForm(object):
         font.setBold(True)
         font.setWeight(75)
         self.driveLayout.setFont(font)
-        self.driveLayout.setStyleSheet(_fromUtf8("font-size:20px;"))
+        self.driveLayout.setStyleSheet(_fromUtf8("font-size:20px; color:#333;"))
         self.driveLayout.setFlat(False)
         self.driveLayout.setObjectName(_fromUtf8("driveLayout"))
         self.formLayout = QtGui.QFormLayout(self.driveLayout)
@@ -81,7 +81,7 @@ class Ui_ImageForm(object):
         font.setBold(True)
         font.setWeight(75)
         self.idLayout.setFont(font)
-        self.idLayout.setStyleSheet(_fromUtf8("font-size:20px;"))
+        self.idLayout.setStyleSheet(_fromUtf8("font-size:20px; color:#333;"))
         self.idLayout.setFlat(False)
         self.idLayout.setCheckable(False)
         self.idLayout.setChecked(False)
@@ -127,7 +127,7 @@ class Ui_ImageForm(object):
         font.setBold(True)
         font.setWeight(75)
         self.syncLayout.setFont(font)
-        self.syncLayout.setStyleSheet(_fromUtf8("font-size:20px;"))
+        self.syncLayout.setStyleSheet(_fromUtf8("font-size:20px; color:#333;"))
         self.syncLayout.setFlat(False)
         self.syncLayout.setObjectName(_fromUtf8("syncLayout"))
         self.formLayout_6 = QtGui.QFormLayout(self.syncLayout)
