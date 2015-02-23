@@ -133,17 +133,17 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         elif self.parent.currentDisplay == 1:
             # GPS - Step 0 (always show)
             self.gpsForm.idLayout.show()
-            # GPS - Step 1
+            # GPS - Step 1 (Car Information)
             if self.complete_gps_step_1:
                 self.gpsForm.syncLayout.show()
             else:
                 self.gpsForm.syncLayout.hide()
-            # GPS - Step 2
+            # GPS - Step 2 (Sync Information)
             if self.complete_gps_step_2:
                 self.submitButton.setEnabled(True)
             else:
                 self.submitButton.setEnabled(False)
-            # Image - Step 5 (Images)
+            # GPS - Step 3 (Importing/Submitting)
             if self.complete_gps_step_3:
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
                 self.submitButton.setText('Submit')
