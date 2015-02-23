@@ -316,6 +316,7 @@ class selection_group(QtGui.QWidget):
         if len(self.active_files) ==  0:
             # If we've run through all the filename, just blindly restart the q
             self.active_files = copy.deepcopy(self.stored_files)
-
+            for IB in self.image_boxes:
+                self.active_files.remove(IB.image.current_image)
         filename = self.active_files.pop((random.randrange(len(self.active_files))))
         return filename
