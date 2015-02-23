@@ -8,9 +8,9 @@ from os.path import dirname, join
 
 
 FILE_DPATH = dirname(__file__)
-PLACEHOLDER_IMAGE = join(FILE_DPATH, "../assets/placeholder.png")
-ZEBRA_ICON = join(FILE_DPATH, "../assets/icons/icon_zebra.png")
-GIRAFFE_ICON = join(FILE_DPATH, "../assets/icons/icon_giraffe.png")
+PLACEHOLDER_IMAGE = join(FILE_DPATH, '../assets/placeholder.png')
+ZEBRA_ICON = join(FILE_DPATH, '../assets/icons/icon_zebra.png')
+GIRAFFE_ICON = join(FILE_DPATH, '../assets/icons/icon_giraffe.png')
 
 IMAGE_SIZE = 150
 
@@ -31,10 +31,10 @@ class first_last_image(QtGui.QFrame):
         self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
         self.setLineWidth(2)
 
-        self.image_time = QtGui.QLabel("Awaiting images...", self)
+        self.image_time = QtGui.QLabel('Awaiting images...', self)
         self.image_time.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.info_text = QtGui.QLabel("", self)
+        self.info_text = QtGui.QLabel('', self)
         self.info_text.setAlignment(QtCore.Qt.AlignCenter)
 
         self.clear()
@@ -62,7 +62,7 @@ class first_last_image(QtGui.QFrame):
         self.image_time.setText(time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image))))
 
     def clear(self):
-        self.image_time.setText("Awaiting images...")
+        self.image_time.setText('Awaiting images...')
         Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE)
         pxSizeX = Pixmap.size().width()
         pxSizeY = Pixmap.size().height()
@@ -103,7 +103,7 @@ class image_selection_roll(QtGui.QLabel):
         chdir(path.dirname(path.realpath(__file__)))
 
         if self.current_image == PLACEHOLDER_IMAGE:
-            return "Awaiting images..."
+            return 'Awaiting images...'
         else:
             return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
 
@@ -192,7 +192,7 @@ class image_selection_box(QtGui.QWidget):
 
     def clear(self):
         self.image.clear()
-        self.image_time.setText("Awaiting images...")
+        self.image_time.setText('Awaiting images...')
         self.select_zebra.setEnabled(False)
         self.select_giraffe.setEnabled(False)
         checked = self.select_group.checkedButton()
@@ -219,7 +219,7 @@ class selection_group(QtGui.QWidget):
 
     def init_widgets(self):
         self.first_image = first_last_image(self)
-        self.first_image.info_text.setText("First Image in Directory")
+        self.first_image.info_text.setText('First Image in Directory')
         self.image_boxes = []
         for i in range(10):
             box = image_selection_box(self)
@@ -227,7 +227,7 @@ class selection_group(QtGui.QWidget):
             self.connect(box, QtCore.SIGNAL('images_modified'), self.images_modified)
 
         self.last_image = first_last_image(self)
-        self.last_image.info_text.setText("Last Image in Directory")
+        self.last_image.info_text.setText('Last Image in Directory')
 
     def all_images_selected(self):
         for image_box in self.image_boxes:

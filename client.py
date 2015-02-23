@@ -10,15 +10,18 @@ from widgets.GZCQWidgets import QLabelButton
 
 
 BUTTON_SIZE = 100
-TOGGLE_BUTTON_CAM = "assets/icons/icon_camera_small.png"
-TOGGLE_BUTTON_GPS = "assets/icons/icon_gps_small.png"
-TOGGLE_BITMAP     = "assets/icons/bitmap_toggle_small.png"
+DEFAULT_DOMAIN    = 'http://localhost:5000'
+TOGGLE_BUTTON_CAM = 'assets/icons/icon_camera_small.png'
+TOGGLE_BUTTON_GPS = 'assets/icons/icon_gps_small.png'
+TOGGLE_BITMAP     = 'assets/icons/bitmap_toggle_small.png'
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self):
         QtGui.QWidget.__init__(self)
         # Load toggle button icons and bitmap
+        self.domain = DEFAULT_DOMAIN
+        self.path_list = ['data']
         self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(BUTTON_SIZE, BUTTON_SIZE)
         self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE)
         self.toggle_button_bitmap = QtGui.QPixmap(TOGGLE_BITMAP).scaled(BUTTON_SIZE, BUTTON_SIZE)
@@ -47,6 +50,11 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.toggleButton.move(self.width(), 0)
         self.toggleButton.setParent(self.centralWidget())
         self.toggleButton.show()
+        # Domain input
+        self.domainInput = QtGui.QInputDialog()
+        self.domainInput.setLabelText(QtCore.QString('Enter server domain:'))
+        self.pathInput = QtGui.QInputDialog()
+        self.pathInput.setLabelText(QtCore.QString('Enter copy paths:'))
 
     def initConnect(self):
         self.toggleButton.clicked.connect(self.switchWidgets)
@@ -59,11 +67,14 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.shortcutFull.setKey(QtGui.QKeySequence('F11'))
         self.shortcutFull.setContext(QtCore.Qt.ApplicationShortcut)
         self.shortcutFull.activated.connect(self.handleFullScreen)
+        # Menu items
+        self.domainInput.accepted.connect(self.domainChanged)
+        self.pathInput.accepted.connect(self.pathChanged)
 
     def initVisuals(self):
         # Set window title
-        self.setWindowTitle("Great Zebra Count 2015")
-        # self.setStyleSheet("background-color: white;")
+        self.setWindowTitle('Great Zebra Count 2015')
+        # self.setStyleSheet('background-color: white;')
 
     # Slots
     def handleFullScreen(self):
@@ -76,18 +87,35 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.toggleButton.move(self.width() - self.toggleButton.width(), 0)
 
     def specifyDomain(self, checked):
-        print('specifyDomain')
+        self.domainInput.setTextValue(self.domain)
+        self.domainInput.show()
 
     def specifyFilepaths(self, checked):
-        print('specifyFilepaths')
+        self.pathInput.setTextValue(','.join(self.path_list))
+        self.pathInput.show()
 
     def manuallySelectImages(self, checked):
         print('manuallySelectImages')
+        dialog = QtGui.QFileDialog()
+        dialog.setFileMode(QtGui.QFileDialog.ExistingFiles)
+        first = dialog.getOpenFileNames(self, 'Open files', '/home')
+        print("SELECTED FIRST", first)
 
     def manuallySelectGPS(self, checked):
         print('manuallySelectGPS')
+        dialog = QtGui.QFileDialog()
+        dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
+        fname = dialog.getOpenFileName(self, 'Open file', '/home')
+        print("SELECTED GPS FILE", fname)
 
     # Functions
+    def domainChanged(self):
+        self.domain = str(self.domainInput.textValue())
+
+    def pathChanged(self):
+        path_str = str(self.pathInput.textValue())
+        self.path_list = path_str.split(',')
+
     def allImagesSelected(self):
         return self.imageDisplay.all_images_selected()
 

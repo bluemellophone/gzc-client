@@ -4,9 +4,13 @@ from SidebarSkel import Ui_Sidebar
 from ImageFormSkel import Ui_ImageForm
 from GPSFormSkel import Ui_GPSForm
 from GZCQWidgets import QwwColorComboBox
-from os.path import dirname, join, basename, exists
+from os import chdir, getcwd
+from os.path import dirname, join, basename, exists, realpath
 from shutil import rmtree
-from clientfuncs import CopyThread, find_candidates, ex_deco
+from clientfuncs import CopyThread, find_candidates, ex_deco, ensure_structure
+import zipfile
+import simplejson as json
+import requests
 
 
 LOGO_SIZE = 150
@@ -82,7 +86,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def submitClicked(self, *args):
         if self.parent.currentDisplay == 0:
             if self.complete_image_step_4:
-                print('COMPILE ZIP')
+                self.submitImage()
             else:
                 self.parent.clearImageDisplay()
                 car_number = str(self.imageForm.numberInput.currentText())
@@ -111,16 +115,19 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 # print self.file_bases
                 self.move_file_list(self.file_bases)
 
-                target_directory = join('..', 'data', 'images', car_number + car_color, person_letter)
-                if exists(target_directory):
-                    print("Target directory already exists... deleting")
-                    rmtree(target_directory)
-                self.copyThread = CopyThread(self.files, [target_directory])
-                self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
-                self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
-                self.copyThread.start()
+                for index, path in enumerate(self.parent.path_list):
+                    target_directory = join('..', path, 'images', car_number + car_color, person_letter)
+                    if exists(target_directory):
+                        print('Target directory already exists... deleting')
+                        rmtree(target_directory)
+                    self.copyThread = CopyThread(self.files, [target_directory])
+                    if index == 0:
+                        self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
+                        self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
+                    self.copyThread.start()
         elif self.parent.currentDisplay == 1:
             print('START IMPORT')
+            # self.submitGPS()
 
     def clearClicked(self):
         self.clear()
@@ -150,10 +157,10 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             # Image - Step 4 (Images)
             if self.complete_image_step_4:
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
-                self.submitButton.setText("Submit")
+                self.submitButton.setText('Submit')
             else:
                 self.submitButton.setIcon(QtGui.QIcon(IMPORT_ICON))
-                self.submitButton.setText("Import")
+                self.submitButton.setText('Import')
         elif self.parent.currentDisplay == 1:
             # GPS - Step 0 (always show)
             self.gpsForm.idLayout.show()
@@ -176,6 +183,119 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
+
+    @ex_deco
+    def submitImage(self):
+        DOMAIN = '%s/images/submit' % (self.parent.domain)
+        #Zip selected images: first, last, zebra/, giraffe/
+
+        car_number = str(self.imageForm.numberInput.currentText())
+        car_color = str(self.imageForm.colorInput.currentText())
+        person_letter = str(self.imageForm.letterInput.currentText())
+
+        chdir(dirname(realpath(__file__)))
+        pull_directory = join(self.parent.path_list[0], car_number + car_color, person_letter)
+        chdir(join(getcwd(), pull_directory))
+
+        first = self.parent.imageDisplay.first_image.current_image
+        zebra = []
+        giraffe = []
+        for IB in self.parent.imageDisplay.image_boxes:
+            selection = IB.get_selection()
+            if selection[1] == 0:
+                raise IOError('Please make sure all image boxes have been identified as either zebra of giraffe.')
+                return
+            if selection[1] == 'Zebra':
+                zebra.append(selection[0])
+            else:
+                giraffe.append(selection[0])
+
+        last = self.parent.imageDisplay.last_image.current_image
+
+        zip_archive = zipfile.ZipFile('%s%s%s.zip' % (car_number, car_color, person_letter), 'w')
+        zip_archive.write(join(getcwd(), first), 'first.jpg')
+        zip_archive.write(join(getcwd(), last), 'last.jpg')
+        if len(zebra) == 0:
+            empty = open('.empty', 'w')
+            empty.close()
+            zip_archive.write(join(getcwd(), '.empty'), join('zebra', '.empty'))
+        if len(giraffe) == 0:
+            empty = open('.empty', 'w')
+            empty.close()
+            zip_archive.write(join(getcwd(), '.empty'), join('giraffe', '.empty'))
+        for filename in zebra:
+            zip_archive.write(join(getcwd(), filename), join('zebra', filename))
+        for filename in giraffe:
+            zip_archive.write(join(getcwd(), filename), join('giraffe', filename))
+
+        zip_archive.close()
+
+        #format data
+        data = {
+            'car_color': str(self.user_input_group.colorBox.currentText()),
+            'car_number': str(self.user_input_group.id_car_number.value()),
+            'person_letter': str(self.user_input_group.id_person.currentText()),
+            'image_first_time_hour': str(self.user_input_group.sync_time.time().hour()),
+            'image_first_time_minute': str(self.user_input_group.sync_time.time().minute()),
+        }
+
+        content = open(str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()) + str(self.user_input_group.id_person.currentText()) + '.zip', 'rb')
+        files = {
+            'image_archive': content,
+        }
+
+        # SEND POST REQUEST WITH data AND files PAYLOADS
+        r = requests.post(DOMAIN, data=data, files=files)
+
+        # Response
+        # print('HTTP STATUS:', r.status_code)
+        response = json.loads(r.text)
+        if response['status']['code'] != 0:
+            raise IOError('Server responded with an error' + response['status']['message'])
+        # print('RESPONSE:', response)
+
+    def submitGPS(self):
+        self.parent.status_bar.showMessage('Submitting to server')
+        self.parent.status_bar.setPalette(self.sending_palette)
+        data = self.compile_data()
+
+        GPSURL = self.parent.domain + '/gps/submit'
+        DEFAULT_DATA_DIR = 'data'
+
+        # Process gps for car
+        car_color  = data['car_color'].lower()
+        car_number = str(data['car_number'])
+        # Ensure the folder
+        car_dir = ensure_structure(DEFAULT_DATA_DIR, 'gps', car_number, car_color)
+        gps_path  = join(car_dir, 'track.gpx')
+
+        # gps data
+        try:
+            content = open(join(gps_path), 'rb')
+        except IOError:
+            self.parent.status_bar.showMessage(QtCore.QString('No file exists. Import first.'))
+            self.parent.status_bar.setPalette(self.error_palette)
+            return
+        files = {
+            'gps_data': content,
+        }
+
+        try:
+            r = requests.post(GPSURL, data=data, files=files)
+        except requests.exceptions.ConnectionError:
+            self.parent.status_bar.showMessage(QtCore.QString('Couldn\'t connect to server. Ensure that the server is running and the domain is correct.'))
+            self.parent.status_bar.setPalette(self.error_palette)
+            return
+        print('HTTP STATUS:', r.status_code)
+        response = json.loads(r.text)
+        print('RESPONSE:', response)
+        if r.status_code == 200:
+            self.parent.status_bar.showMessage(QtCore.QString('Submit successful.'))
+            self.parent.status_bar.setPalette(self.sent_palette)
+        else:
+            self.parent.status_bar.showMessage(QtCore.QString('Submit failed. Error %r' % r.status_code))
+            self.parent.status_bar.setPalette(self.error_palette)
+        return r.status_code
 
     def clear(self):
         # Stop any ongoing copy thread

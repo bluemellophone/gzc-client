@@ -20,7 +20,7 @@ class ColorModel(QtGui.QStandardItemModel):
             model.setItemData(model.index(i, 0), oldData)
         return model
 
-    def addColor(self, color, name=""):
+    def addColor(self, color, name=''):
         item = QtGui.QStandardItem()
         item.setText(name)
         item.setData(color, QtCore.Qt.DecorationRole)
@@ -28,7 +28,7 @@ class ColorModel(QtGui.QStandardItemModel):
         self.appendRow(item)
         return item.index()
 
-    def insertColor(self, index, color, name=""):
+    def insertColor(self, index, color, name=''):
         item = QtGui.QStandardItem()
         item.setText(name)
         item.setData(color, QtCore.Qt.DecorationRole)
@@ -77,14 +77,14 @@ class QwwColorComboBox(QtGui.QComboBox):
         slist = []
         for i in range(self._model.rowCount()):
             ind = self._model.index(i, 0)
-            slist.append("%s,%s" % (QtGui.QColor(ind.data(QtCore.Qt.DecorationRole)).name(), int.data(PyQt4.ToolTipRole).toString()))
+            slist.append('%s,%s' % (QtGui.QColor(ind.data(QtCore.Qt.DecorationRole)).name(), int.data(PyQt4.ToolTipRole).toString()))
         return slist
 
     def setColors(self, colors):
         self.clear()
         self._model.clear()
         for nam in colors:
-            slist = nam.split(",")
+            slist = nam.split(',')
             c = QtGui.QColor()
             c.setNamedColor(slist[0])
             self.addColor(c, slist[1])
@@ -105,13 +105,13 @@ class QwwColorComboBox(QtGui.QComboBox):
     def _q_popupDialog(self):
         newcol = QtGui.QColorDialog.getColor(self.currentColor,
                                              self,
-                                             "Choose Colour",
+                                             'Choose Colour',
                                              QtGui.QColorDialog.ShowAlphaChannel)
 
         if newcol.isValid():
             ind = self.findData(newcol, QtCore.Qt.DecorationRole)
             if ind == -1:
-                self.addColor(newcol, "Custom Colour")
+                self.addColor(newcol, 'Custom Colour')
                 ind = self.count() - 1
             self.setCurrentIndex(ind)
 
@@ -138,18 +138,18 @@ class QwwColorComboBox(QtGui.QComboBox):
         if i != 1:
             self.setCurrentIndex(i)
         else:
-            self.addColor(color, "Custom Colour")
+            self.addColor(color, 'Custom Colour')
             self.setCurrentIndex(self.count() - 1)
 
     def eventFilter(self, obj, event):
         if obj == self.view():
             if event.type() == QtCore.QEvent.Show:
                 if self.isColorDialogEnabled():
-                    self.addItem("Other")
+                    self.addItem('Other')
                     ind = self.count() - 1
                     self.setItemData(ind, PyQt4.AlignCenter, PyQt4.TextAlignmentRole)
                     self.setItemData(ind, self.palette().color(QtGui.QPalette.Button), PyQt4.BackgroundRole)
-                    self.setItemData(ind, "Choose a custom colour", PyQt4.ToolTipRole)
+                    self.setItemData(ind, 'Choose a custom colour', PyQt4.ToolTipRole)
                 return False
             elif event.type() == QtCore.QEvent.Hide:
                 if self.isColorDialogEnabled():
@@ -201,7 +201,7 @@ class QwwColorComboBox(QtGui.QComboBox):
 
 
 class QLabelButton(QtGui.QLabel):
-    clicked = QtCore.pyqtSignal(name="toggle_clicked")
+    clicked = QtCore.pyqtSignal(name='toggle_clicked')
 
     def __init__(self, icon1=None, icon2=None, bitmap=None):
         QtGui.QLabel.__init__(self)
@@ -210,7 +210,7 @@ class QLabelButton(QtGui.QLabel):
         self.bitmap = bitmap
         self.setPixmap(icon1)
         color = self.palette().background().color().name()
-        self.setStyleSheet("background-color: %s;" % (color, ))
+        self.setStyleSheet('background-color: %s;' % (color, ))
         self.setAutoFillBackground(True)
         self.setMask(self.bitmap.mask())
         self.current = 0
