@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Sidebar.ui'
 #
-# Created: Mon Feb 23 11:42:14 2015
+# Created: Mon Feb 23 12:08:34 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -36,27 +36,16 @@ class Ui_Sidebar(object):
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.layout = QtGui.QVBoxLayout()
         self.layout.setObjectName(_fromUtf8("layout"))
-        self.logoLayoutWide = QtGui.QHBoxLayout()
-        self.logoLayoutWide.setObjectName(_fromUtf8("logoLayoutWide"))
-        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.logoLayoutWide.addItem(spacerItem)
-        self.logo0 = QtGui.QLabel(Sidebar)
-        self.logo0.setText(_fromUtf8(""))
-        self.logo0.setObjectName(_fromUtf8("logo0"))
-        self.logoLayoutWide.addWidget(self.logo0)
-        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.logoLayoutWide.addItem(spacerItem1)
-        self.layout.addLayout(self.logoLayoutWide)
         self.logoLayout = QtGui.QHBoxLayout()
         self.logoLayout.setObjectName(_fromUtf8("logoLayout"))
-        self.logo1 = QtGui.QLabel(Sidebar)
-        self.logo1.setText(_fromUtf8(""))
-        self.logo1.setObjectName(_fromUtf8("logo1"))
-        self.logoLayout.addWidget(self.logo1, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
-        self.logo2 = QtGui.QLabel(Sidebar)
-        self.logo2.setText(_fromUtf8(""))
-        self.logo2.setObjectName(_fromUtf8("logo2"))
-        self.logoLayout.addWidget(self.logo2, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
+        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.logoLayout.addItem(spacerItem)
+        self.logo = QtGui.QLabel(Sidebar)
+        self.logo.setText(_fromUtf8(""))
+        self.logo.setObjectName(_fromUtf8("logo"))
+        self.logoLayout.addWidget(self.logo)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.logoLayout.addItem(spacerItem1)
         self.layout.addLayout(self.logoLayout)
         self.form = QtGui.QVBoxLayout()
         self.form.setObjectName(_fromUtf8("form"))
@@ -117,9 +106,8 @@ class Ui_Sidebar(object):
         self.sidebarStatus.setText(_fromUtf8(""))
         self.sidebarStatus.setObjectName(_fromUtf8("sidebarStatus"))
         self.layout.addWidget(self.sidebarStatus)
-        self.layout.setStretch(0, 1)
-        self.layout.setStretch(2, 5)
-        self.layout.setStretch(3, 1)
+        self.layout.setStretch(1, 5)
+        self.layout.setStretch(2, 1)
         self.horizontalLayout.addLayout(self.layout)
 
         self.retranslateUi(Sidebar)

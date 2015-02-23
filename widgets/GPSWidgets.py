@@ -2,17 +2,17 @@ from __future__ import absolute_import, division, print_function
 from PyQt4 import QtGui, QtCore, QtWebKit
 #import matplotlib.pyplot as plt
 from clientfuncs import ImportThread
-from os.path import join, exists  # NOQA
+from os.path import abspath
 
 
 class gps_map(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.parent = parent
-        #self.map_image_file = '../assets/map_nairobi.png'
-        #self.map_image_file = '../assets/map_albany.png'
-        #self.map_image_file = '../assets/map_troy.png'
-        self.map_image_file = '../assets/map_rpi.png'
+        # self.map_image_file = abspath('assets/map_nairobi.png')
+        # self.map_image_file = abspath('assets/map_albany.png')
+        # self.map_image_file = abspath('assets/map_troy.png')
+        self.map_image_file  = abspath('assets/map_rpi.png')
         self.initComponents()
         self.initLayout()
         self.initSignals()

@@ -4,15 +4,13 @@ from os import path, chdir
 import time
 import random
 import copy
-from os.path import dirname, join
+from os.path import abspath
 
-
-FILE_DPATH = dirname(__file__)
-PLACEHOLDER_IMAGE = join(FILE_DPATH, '../assets/placeholder.png')
-ZEBRA_ICON = join(FILE_DPATH, '../assets/icons/icon_zebra.png')
-GIRAFFE_ICON = join(FILE_DPATH, '../assets/icons/icon_giraffe.png')
 
 IMAGE_SIZE = 150
+PLACEHOLDER_IMAGE = abspath('assets/placeholder.png')
+ZEBRA_ICON        = abspath('assets/icons/icon_zebra.png')
+GIRAFFE_ICON      = abspath('assets/icons/icon_giraffe.png')
 
 
 class first_last_image(QtGui.QFrame):

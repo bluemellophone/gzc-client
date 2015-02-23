@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from PyQt4 import QtGui, QtCore
 import sys
+from os.path import abspath
 import signal
 from widgets import Sidebar as sb
 from widgets import ImageWidgets as img
@@ -11,11 +12,12 @@ import simplejson as json
 import requests
 
 
-BUTTON_SIZE = 100
+TOGGLE_BUTTON_SIZE = 100
 DEFAULT_DOMAIN    = 'http://localhost:5000'
-TOGGLE_BUTTON_CAM = 'assets/icons/icon_camera_small.png'
-TOGGLE_BUTTON_GPS = 'assets/icons/icon_gps_small.png'
-TOGGLE_BITMAP     = 'assets/icons/bitmap_toggle_small.png'
+DEFAULT_PATH      = abspath('data')
+TOGGLE_BUTTON_CAM = abspath('assets/icons/icon_camera_small.png')
+TOGGLE_BUTTON_GPS = abspath('assets/icons/icon_gps_small.png')
+TOGGLE_BITMAP     = abspath('assets/icons/bitmap_toggle_small.png')
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
@@ -23,10 +25,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         QtGui.QWidget.__init__(self)
         # Load toggle button icons and bitmap
         self.domain = DEFAULT_DOMAIN
-        self.path_list = ['data']
-        self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(BUTTON_SIZE, BUTTON_SIZE)
-        self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(BUTTON_SIZE, BUTTON_SIZE)
-        self.toggle_button_bitmap = QtGui.QPixmap(TOGGLE_BITMAP).scaled(BUTTON_SIZE, BUTTON_SIZE)
+        self.path_list = [DEFAULT_PATH]
+        self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(TOGGLE_BUTTON_SIZE, TOGGLE_BUTTON_SIZE)
+        self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(TOGGLE_BUTTON_SIZE, TOGGLE_BUTTON_SIZE)
+        self.toggle_button_bitmap = QtGui.QPixmap(TOGGLE_BITMAP).scaled(TOGGLE_BUTTON_SIZE, TOGGLE_BUTTON_SIZE)
         # Init
         self.setupUi(self)
         self.initWidgets()
@@ -51,7 +53,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             icon2=self.toggle_button_gps_ic,
             bitmap=self.toggle_button_bitmap
         )
-        self.toggleButton.resize(BUTTON_SIZE, BUTTON_SIZE)
+        self.toggleButton.resize(TOGGLE_BUTTON_SIZE, TOGGLE_BUTTON_SIZE)
         self.toggleButton.move(self.width(), 0)
         self.toggleButton.setParent(self.centralWidget())
         self.toggleButton.show()
@@ -131,7 +133,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def pathChanged(self):
         path_str = str(self.pathInput.textValue())
-        self.path_list = path_str.split(',')
+        self.path_list = map(abspath, path_str.split(','))
 
     def allImagesSelected(self):
         return self.imageDisplay.all_images_selected()

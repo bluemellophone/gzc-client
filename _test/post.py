@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, print_function
 import requests
 import simplejson as json
-from os.path import join, exists  # NOQA
+from os.path import join
 
 # This is test code for pushing POST content and a zip file to a web server.
 # Run server.py from https://github.com/bluemellophone/gzc-server and then run this

@@ -5,7 +5,7 @@ from ImageFormSkel import Ui_ImageForm
 from GPSFormSkel import Ui_GPSForm
 from GZCQWidgets import QwwColorComboBox
 from os import chdir, getcwd
-from os.path import dirname, join, basename, exists, realpath
+from os.path import dirname, join, basename, exists, realpath, abspath
 from shutil import rmtree
 from clientfuncs import CopyThread, find_candidates, ex_deco, ensure_structure
 import zipfile
@@ -13,15 +13,14 @@ import simplejson as json
 import requests
 
 
-LOGO_SIZE = 150
-FILE_DPATH = dirname(__file__)
-LOGO_ZERO = join(FILE_DPATH, '../assets/logo_kwf_alpha.png')
-LOGO_ONE = join(FILE_DPATH, '../assets/logo_ibeis_alpha.png')
-LOGO_TWO = join(FILE_DPATH, '../assets/logo_kws_alpha.png')
-IMPORT_ICON = join(FILE_DPATH, '../assets/icons/icon_import.png')
-SUBMIT_ICON = join(FILE_DPATH, '../assets/icons/icon_upload.png')
-BROWSE_ICON = join(FILE_DPATH, '../assets/icons/icon_browse.png')
-CLEAR_ICON = join(FILE_DPATH, '../assets/icons/icon_trash.png')
+LOGO_SIZE = 200
+LOGO        = abspath('assets/logo_ibeis_alpha.png')
+# LOGO        = abspath('assets/logo_kwf_alpha.png')
+# LOGO        = abspath('assets/logo_kws_alpha.png')
+IMPORT_ICON = abspath('assets/icons/icon_import.png')
+SUBMIT_ICON = abspath('assets/icons/icon_upload.png')
+BROWSE_ICON = abspath('assets/icons/icon_browse.png')
+CLEAR_ICON  = abspath('assets/icons/icon_trash.png')
 
 CAR_COLORS = [('Select Color', '#F6F6F6')] + [
     ('white',    '#FFFFFF'),
@@ -65,12 +64,8 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.parent.clearGPSDisplay()
 
     def initLogos(self):
-        logo0 = QtGui.QPixmap(LOGO_ZERO)
-        # logo1 = QtGui.QPixmap(LOGO_ONE).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
-        # logo2 = QtGui.QPixmap(LOGO_TWO).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio)
-        self.logo0.setPixmap(logo0)
-        # self.logo1.setPixmap(logo1)
-        # self.logo2.setPixmap(logo2)
+        logo = QtGui.QPixmap(LOGO).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio, 1)
+        self.logo.setPixmap(logo)
 
     def initConnect(self):
         self.submitButton.clicked.connect(self.submitClicked)
@@ -82,8 +77,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.clearButton.setText('')
         self.clearButton.setIcon(QtGui.QIcon(CLEAR_ICON))
         # Hide non-visible icons
-        self.logo1.setMaximumHeight(0)
-        self.logo2.setMaximumHeight(0)
+        # self.logo.setMinimumWidth(300)
         # Clear Sidebar
         self.clear()
 
@@ -122,7 +116,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 self.move_file_list(self.file_bases)
 
                 for index, path in enumerate(self.parent.path_list):
-                    target_directory = join('..', path, 'images', car_number + car_color, person_letter)
+                    target_directory = abspath(path, 'images', car_number + car_color, person_letter)
                     if exists(target_directory):
                         print('Target directory already exists... deleting')
                         rmtree(target_directory)
@@ -203,7 +197,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
         chdir(dirname(realpath(__file__)))
         path = self.parent.path_list[0]
-        pull_directory = join('..', path, 'images', car_number + car_color, person_letter)
+        pull_directory = abspath(path, 'images', car_number + car_color, person_letter)
         chdir(join(getcwd(), pull_directory))
 
         first = self.parent.imageDisplay.first_image.current_image
