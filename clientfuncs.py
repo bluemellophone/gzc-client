@@ -255,7 +255,7 @@ def ensure_structure(data, kind, car_number, car_color, person=None):
     if person is None:
         return car_dir
     # Create person dir
-    person     = person.lower()
+    person = person.lower()
     person_dir = join(car_dir, person)
     if not exists(person_dir):
         mkdir(person_dir)

@@ -202,10 +202,13 @@ class image_selection_box(QtGui.QWidget):
             self.select_group.setExclusive(True)
 
     def get_selection(self):
+        enabled = self.select_zebra.isEnabled() and self.select_giraffe.isEnabled()
+        if not enabled:
+            return (None, 'Ignore')
         checked = self.select_group.checkedButton()
-        if checked is not None:
-            return (path.basename(self.image.current_image), checked.text())
-        return (None, 0)
+        if checked is None:
+            return (None, 'Unassigned')
+        return (path.basename(self.image.current_image), checked.text())
 
 
 class selection_group(QtGui.QWidget):
