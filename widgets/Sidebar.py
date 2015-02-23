@@ -102,6 +102,12 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 self.imageForm.idLayout.hide()
             # Image - Step 2
             if self.complete_image_step_2:
+                if self.import_directory == "overridden":
+                    self.imageForm.nameInput.setEnabled(False)
+                    self.imageForm.nameInput.setText(self.files[0])
+                    self.complete_image_step_3 = True
+                else:
+                    self.imageForm.nameInput.setEnabled(True)
                 self.imageForm.syncLayout.show()
             else:
                 self.imageForm.syncLayout.hide()
@@ -180,7 +186,8 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             self.reset_cursor()
             raise IOError('The first image name must be defined.')
             return
-        self.files = find_candidates(directory, str(self.imageForm.nameInput.text()))
+        if directory != "overridden":
+            self.files = find_candidates(directory, str(self.imageForm.nameInput.text()))
         if len(self.files) == 0:
             self.reset_cursor()
             raise IOError('Could not find any files for selected directory. Please check your first image name.')
@@ -358,6 +365,15 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # Update status
         self.updateStatus()
 
+    def imagesSelectedOverride(self, imgList):
+        # possibly do more tests for validity of list here
+        self.clear()
+
+        self.import_directory = "overridden"
+        self.imageForm.driveLabel.setText("Images manually selected...")
+        self.complete_image_step_1 = True
+        self.files = imgList
+        self.updateStatus()
 
 class ImageForm(QtGui.QWidget, Ui_ImageForm):
     def __init__(self, parent):
