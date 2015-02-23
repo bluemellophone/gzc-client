@@ -78,7 +78,7 @@
   </action>
   <action name="actionManuallySelectGPS">
    <property name="text">
-    <string>Manually Select GPS Data</string>
+    <string>Manually Select GPX File</string>
    </property>
   </action>
  </widget>

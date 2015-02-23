@@ -86,7 +86,6 @@ class image_selection_roll(QtGui.QLabel):
         if self.current_image != PLACEHOLDER_IMAGE:
             self.emit(QtCore.SIGNAL('clicked()'))
 
-
     def enterEvent(self, ev):
         if self.current_image != PLACEHOLDER_IMAGE:
             QtGui.QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
@@ -170,7 +169,6 @@ class image_selection_box(QtGui.QWidget):
     def init_connect(self):
         self.connect(self.image, QtCore.SIGNAL('clicked()'), self.reroll)
         self.select_group.buttonClicked[int].connect(self.option_selected)
-
 
     def reroll(self, filename=None):
         #get new filename

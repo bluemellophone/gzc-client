@@ -42,9 +42,6 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         QtGui.QWidget.__init__(self)
         self.parent = parent
         self.copyThread = None
-        self.image_file_list = []
-        self.gps_file_list = []
-
         self.setupUi(self)
         self.initWidgets()
         self.initConnect()
@@ -163,7 +160,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.parent.imageDisplay.add_filename(filename, add_to_display=add_to_display)
 
     def update_recent_file_gps(self, index, filename):
-        self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.image_file_list), ))
+        self.sidebarStatus.setText('Copying GPX file...')
 
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
@@ -229,13 +226,18 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
         self.sidebarStatus.setText('Copying GPS Track')
 
+        # Assert filled out
+        color_index  = self.gpsForm.colorInput.currentIndex()
+        number_index = self.gpsForm.numberInput.currentIndex()
+        if color_index == 0 or number_index == 0:
+            raise ValueError('Cannot import GPX file without specifying a car color and car number')
+
         # Get data from form
-        car_number    = str(self.imageForm.numberInput.currentText())
-        car_color     = str(self.imageForm.colorInput.currentText())
-        person_letter = str(self.imageForm.letterInput.currentText())
+        car_number    = str(self.gpsForm.numberInput.currentText())
+        car_color     = str(self.gpsForm.colorInput.currentText())
 
         for index, path in enumerate(self.parent.path_list):
-            dst_directory = ensure_structure(path, 'gps', car_number, car_color, person_letter)
+            dst_directory = ensure_structure(path, 'gps', car_number, car_color)
             if exists(dst_directory):
                 print('Target directory already exists... deleting')
                 rmtree(dst_directory)
@@ -243,7 +245,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 self.gps_file_list.append(pre_extracted_gpx_path)
             else:
                 print('call igotu2gpx', dst_directory)
-            self.copyThread = CopyThread([self.gps_file_list], [dst_directory])
+            self.copyThread = CopyThread(self.gps_file_list, [dst_directory])
             if index == 0:
                 self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file_gps)
                 self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
@@ -366,8 +368,11 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         if self.copyThread is not None:
             self.copyThread.terminate()
             self.copyThread.quit()
-        # Clear Flags
+        # Clear attributes
         self.import_directory = None
+        self.image_file_list = []
+        self.gps_file_list = []
+        # Clear Flags
         self.complete_image_step_1 = False
         self.complete_image_step_2 = False
         self.complete_image_step_3_name = False

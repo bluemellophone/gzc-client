@@ -22,8 +22,7 @@ class CopyThread(QtCore.QThread):
         self.wait()
 
     def run(self):
-        for index, f in enumerate(self.filenames):
-            filepath = f
+        for index, filepath in enumerate(self.filenames):
             if not isfile(filepath):
                 continue
             for outdir in self.destinations:
@@ -31,7 +30,7 @@ class CopyThread(QtCore.QThread):
                     makedirs(outdir)
                 # time.sleep(2)
                 shutil.copy2(filepath, outdir)
-                self.emit(QtCore.SIGNAL('file_done'), index, join(outdir, f))
+                self.emit(QtCore.SIGNAL('file_done'), index, join(outdir, filepath))
         self.emit(QtCore.SIGNAL('completed'))
         return None
 
@@ -49,7 +48,6 @@ class ImportThread(QtCore.QThread):
             gpx_string = import_gpx(data)
         except IOError:
             thrd.gpswgt.parent.status_bar.showMessage(QtCore.QString("Couldn't import GPS info. Make sure the dongle is connected"))
-            thrd.gpswgt.parent.status_bar.setPalette(thrd.gpswgt.error_palette)
             return
         import cv2
         #gpx_string = open("test_gps/track.gpx", "r").read()
@@ -65,7 +63,6 @@ class ImportThread(QtCore.QThread):
         gps_json = convert_gpx_to_json(gpx_string)
         if len(gps_json['track']) == 0:
             thrd.gpswgt.parent.status_bar.showMessage(QtCore.QString("No Points found. Import again."))
-            thrd.gpswgt.parent.status_bar.setPalette(thrd.gpswgt.error_palette)
             return
         pts = []
         img = cv2.imread(thrd.gpswgt.map_image_file)
@@ -215,9 +212,9 @@ def ex_deco(action_func):
 
     def logerr(ex, self=None):
         print ('EXCEPTION RAISED! ' + traceback.format_exc(ex))
-        log = open('error_log.txt', 'w')
-        log.write(traceback.format_exc(ex))
-        log.close()
+        # log = open('error_log.txt', 'w')
+        # log.write(traceback.format_exc(ex))
+        # log.close()
         msg_box = QtGui.QErrorMessage(self)
         msg_box.showMessage(ex.message)
     #is_method = isinstance(action_func, types.MethodType)

@@ -47,8 +47,8 @@ print("RESPONSE:", response)
 data = {
     'car_color': 'GREEN',
     'car_number': 1,
-    'gps_first_time_hour': 11,
-    'gps_first_time_minute': 43,
+    'gps_start_time_hour': 11,
+    'gps_start_time_minute': 43,
 }
 
 # LOAD THE GPX FILE AND ADD TO THE PAYLOAD

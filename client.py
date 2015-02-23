@@ -154,11 +154,15 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def clear(self):
         self.imageDisplay.hide()
         self.gpsDisplay.hide()
+        self.actionManuallySelectImages.setEnabled(False)
+        self.actionManuallySelectGPS.setEnabled(False)
         # Show correct display
         if self.currentDisplay == 0:
             self.imageDisplay.show()
+            self.actionManuallySelectImages.setEnabled(True)
         elif self.currentDisplay == 1:
             self.gpsDisplay.show()
+            self.actionManuallySelectGPS.setEnabled(True)
         # Clear children
         self.clearSidebar()
         self.clearImageDisplay()

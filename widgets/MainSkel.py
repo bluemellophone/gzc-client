@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Main.ui'
 #
-# Created: Mon Feb 23 14:47:30 2015
+# Created: Mon Feb 23 16:00:48 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -77,5 +77,5 @@ class Ui_MainWindow(object):
         self.actionSpecifyDomain.setText(_translate("MainWindow", "Specify Domain", None))
         self.actionSpecifyFilepaths.setText(_translate("MainWindow", "Specify Filepaths", None))
         self.actionManuallySelectImages.setText(_translate("MainWindow", "Manually Select Images", None))
-        self.actionManuallySelectGPS.setText(_translate("MainWindow", "Manually Select GPS Data", None))
+        self.actionManuallySelectGPS.setText(_translate("MainWindow", "Manually Select GPX File", None))
 
