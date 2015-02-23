@@ -162,6 +162,7 @@ class image_selection_box(QtGui.QWidget):
         self.select_group.buttonClicked[int].connect(self.option_selected)
 
     def reroll(self):
+        print("rerolling")
         #get new filename
         try:
             filename = self.parent().get_filename()
