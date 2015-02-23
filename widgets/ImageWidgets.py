@@ -83,7 +83,9 @@ class image_selection_roll(QtGui.QLabel):
         self.clear()
 
     def mouseReleaseEvent(self, ev):
-        self.emit(QtCore.SIGNAL('clicked()'))
+        if self.current_image != PLACEHOLDER_IMAGE:
+            self.emit(QtCore.SIGNAL('clicked()'))
+
 
     def enterEvent(self, ev):
         if self.current_image != PLACEHOLDER_IMAGE:
