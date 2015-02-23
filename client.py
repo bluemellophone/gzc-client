@@ -106,8 +106,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         print('manuallySelectImages')
         dialog = QtGui.QFileDialog()
         dialog.setFileMode(QtGui.QFileDialog.ExistingFiles)
-        first = dialog.getOpenFileNames(self, 'Open files', '/home')
-        print("SELECTED FIRST", first)
+        qFiles = dialog.getOpenFileNames(self, 'Open files', '/home')
+        # convert QStringList to a python list of strings
+        files = [str(f) for f in qFiles]
+        self.sidebar.imagesSelectedOverride(files)
 
     def manuallySelectGPS(self, checked):
         print('manuallySelectGPS')
