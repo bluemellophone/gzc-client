@@ -7,6 +7,8 @@ from widgets import ImageWidgets as img
 # from widgets import GPSWidgets as gps
 from widgets.MainSkel import Ui_MainWindow
 from widgets.GZCQWidgets import QLabelButton
+import simplejson as json
+import requests
 
 
 BUTTON_SIZE = 100
@@ -52,9 +54,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.toggleButton.show()
         # Domain input
         self.domainInput = QtGui.QInputDialog()
-        self.domainInput.setLabelText(QtCore.QString('Enter server domain:'))
+        self.domainInput.setLabelText(QtCore.QString('Enter server domain'))
         self.pathInput = QtGui.QInputDialog()
-        self.pathInput.setLabelText(QtCore.QString('Enter copy paths:'))
+        self.pathInput.setLabelText(QtCore.QString('Enter copy paths'))
 
     def initConnect(self):
         self.toggleButton.clicked.connect(self.switchWidgets)
@@ -70,6 +72,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         # Menu items
         self.domainInput.accepted.connect(self.domainChanged)
         self.pathInput.accepted.connect(self.pathChanged)
+        self.domainInput.textValueChanged.connect(self.checkServerResponse)
 
     def initVisuals(self):
         # Set window title
@@ -107,6 +110,17 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
         fname = dialog.getOpenFileName(self, 'Open file', '/home')
         print("SELECTED GPS FILE", fname)
+
+    def checkServerResponse(self, value):
+        self.domainInput.setLabelText(QtCore.QString('Enter server domain'))
+        value = str(value)
+        try:
+            r = requests.get(value + '/status')
+            response = json.loads(r.text)
+            if response['status']['code'] == 0:
+                self.domainInput.setLabelText(QtCore.QString('Enter server domain - Valid Server Response'))
+        except requests.exceptions.ConnectionError:
+            return
 
     # Functions
     def domainChanged(self):

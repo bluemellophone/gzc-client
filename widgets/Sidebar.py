@@ -189,12 +189,15 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         DOMAIN = '%s/images/submit' % (self.parent.domain)
         #Zip selected images: first, last, zebra/, giraffe/
 
-        car_number = str(self.imageForm.numberInput.currentText())
-        car_color = str(self.imageForm.colorInput.currentText())
+        car_number    = str(self.imageForm.numberInput.currentText())
+        car_color     = str(self.imageForm.colorInput.currentText())
         person_letter = str(self.imageForm.letterInput.currentText())
+        time_hour     = str(self.imageForm.timeInput.time().hour())
+        time_minute   = str(self.imageForm.timeInput.time().minute())
 
         chdir(dirname(realpath(__file__)))
-        pull_directory = join(self.parent.path_list[0], car_number + car_color, person_letter)
+        path = self.parent.path_list[0]
+        pull_directory = join('..', path, 'images', car_number + car_color, person_letter)
         chdir(join(getcwd(), pull_directory))
 
         first = self.parent.imageDisplay.first_image.current_image
@@ -212,7 +215,8 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
         last = self.parent.imageDisplay.last_image.current_image
 
-        zip_archive = zipfile.ZipFile('%s%s%s.zip' % (car_number, car_color, person_letter), 'w')
+        zip_path = pull_directory + '.zip'
+        zip_archive = zipfile.ZipFile(zip_path, 'w')
         zip_archive.write(join(getcwd(), first), 'first.jpg')
         zip_archive.write(join(getcwd(), last), 'last.jpg')
         if len(zebra) == 0:
@@ -227,19 +231,18 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             zip_archive.write(join(getcwd(), filename), join('zebra', filename))
         for filename in giraffe:
             zip_archive.write(join(getcwd(), filename), join('giraffe', filename))
-
         zip_archive.close()
 
         #format data
         data = {
-            'car_color': str(self.user_input_group.colorBox.currentText()),
-            'car_number': str(self.user_input_group.id_car_number.value()),
-            'person_letter': str(self.user_input_group.id_person.currentText()),
-            'image_first_time_hour': str(self.user_input_group.sync_time.time().hour()),
-            'image_first_time_minute': str(self.user_input_group.sync_time.time().minute()),
+            'car_color': car_color,
+            'car_number': car_number,
+            'person_letter': person_letter,
+            'image_first_time_hour': time_hour,
+            'image_first_time_minute': time_minute,
         }
 
-        content = open(str(self.user_input_group.colorBox.currentText()) + str(self.user_input_group.id_car_number.value()) + str(self.user_input_group.id_person.currentText()) + '.zip', 'rb')
+        content = open(zip_path, 'rb')
         files = {
             'image_archive': content,
         }
