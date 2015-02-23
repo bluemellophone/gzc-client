@@ -174,6 +174,8 @@ def find_candidates(search_path, search_str, verbose=False):
         return sorted(temp)
 
     direct = Directory(search_path, recursive=True, include_file_extensions='images')
+    if len(search_str.strip()) == 0:
+        return direct.files()
     if verbose:
         print('TESTING FOR %d TRANSFORMS ON %d FILES' % (len(transform_list) ** 2, len(direct.files())))
     found_list = []
