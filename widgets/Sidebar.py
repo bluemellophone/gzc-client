@@ -89,7 +89,6 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 self.submitImage()
             else:
                 self.copyImage()
-                self.complete_image_step_4 = True
         elif self.parent.currentDisplay == 1:
             print('START IMPORT')
             # self.submitGPS()
@@ -146,12 +145,13 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # self.image_selection_group.stored_files = file_list
 
     def update_recent_file(self, index, filename):
-        print(index, filename)
         self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.files), ))
         self.parent.imageDisplay.add_filename(filename)
 
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
+        self.sidebarStatus.setText('Copying completed')
+        self.complete_image_step_4 = True
 
     @ex_deco
     def copyImage(self):
@@ -322,6 +322,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def clear(self):
         # Stop any ongoing copy thread
         if self.copyThread is not None:
+            self.sidebarStatus.setText('')
             self.copyThread.quit()
         # Clear Flags
         self.import_directory = None
