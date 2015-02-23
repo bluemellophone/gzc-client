@@ -103,20 +103,18 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.pathInput.show()
 
     def manuallySelectImages(self, checked):
-        print('manuallySelectImages')
         dialog = QtGui.QFileDialog()
         dialog.setFileMode(QtGui.QFileDialog.ExistingFiles)
-        qFiles = dialog.getOpenFileNames(self, 'Open files', '/home')
+        qFiles = dialog.getOpenFileNames(self, 'Select image files')
         # convert QStringList to a python list of strings
         files = [str(f) for f in qFiles]
         self.sidebar.imagesSelectedOverride(files)
 
     def manuallySelectGPS(self, checked):
-        print('manuallySelectGPS')
         dialog = QtGui.QFileDialog()
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
-        fname = dialog.getOpenFileName(self, 'Open file', '/home')
-        print("SELECTED GPS FILE", fname)
+        fname = str(dialog.getOpenFileName(self, 'Select GPX file'))
+        self.sidebar.copyGPS(fname)
 
     def checkServerResponse(self, value):
         self.domainInput.setLabelText(QtCore.QString('Enter server domain'))

@@ -40,6 +40,8 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         QtGui.QWidget.__init__(self)
         self.parent = parent
         self.copyThread = None
+        self.image_file_list = []
+        self.gps_file_list = []
 
         self.setupUi(self)
         self.initWidgets()
@@ -95,6 +97,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         if self.parent.currentDisplay == 0:
             # Image - Step 0 (always show)
             self.imageForm.driveLayout.show()
+            self.imageForm.nameInput.setEnabled(True)
             # Image - Step 1
             if self.complete_image_step_1:
                 self.imageForm.idLayout.show()
@@ -104,10 +107,8 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             if self.complete_image_step_2:
                 if self.import_directory == "overridden":
                     self.imageForm.nameInput.setEnabled(False)
-                    self.imageForm.nameInput.setText(self.files[0])
+                    self.imageForm.nameInput.setText(basename(self.image_file_list[0]))
                     self.complete_image_step_3 = True
-                else:
-                    self.imageForm.nameInput.setEnabled(True)
                 self.imageForm.syncLayout.show()
             else:
                 self.imageForm.syncLayout.hide()
@@ -151,14 +152,18 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.parent.imageDisplay.last_image.current_image = file_list.pop()
         # self.image_selection_group.stored_files = file_list
 
-    def update_recent_file(self, index, filename):
-        self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.files), ))
+    def update_recent_file_image(self, index, filename):
+        self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.image_file_list), ))
+        self.parent.imageDisplay.add_filename(filename)
+
+    def update_recent_file_gps(self, index, filename):
+        self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.image_file_list), ))
         self.parent.imageDisplay.add_filename(filename)
 
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
         self.sidebarStatus.setText('Copying completed')
-        if self.parent.currentDisplay == 0:
+        if self.parent.currentDisplay == 0 and len(self.image_file_list) > 0:
             self.complete_image_step_4 = True
         elif self.parent.currentDisplay == 1:
             self.complete_gps_step_2 = True
@@ -187,13 +192,13 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             raise IOError('The first image name must be defined.')
             return
         if directory != "overridden":
-            self.files = find_candidates(directory, str(self.imageForm.nameInput.text()))
-        if len(self.files) == 0:
+            self.image_file_list = find_candidates(directory, str(self.imageForm.nameInput.text()))
+        if len(self.image_file_list) == 0:
             self.reset_cursor()
             raise IOError('Could not find any files for selected directory. Please check your first image name.')
             return
         #send this file list to the selection group i am a bad programmer
-        self.file_bases = [basename(f) for f in self.files]
+        self.file_bases = [basename(f) for f in self.image_file_list]
         # print self.file_bases
         self.move_file_list(self.file_bases)
 
@@ -202,14 +207,14 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             if exists(dst_directory):
                 print('Target directory already exists... deleting')
                 rmtree(dst_directory)
-            self.copyThread = CopyThread(self.files, [dst_directory])
+            self.copyThread = CopyThread(self.image_file_list, [dst_directory])
             if index == 0:
-                self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
+                self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file_image)
                 self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
             self.copyThread.start()
 
     @ex_deco
-    def copyGPS(self):
+    def copyGPS(self, pre_extracted_gpx_path=None):
         # Change cursor to busy
         QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
         self.sidebarStatus.setText('Copying GPS Track')
@@ -220,10 +225,19 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         person_letter = str(self.imageForm.letterInput.currentText())
 
         for index, path in enumerate(self.parent.path_list):
-            dst_directory = ensure_structure(path, 'zip', car_number, car_color, person_letter)
-            print('call igotu2gpx', dst_directory)
-
-        self.reset_cursor()
+            dst_directory = ensure_structure(path, 'gps', car_number, car_color, person_letter)
+            if exists(dst_directory):
+                print('Target directory already exists... deleting')
+                rmtree(dst_directory)
+            if pre_extracted_gpx_path is not None:
+                self.gps_file_list.append(pre_extracted_gpx_path)
+            else:
+                print('call igotu2gpx', dst_directory)
+            self.copyThread = CopyThread([self.gps_file_list], [dst_directory])
+            if index == 0:
+                self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file_gps)
+                self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
+            self.copyThread.start()
 
     @ex_deco
     def submitImage(self):
@@ -241,7 +255,6 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # Establish source and destination folders
         src_directory = ensure_structure(path, 'images', car_number, car_color, person_letter)
         dst_directory = ensure_structure(path, 'zip', car_number, car_color, person_letter)
-        print(src_directory, dst_directory)
 
         # Gather selected images from the GUI
         first   = self.parent.imageDisplay.first_image.current_image
@@ -368,12 +381,12 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def imagesSelectedOverride(self, imgList):
         # possibly do more tests for validity of list here
         self.clear()
-
         self.import_directory = "overridden"
-        self.imageForm.driveLabel.setText("Images manually selected...")
+        self.imageForm.driveLabel.setText("Images selected manually...")
         self.complete_image_step_1 = True
-        self.files = imgList
+        self.image_file_list = imgList
         self.updateStatus()
+
 
 class ImageForm(QtGui.QWidget, Ui_ImageForm):
     def __init__(self, parent):
