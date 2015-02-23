@@ -36,8 +36,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def initWidgets(self):
         # Init displays
-        self.imageDisplay = img.selection_group()
-        self.gpsDisplay = gps.gps_map()
+        self.imageDisplay = img.selection_group(self)
+        self.gpsDisplay = gps.gps_map(self)
         self.displaySpace.addWidget(self.imageDisplay)
         self.displaySpace.addWidget(self.gpsDisplay)
         # Init sidebar (must happen second)

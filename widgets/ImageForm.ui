@@ -280,13 +280,13 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>154</height>
+         <height>126</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>154</height>
+         <height>126</height>
         </size>
        </property>
        <property name="font">
@@ -335,7 +335,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="1" column="0">
          <widget class="QLabel" name="timeLabel">
           <property name="minimumSize">
            <size>
@@ -351,7 +351,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="1" column="1">
          <widget class="QTimeEdit" name="timeInput">
           <property name="minimumSize">
            <size>
@@ -373,24 +373,6 @@
           </property>
           <property name="displayFormat">
            <string>HH:mm</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="syncLabel">
-          <property name="font">
-           <font>
-            <pointsize>-1</pointsize>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color:#666;</string>
-          </property>
-          <property name="text">
-           <string>Specify image name</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>

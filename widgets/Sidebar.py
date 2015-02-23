@@ -42,6 +42,12 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         QtGui.QWidget.__init__(self)
         self.parent = parent
         self.copyThread = None
+        self.paletteProcessing = QtGui.QPalette(QtGui.QColor(255, 255, 255))
+        self.paletteReady = QtGui.QPalette(QtGui.QColor(155, 209, 229))
+        self.paletteSending = QtGui.QPalette(QtGui.QColor(63, 124, 172))
+        self.paletteSent = QtGui.QPalette(QtGui.QColor(0, 96, 6))
+        self.paletteError = QtGui.QPalette(QtGui.QColor(163, 11, 55))
+
         self.setupUi(self)
         self.initWidgets()
         self.initConnect()
@@ -259,7 +265,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
     def submitGPS(self):
         self.parent.status_bar.showMessage('Submitting to server')
-        self.parent.status_bar.setPalette(self.sending_palette)
+        self.parent.status_bar.setPalette(self.paletteSending)
         car_number    = str(self.gpsForm.numberInput.currentText())
         car_color     = str(self.gpsForm.colorInput.currentText())
         time_hour     = str(self.gpsForm.timeInput.time().hour())
@@ -287,7 +293,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             content = open(join(gps_path), 'rb')
         except IOError:
             self.parent.status_bar.showMessage(QtCore.QString('No file exists. Import first.'))
-            self.parent.status_bar.setPalette(self.error_palette)
+            self.parent.status_bar.setPalette(self.paletteError)
             return
         files = {
             'gps_data': content,
@@ -297,17 +303,17 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             r = requests.post(GPSURL, data=data, files=files)
         except requests.exceptions.ConnectionError:
             self.parent.status_bar.showMessage(QtCore.QString('Couldn\'t connect to server. Ensure that the server is running and the domain is correct.'))
-            self.parent.status_bar.setPalette(self.error_palette)
+            self.parent.status_bar.setPalette(self.paletteError)
             return
         print('HTTP STATUS:', r.status_code)
         response = json.loads(r.text)
         print('RESPONSE:', response)
         if r.status_code == 200:
             self.parent.status_bar.showMessage(QtCore.QString('Submit successful.'))
-            self.parent.status_bar.setPalette(self.sent_palette)
+            self.parent.status_bar.setPalette(self.paletteSent)
         else:
             self.parent.status_bar.showMessage(QtCore.QString('Submit failed. Error %r' % r.status_code))
-            self.parent.status_bar.setPalette(self.error_palette)
+            self.parent.status_bar.setPalette(self.paletteError)
         return r.status_code
 
     def clear(self):

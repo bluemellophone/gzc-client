@@ -208,9 +208,9 @@ class image_selection_box(QtGui.QWidget):
 
 class selection_group(QtGui.QWidget):
     #The right side of the interface
-    def __init__(self, *args):
-        apply(QtGui.QWidget.__init__, (self, ) + args)
-        QtGui.QWidget.__init__(self)
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        self.parent = parent
         self.init_widgets()
         self.init_layout()
         self.stored_files = []

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ImageForm.ui'
 #
-# Created: Mon Feb 23 09:15:42 2015
+# Created: Mon Feb 23 10:08:26 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -120,8 +120,8 @@ class Ui_ImageForm(object):
         spacerItem1 = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Maximum)
         self.layout.addItem(spacerItem1)
         self.syncLayout = QtGui.QGroupBox(ImageForm)
-        self.syncLayout.setMinimumSize(QtCore.QSize(0, 154))
-        self.syncLayout.setMaximumSize(QtCore.QSize(16777215, 154))
+        self.syncLayout.setMinimumSize(QtCore.QSize(0, 126))
+        self.syncLayout.setMaximumSize(QtCore.QSize(16777215, 126))
         font = QtGui.QFont()
         font.setPointSize(-1)
         font.setBold(True)
@@ -147,7 +147,7 @@ class Ui_ImageForm(object):
         self.timeLabel.setMinimumSize(QtCore.QSize(159, 0))
         self.timeLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.timeLabel.setObjectName(_fromUtf8("timeLabel"))
-        self.formLayout_6.setWidget(2, QtGui.QFormLayout.LabelRole, self.timeLabel)
+        self.formLayout_6.setWidget(1, QtGui.QFormLayout.LabelRole, self.timeLabel)
         self.timeInput = QtGui.QTimeEdit(self.syncLayout)
         self.timeInput.setMinimumSize(QtCore.QSize(0, 30))
         self.timeInput.setStyleSheet(_fromUtf8(""))
@@ -155,15 +155,7 @@ class Ui_ImageForm(object):
         self.timeInput.setReadOnly(False)
         self.timeInput.setButtonSymbols(QtGui.QAbstractSpinBox.NoButtons)
         self.timeInput.setObjectName(_fromUtf8("timeInput"))
-        self.formLayout_6.setWidget(2, QtGui.QFormLayout.FieldRole, self.timeInput)
-        self.syncLabel = QtGui.QLabel(self.syncLayout)
-        font = QtGui.QFont()
-        font.setPointSize(-1)
-        self.syncLabel.setFont(font)
-        self.syncLabel.setStyleSheet(_fromUtf8("color:#666;"))
-        self.syncLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.syncLabel.setObjectName(_fromUtf8("syncLabel"))
-        self.formLayout_6.setWidget(1, QtGui.QFormLayout.SpanningRole, self.syncLabel)
+        self.formLayout_6.setWidget(1, QtGui.QFormLayout.FieldRole, self.timeInput)
         self.layout.addWidget(self.syncLayout)
         spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.layout.addItem(spacerItem2)
@@ -185,5 +177,4 @@ class Ui_ImageForm(object):
         self.nameLabel.setText(_translate("ImageForm", "First Image Name", None))
         self.timeLabel.setText(_translate("ImageForm", "First Image Time", None))
         self.timeInput.setDisplayFormat(_translate("ImageForm", "HH:mm", None))
-        self.syncLabel.setText(_translate("ImageForm", "Specify image name", None))
 
