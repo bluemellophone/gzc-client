@@ -264,7 +264,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
         # Establish source and destination folders
         src_directory = ensure_structure(path, 'images', car_number, car_color, person_letter)
-        dst_directory = ensure_structure(path, 'zip', car_number, car_color, person_letter)
+        dst_directory = ensure_structure(path, 'zip', car_number, car_color)
 
         # Gather selected images from the GUI
         first   = self.parent.imageDisplay.first_image.current_image
@@ -289,7 +289,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 empty.write('')
 
         # Create zip archive
-        zip_path = dst_directory + '.zip'
+        zip_path = join(dst_directory, person_letter + '.zip')
         with zipfile.ZipFile(zip_path, 'w') as zip_archive:
             zip_archive.write(join(src_directory, first), 'first.jpg')
             zip_archive.write(join(src_directory, last), 'last.jpg')
