@@ -167,13 +167,13 @@ class image_selection_box(QtGui.QWidget):
         self.connect(self.image, QtCore.SIGNAL('clicked()'), self.reroll)
         self.select_group.buttonClicked[int].connect(self.option_selected)
 
-    def reroll(self):
+    def reroll(self, filename=None):
         #get new filename
         try:
-            filename = self.parent().get_filename()
+            if filename is None:
+                filename = self.parent().get_filename()
         except ValueError:
             return
-
         self.image.changeImage(filename)
         self.image_time.setText(self.image.get_timestamp())
         self.select_zebra.setEnabled(True)
@@ -292,7 +292,7 @@ class selection_group(QtGui.QWidget):
 
         self.setLayout(gridV)
 
-    def add_filename(self, filename):
+    def add_filename(self, filename, add_to_display):
         # self.active_files.append(filename)
         # self.stored_files.append(filename)
         #for the first couple of images to be copied, we will update the displayed photos
@@ -304,10 +304,11 @@ class selection_group(QtGui.QWidget):
         else:
             self.active_files.append(filename)
             self.stored_files.append(filename)
-            for IB in self.image_boxes:
-                if IB.image.current_image == PLACEHOLDER_IMAGE:
-                    IB.reroll()
-                    break
+            if add_to_display:
+                for IB in self.image_boxes:
+                    if IB.image.current_image == PLACEHOLDER_IMAGE:
+                            IB.reroll(filename)
+                            break
         #if we've filled the image boxes, update the last image
 
     def clear(self):

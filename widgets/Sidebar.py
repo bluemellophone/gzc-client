@@ -8,6 +8,7 @@ from os.path import join, basename, exists, abspath
 from shutil import rmtree
 from clientfuncs import CopyThread, find_candidates, ex_deco, ensure_structure
 import zipfile
+import random
 import simplejson as json
 import requests
 
@@ -154,11 +155,11 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
     def update_recent_file_image(self, index, filename):
         self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.image_file_list), ))
-        self.parent.imageDisplay.add_filename(filename)
+        add_to_display = index in self.image_file_list_random_indices
+        self.parent.imageDisplay.add_filename(filename, add_to_display=add_to_display)
 
     def update_recent_file_gps(self, index, filename):
         self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.image_file_list), ))
-        self.parent.imageDisplay.add_filename(filename)
 
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
@@ -193,6 +194,11 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             return
         if directory != "overridden":
             self.image_file_list = find_candidates(directory, str(self.imageForm.nameInput.text()))
+            # Create random indices
+            self.image_file_list_random_indices = set()
+            while len(self.image_file_list_random_indices) < min(10, len(self.image_file_list)):
+                rand_index = random.randint(0, len(self.image_file_list) - 1)
+                self.image_file_list_random_indices.add(rand_index)
         if len(self.image_file_list) == 0:
             self.reset_cursor()
             raise IOError('Could not find any files for selected directory. Please check your first image name.')
