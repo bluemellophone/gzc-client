@@ -85,7 +85,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             else:
                 self.copyImage()
         elif self.parent.currentDisplay == 1:
-            if self.complete_gps_step_2:
+            if self.complete_gps_step_3:
                 self.submitGPS()
             else:
                 self.copyGPS()
@@ -136,12 +136,15 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             # GPS - Step 1
             if self.complete_gps_step_1:
                 self.gpsForm.syncLayout.show()
-                self.submitButton.setEnabled(True)
             else:
                 self.gpsForm.syncLayout.hide()
+            # GPS - Step 2
+            if self.complete_gps_step_2:
+                self.submitButton.setEnabled(True)
+            else:
                 self.submitButton.setEnabled(False)
             # Image - Step 5 (Images)
-            if self.complete_gps_step_2:
+            if self.complete_gps_step_3:
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
                 self.submitButton.setText('Submit')
             else:
@@ -167,7 +170,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         if self.parent.currentDisplay == 0 and len(self.image_file_list) > 0:
             self.complete_image_step_4 = True
         elif self.parent.currentDisplay == 1:
-            self.complete_gps_step_2 = True
+            self.complete_gps_step_3 = True
         self.updateStatus()
 
     @ex_deco
@@ -367,6 +370,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.complete_image_step_5 = False
         self.complete_gps_step_1 = False
         self.complete_gps_step_2 = False
+        self.complete_gps_step_3 = False
         # Update overall display
         if self.parent.currentDisplay == 0:
             # Clear imageForm and imageDisplay
@@ -489,6 +493,7 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
     def initConnect(self):
         self.colorInput.currentIndexChanged[int].connect(self.check_identification)
         self.numberInput.currentIndexChanged[int].connect(self.check_identification)
+        self.timeInput.timeChanged.connect(self.check_sync_time)
 
     # Slots
     def check_identification(self, ignore):
@@ -498,6 +503,14 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
             self.parent.complete_gps_step_1 = True
         else:
             self.parent.complete_gps_step_1 = False
+        self.parent.updateStatus()
+
+    def check_sync_time(self, value):
+        hour = int(str(value.hour()))
+        if hour in TIME_HOUR_RANGE:
+            self.parent.complete_gps_step_2 = True
+        else:
+            self.parent.complete_gps_step_2 = False
         self.parent.updateStatus()
 
     # Functions
