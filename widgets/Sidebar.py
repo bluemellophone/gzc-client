@@ -85,46 +85,11 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     @ex_deco
     def submitClicked(self, *args):
         if self.parent.currentDisplay == 0:
-            if self.complete_image_step_4:
+            if self.complete_image_step_5:
                 self.submitImage()
             else:
-                self.parent.clearImageDisplay()
-                car_number = str(self.imageForm.numberInput.currentText())
-                car_color = str(self.imageForm.colorInput.currentText())
-                person_letter = str(self.imageForm.letterInput.currentText())
-                QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-                # print('IMPORT SELF %r' % (self,))
-                #print('IMPORT ARGS %r' % (args,))
-                directory = self.import_directory
-                # print (directory)
-                if directory is None or directory == '':
-                    self.reset_cursor()
-                    raise IOError('Please select the directory that contains the photos you wish to import from.')
-                    return
-                if str(self.imageForm.nameInput.text()) == '':
-                    self.reset_cursor()
-                    raise IOError('The first image name must be defined.')
-                    return
-                self.files = find_candidates(directory, str(self.imageForm.nameInput.text()))
-                if len(self.files) == 0:
-                    self.reset_cursor()
-                    raise IOError('Could not find any files for selected directory. Please check your first image name.')
-                    return
-                #send this file list to the selection group i am a bad programmer
-                self.file_bases = [basename(f) for f in self.files]
-                # print self.file_bases
-                self.move_file_list(self.file_bases)
-
-                for index, path in enumerate(self.parent.path_list):
-                    target_directory = abspath(path, 'images', car_number + car_color, person_letter)
-                    if exists(target_directory):
-                        print('Target directory already exists... deleting')
-                        rmtree(target_directory)
-                    self.copyThread = CopyThread(self.files, [target_directory])
-                    if index == 0:
-                        self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
-                        self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
-                    self.copyThread.start()
+                self.copyImage()
+                self.complete_image_step_4 = True
         elif self.parent.currentDisplay == 1:
             print('START IMPORT')
             # self.submitGPS()
@@ -150,12 +115,15 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             # Image - Step 3
             if self.complete_image_step_3:
                 self.submitButton.setEnabled(True)
-                self.complete_image_step_4 = self.parent.allImagesSelected()
             else:
                 self.submitButton.setEnabled(False)
-                self.complete_image_step_4 = False
-            # Image - Step 4 (Images)
+            # Image - Step 4 (Import)
             if self.complete_image_step_4:
+                self.complete_image_step_5 = self.parent.allImagesSelected()
+            else:
+                self.complete_image_step_5 = False
+            # Image - Step 5 (Images)
+            if self.complete_image_step_5:
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
                 self.submitButton.setText('Submit')
             else:
@@ -177,12 +145,53 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.parent.imageDisplay.last_image.current_image = file_list.pop()
         # self.image_selection_group.stored_files = file_list
 
-    def update_recent_file(self, filename):
-        #self.progress_bar.setText('Imported new image from ' + filename)
+    def update_recent_file(self, index, filename):
+        print(index, filename)
+        self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.files), ))
         self.parent.imageDisplay.add_filename(filename)
 
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
+
+    @ex_deco
+    def copyImage(self):
+        self.parent.clearImageDisplay()
+        car_number = str(self.imageForm.numberInput.currentText())
+        car_color = str(self.imageForm.colorInput.currentText())
+        person_letter = str(self.imageForm.letterInput.currentText())
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+        # print('IMPORT SELF %r' % (self,))
+        #print('IMPORT ARGS %r' % (args,))
+        directory = self.import_directory
+        # print (directory)
+        if directory is None or directory == '':
+            self.reset_cursor()
+            raise IOError('Please select the directory that contains the photos you wish to import from.')
+            return
+        if str(self.imageForm.nameInput.text()) == '':
+            self.reset_cursor()
+            raise IOError('The first image name must be defined.')
+            return
+        self.files = find_candidates(directory, str(self.imageForm.nameInput.text()))
+        if len(self.files) == 0:
+            self.reset_cursor()
+            raise IOError('Could not find any files for selected directory. Please check your first image name.')
+            return
+        #send this file list to the selection group i am a bad programmer
+        self.file_bases = [basename(f) for f in self.files]
+        # print self.file_bases
+        self.move_file_list(self.file_bases)
+
+        for index, path in enumerate(self.parent.path_list):
+            target_directory = abspath(join(path, 'images', car_number + car_color, person_letter))
+            if exists(target_directory):
+                print('Target directory already exists... deleting')
+                rmtree(target_directory)
+            self.copyThread = CopyThread(self.files, [target_directory])
+            if index == 0:
+                self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file)
+                self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
+            self.copyThread.start()
 
     @ex_deco
     def submitImage(self):
@@ -197,7 +206,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
         chdir(dirname(realpath(__file__)))
         path = self.parent.path_list[0]
-        pull_directory = abspath(path, 'images', car_number + car_color, person_letter)
+        pull_directory = abspath(join(path, 'images', car_number + car_color, person_letter))
         chdir(join(getcwd(), pull_directory))
 
         first = self.parent.imageDisplay.first_image.current_image
@@ -320,6 +329,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.complete_image_step_2 = False
         self.complete_image_step_3 = False
         self.complete_image_step_4 = False
+        self.complete_image_step_5 = False
         self.complete_gps_step_1 = False
         self.complete_gps_step_2 = False
         # Update overall display

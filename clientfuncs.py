@@ -22,7 +22,7 @@ class CopyThread(QtCore.QThread):
         self.wait()
 
     def run(self):
-        for f in self.filenames:
+        for index, f in enumerate(self.filenames):
             filepath = f
             if not isfile(filepath):
                 continue
@@ -31,7 +31,7 @@ class CopyThread(QtCore.QThread):
                     makedirs(outdir)
                 # time.sleep(2)
                 shutil.copy2(filepath, outdir)
-                self.emit(QtCore.SIGNAL('file_done'), (join(outdir, f)))
+                self.emit(QtCore.SIGNAL('file_done'), index, join(outdir, f))
         self.emit(QtCore.SIGNAL('completed'))
         return None
 

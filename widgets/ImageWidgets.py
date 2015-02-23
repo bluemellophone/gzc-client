@@ -183,7 +183,8 @@ class image_selection_box(QtGui.QWidget):
         self.emit(QtCore.SIGNAL('images_modified'))
 
     def is_selected(self):
-        return int(self.select_group.checkedId()) != -1
+        enabled = self.select_zebra.isEnabled() and self.select_giraffe.isEnabled()
+        return not enabled or int(self.select_group.checkedId()) != -1
 
     def option_selected(self):
         self.emit(QtCore.SIGNAL('images_modified'))
@@ -201,7 +202,10 @@ class image_selection_box(QtGui.QWidget):
             self.select_group.setExclusive(True)
 
     def get_selection(self):
-        return (path.basename(self.image.current_image), self.select_group.checkedButton().text())
+        checked = self.select_group.checkedButton()
+        if checked is not None:
+            return (path.basename(self.image.current_image), checked.text())
+        return (None, 0)
 
 
 class selection_group(QtGui.QWidget):
