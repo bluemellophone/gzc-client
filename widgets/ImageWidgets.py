@@ -20,7 +20,7 @@ class image_selection_roll_first_last(QtGui.QLabel):
 
     def init_layout(self):
         self.setAlignment(QtCore.Qt.AlignCenter)
-        self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.MinimumExpanding)
         self.clear()
 
     def get_timestamp(self):
@@ -40,7 +40,6 @@ class image_selection_roll_first_last(QtGui.QLabel):
         else:
             Pixmap = QtGui.QPixmap(filename)
         self.current_image = filename
-        print(self.size())
         Pixmap = Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
         self.setPixmap(Pixmap)
 
@@ -54,8 +53,8 @@ class image_selection_box_first_last(QtGui.QWidget):
         self.init_visual()
 
     def init_widgets(self):
-        self.image = image_selection_roll(self)
-        self.image_time = QtGui.QLabel(self.image.get_timestamp(), self)
+        self.image = image_selection_roll_first_last(self)
+        self.image_time = QtGui.QLabel(parent=self)
         self.image_time.setAlignment(QtCore.Qt.AlignCenter)
         self.info_text = QtGui.QLabel(parent=self)
         self.info_text.setAlignment(QtCore.Qt.AlignCenter)
@@ -78,13 +77,14 @@ class image_selection_box_first_last(QtGui.QWidget):
 
     def update(self, filename):
         self.image.clear(filename)
+        self.image_time.setText(self.image.get_timestamp())
 
     def triggerResize(self):
         self.image.triggerResize()
 
     def clear(self):
         self.image.clear()
-        self.image_time.setText('Awaiting images...')
+        self.image_time.setText(self.image.get_timestamp())
 
 
 class image_selection_roll(QtGui.QLabel):
@@ -157,7 +157,7 @@ class image_selection_box(QtGui.QWidget):
         self.select_group.addButton(self.select_zebra)
         self.select_group.addButton(self.select_giraffe)
 
-        self.image_time = QtGui.QLabel(self.image.get_timestamp(), self)
+        self.image_time = QtGui.QLabel(parent=self)
         self.image_time.setAlignment(QtCore.Qt.AlignCenter)
 
     def init_layout(self):
@@ -215,7 +215,6 @@ class image_selection_box(QtGui.QWidget):
 
     def clear(self):
         self.image.clear()
-        self.image_time.setText('Awaiting images...')
         self.select_zebra.setEnabled(False)
         self.select_giraffe.setEnabled(False)
         checked = self.select_group.checkedButton()
@@ -224,6 +223,7 @@ class image_selection_box(QtGui.QWidget):
             self.select_group.setExclusive(False)
             checked.setChecked(False)
             self.select_group.setExclusive(True)
+        self.image_time.setText(self.image.get_timestamp())
 
 
 class selection_group(QtGui.QWidget):

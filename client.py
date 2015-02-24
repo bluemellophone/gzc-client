@@ -84,6 +84,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def initVisuals(self):
         # Set window title
         self.setWindowTitle('Great Zebra Count 2015')
+        self.setGeometry(0, 0, 100, 100)
         # self.setStyleSheet('background-color: white;')
 
     # Slots
@@ -138,7 +139,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     @ex_deco
     def pathChanged(self):
         path_str = str(self.pathInput.textValue())
-        self.path_list = map(abspath, path_str.split(','))
+        self.path_list = [ abspath(expanduser(path.strip())) for path in path_str.split(',') ]
 
     @ex_deco
     def allImagesSelected(self):

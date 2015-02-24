@@ -114,7 +114,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             else:
                 self.imageForm.syncLayout.hide()
             # Image - Step 3
-            if self.complete_image_step_3_name and self.complete_image_step_3_time:
+            if self.complete_image_step_3_name:
                 self.submitButton.setEnabled(True)
             else:
                 self.submitButton.setEnabled(False)
@@ -124,7 +124,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             else:
                 self.complete_image_step_5 = False
             # Image - Step 5 (Images)
-            if self.complete_image_step_5:
+            if self.complete_image_step_5 and self.complete_image_step_3_time:
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
                 self.submitButton.setText('Submit')
             else:
@@ -144,15 +144,13 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             # GPS - Step 1 (Car Information)
             if self.complete_gps_step_1:
                 self.gpsForm.syncLayout.show()
-            else:
-                self.gpsForm.syncLayout.hide()
-            # GPS - Step 2 (Sync Information)
-            if self.complete_gps_step_2:
                 self.submitButton.setEnabled(True)
             else:
+                self.gpsForm.syncLayout.hide()
                 self.submitButton.setEnabled(False)
+            # GPS - Step 2 (Sync Information)
             # GPS - Step 3 (Importing / Submitting)
-            if self.complete_gps_step_3:
+            if self.complete_gps_step_2 and self.complete_gps_step_3:
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
                 self.submitButton.setText('Submit')
             else:
@@ -270,6 +268,8 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                     self.parent.displayGPXTrack(gpx_track)
             else:
                 print('call igotu2gpx', dst_directory)
+                self.reset_cursor()
+                raise NotImplementedError('i-GotU is not operational on this machine.  Use \'Manually Select GPX File\' from the File menu')
             self.copyThread = CopyThread(self.gps_file_list, [dst_directory])
             if index == 0:
                 self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file_gps)
