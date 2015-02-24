@@ -7,7 +7,6 @@ class gps_map(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.parent = parent
-        self.domain = self.parent.domain + '/map/submit'
         self.initComponents()
         self.initLayout()
 
@@ -29,6 +28,7 @@ class gps_map(QtGui.QWidget):
         return post_params.encodedQuery()
 
     def clear(self, gpx_track=None):
+        self.domain = self.parent.domain + '/map/submit'
         self.webView.page().mainFrame().setScrollBarPolicy(QtCore.Qt.Horizontal, QtCore.Qt.ScrollBarAlwaysOff)
         self.webView.page().mainFrame().setScrollBarPolicy(QtCore.Qt.Vertical, QtCore.Qt.ScrollBarAlwaysOff)
         # Load track Google Maps from server
