@@ -21,7 +21,6 @@ class image_selection_roll_first_last(QtGui.QLabel):
     def init_layout(self):
         self.setAlignment(QtCore.Qt.AlignCenter)
         self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.MinimumExpanding)
-        self.clear()
 
     def get_timestamp(self):
         if self.current_image == PLACEHOLDER_IMAGE:
@@ -74,6 +73,8 @@ class image_selection_box_first_last(QtGui.QWidget):
         p = self.palette()
         p.setColor(self.backgroundRole(), QtGui.QColor("#e2e2e2"))
         self.setPalette(p)
+        self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        self.clear()
 
     def update(self, filename):
         self.image.clear(filename)
@@ -96,7 +97,6 @@ class image_selection_roll(QtGui.QLabel):
     def init_layout(self):
         self.setAlignment(QtCore.Qt.AlignCenter)
         self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
-        self.clear()
 
     def mouseReleaseEvent(self, ev):
         if self.current_image != PLACEHOLDER_IMAGE:
@@ -167,6 +167,7 @@ class image_selection_box(QtGui.QWidget):
         grid.addWidget(self.select_zebra, 3, 0)
         grid.addWidget(self.select_giraffe, 3, 1)
         self.setLayout(grid)
+        self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         self.clear()
 
     def init_connect(self):

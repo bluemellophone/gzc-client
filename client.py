@@ -36,6 +36,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.initWidgets()
         self.initConnect()
         self.initVisuals()
+        self.resize(1400, 850)
         self.clear()
 
     def initWidgets(self):
@@ -84,7 +85,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def initVisuals(self):
         # Set window title
         self.setWindowTitle('Great Zebra Count 2015')
-        self.setGeometry(0, 0, 100, 100)
         # self.setStyleSheet('background-color: white;')
 
     # Slots
@@ -97,6 +97,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def resizeEvent(self, ev):
         self.toggleButton.move(self.width() - self.toggleButton.width(), 0)
         self.imageDisplay.triggerResize()
+        print(self.size())
 
     def specifyDomain(self, checked):
         self.domainInput.setTextValue(self.domain)
