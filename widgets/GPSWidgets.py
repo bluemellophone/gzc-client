@@ -1,50 +1,45 @@
 from __future__ import absolute_import, division, print_function
-from PyQt4 import QtGui, QtCore, QtWebKit
+from PyQt4 import QtGui, QtCore, QtWebKit, QtNetwork
 #import matplotlib.pyplot as plt
-from clientfuncs import ImportThread
-from os.path import abspath
 
 
 class gps_map(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.parent = parent
-        # self.map_image_file = abspath('assets/map_nairobi.png')
-        # self.map_image_file = abspath('assets/map_albany.png')
-        # self.map_image_file = abspath('assets/map_troy.png')
-        self.map_image_file  = abspath('assets/map_rpi.png')
+        self.domain = self.parent.domain + '/map/submit'
         self.initComponents()
         self.initLayout()
-        self.initSignals()
 
     def initComponents(self):
-        # Layout Widgets
         self.pageLayout = QtGui.QVBoxLayout(self)
-        gpsImg = QtGui.QPixmap(self.map_image_file)
-        self.gpsImageLabel = QtGui.QLabel()
-        self.gpsImageLabel.setScaledContents(True)
-        self.gpsImageLabel.setPixmap(gpsImg)
-
         self.webView = QtWebKit.QWebView(self)
-        self.gMapURL = self.parent.domain + '/map'
-        self.webView.resize(1000, 500)
-        self.webView.page().mainFrame().setScrollBarPolicy(QtCore.Qt.Horizontal, QtCore.Qt.ScrollBarAlwaysOff)
-        self.webView.page().mainFrame().setScrollBarPolicy(QtCore.Qt.Vertical, QtCore.Qt.ScrollBarAlwaysOff)
-        self.webView.setUrl(QtCore.QUrl(self.gMapURL))
 
     def initLayout(self):
-        # self.pageLayout.addWidget(self.gpsImageLabel)
         self.pageLayout.addWidget(self.webView)
 
-    def initSignals(self):
-        self.worker_thread = ImportThread(self)
-        self.worker_thread.finished.connect(self.drawTrack)
+    def initVisual(self):
+        self.webView.resize(1000, 500)
+        self.clear()
 
-    def drawTrack(self):
-        gpsImg = QtGui.QPixmap('figure.png')
-        self.gpsImageLabel.setPixmap(gpsImg.scaled(self.gpsImageLabel.width(), self.gpsImageLabel.height(), aspectRatioMode=1))
-        # self.parent.status_bar.setPalette(self.ready_palette)
+    def _urlencode_post_data(self, post_data):
+        post_params = QtCore.QUrl()
+        for (key, value) in post_data.items():
+            post_params.addQueryItem(key, unicode(value))
+        return post_params.encodedQuery()
 
-    def clear(self):
-        gpsImg = QtGui.QPixmap(self.map_image_file)
-        self.gpsImageLabel.setPixmap(gpsImg)
+    def clear(self, gpx_track=None):
+        self.webView.page().mainFrame().setScrollBarPolicy(QtCore.Qt.Horizontal, QtCore.Qt.ScrollBarAlwaysOff)
+        self.webView.page().mainFrame().setScrollBarPolicy(QtCore.Qt.Vertical, QtCore.Qt.ScrollBarAlwaysOff)
+        # Load track Google Maps from server
+        request = QtNetwork.QNetworkRequest()
+        request.setUrl(QtCore.QUrl(self.domain))
+        data = {}
+        if gpx_track is not None:
+            data['gps_data_str'] = gpx_track
+        encoded_data = self._urlencode_post_data(data)
+        request.setRawHeader('Content-Type',
+                             QtCore.QByteArray('application/x-www-form-urlencoded'))
+        self.webView.load(request,
+                           QtNetwork.QNetworkAccessManager.PostOperation,
+                           encoded_data)
