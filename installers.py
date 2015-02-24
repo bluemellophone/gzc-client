@@ -32,8 +32,8 @@ def build_pyinstaller():
     print('[installer] +--- BUILD_PYINSTALLER ---')
     # 1) RUN: PYINSTALLER
     # Run the pyinstaller command (does all the work)
-    if ut.WIN32:
-        #ut.cmd('pyinstaller', '--runtime-hook', 'rthook_pyqt4.py', '_installers/pyinstaller-client.spec', '-y')
+    if sys.platform == 'win32' or sys.platform == 'cygwin':
+        #ut.cmd('pyinstaller', '--runtime-hook', 'rthook_pyqt4.py', '_installers\pyinstaller-client.spec', '-y')
         ut.cmd('pyinstaller --runtime-hook rthook_pyqt4.py _installers/pyinstaller-client.spec -y')
     else:
         ut.cmd('pyinstaller', '_installers/pyinstaller-client.spec', '-y')
