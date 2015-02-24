@@ -15,74 +15,61 @@ GIRAFFE_ICON      = abspath('assets/icons/icon_giraffe.png')
 
 class first_last_image(QtGui.QFrame):
     def __init__(self, *args):
-        apply(QtGui.QWidget.__init__, (self, ) + args)
         QtGui.QWidget.__init__(self)
         self.init_widgets()
         self.init_layout()
 
     def init_widgets(self):
-        self.image = QtGui.QLabel()
-        self.image.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
-        # self.image.setScaledContents(True)
-        self.image.setAlignment(QtCore.Qt.AlignCenter)
-
+        # Init Elements
         self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
         self.setLineWidth(2)
-
-        self.image_time = QtGui.QLabel('Awaiting images...', self)
+        # Init Image
+        self.image = QtGui.QLabel()
+        self.image.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
+        self.image.setAlignment(QtCore.Qt.AlignCenter)
+        # Init time
+        self.image_time = QtGui.QLabel(parent=self)
         self.image_time.setAlignment(QtCore.Qt.AlignCenter)
-
+        # Init label
         self.info_text = QtGui.QLabel('', self)
         self.info_text.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.clear()
-
     def init_layout(self):
         grid = QtGui.QGridLayout()
-        # grid.addItem(QtGui.QSpacerItem(0, 0, vPolicy=QtGui.QSizePolicy.MinimumExpanding), 0, 0, 1, 0)
         grid.addWidget(self.image, 0, 0, 1, 0)
-        # grid.addItem(QtGui.QSpacerItem(0, 0, vPolicy=QtGui.QSizePolicy.MinimumExpanding), 2, 0, 1, 0)
         grid.addWidget(self.image_time, 2, 0, 1, 0)
         grid.addWidget(self.info_text, 3, 0, 1, 0)
-
         self.setLayout(grid)
+        self.clear()
 
     def resizeEvent(self, ev):
-        self.image.setPixmap(self.image.pixmap().scaled(self.image.size(), QtCore.Qt.KeepAspectRatio))
+        self.clear(self.current_image)
 
     def update(self, filename):
-        Pixmap = QtGui.QPixmap(filename)
-        # pxSizeX = Pixmap.size().width()
-        # pxSizeY = Pixmap.size().height()
-        # if pxSizeX > pxSizeY:
-        #     Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
-        # else:
-        #     Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
-        Pixmap.scaled(self.image.size(), QtCore.Qt.KeepAspectRatio)
-        self.image.setPixmap(Pixmap)
-        self.current_image = filename
-        self.image_time.setText(time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image))))
+        self.clear(filename)
 
-    def clear(self):
-        self.image_time.setText('Awaiting images...')
-        Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE)
-        pxSizeX = Pixmap.size().width()
-        pxSizeY = Pixmap.size().height()
-        if pxSizeX > pxSizeY:
-            Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
-        else:
-            Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
-        self.desiredsize = QtCore.QSize(IMAGE_SIZE, IMAGE_SIZE)
+    def clear(self, filename=None):
+        if filename is None:
+            filename = PLACEHOLDER_IMAGE
+        Pixmap = QtGui.QPixmap(filename)
+        self.current_image = filename
+        print(self.size())
+        Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
         self.image.setPixmap(Pixmap)
-        self.current_image = PLACEHOLDER_IMAGE
+        # Set label
+        if filename == PLACEHOLDER_IMAGE:
+            self.image_time.setText('Awaiting images...')
+        else:
+            self.image_time.setText(time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image))))
 
 
 class image_selection_roll(QtGui.QLabel):
     #Modify the QtGui.QLabel functionality to allow it to act like a button
     def __init__(self, *args):
-        apply(QtGui.QLabel.__init__, (self, ) + args)
         QtGui.QLabel.__init__(self)
-        # self.setScaledContents(True)  # <--this causes the image displayed to be centered, but stretched. Aspect ratio not maintained
+        self.init_layout()
+
+    def init_layout(self):
         self.setAlignment(QtCore.Qt.AlignCenter)
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
         self.clear()
@@ -99,18 +86,8 @@ class image_selection_roll(QtGui.QLabel):
         if self.current_image != PLACEHOLDER_IMAGE:
             QtGui.QApplication.restoreOverrideCursor()
 
-    def resizeEvent(self, ev):
-        self.setPixmap(self.pixmap().scaled(ev.size(), QtCore.Qt.KeepAspectRatio))
-
     def changeImage(self, image_file):
-        Pixmap = QtGui.QPixmap(image_file)
-        # if pxSizeX > pxSizeY:
-        #     Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
-        # else:
-        #     Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
-        Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
-        self.setPixmap(Pixmap)
-        self.current_image = image_file
+        self.clear(image_file)
 
     def get_timestamp(self):
         #lol need to ensure path consistancy!
@@ -121,25 +98,23 @@ class image_selection_roll(QtGui.QLabel):
         else:
             return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
 
-    def clear(self):
-        Pixmap = QtGui.QPixmap(PLACEHOLDER_IMAGE)
-        # if pxSizeX > pxSizeY:
-        #     Pixmap = Pixmap.scaledToWidth(IMAGE_SIZE)
-        # else:
-        #     Pixmap = Pixmap.scaledToHeight(IMAGE_SIZE)
-        # self.desiredsize = QtCore.QSize(IMAGE_SIZE, IMAGE_SIZE)
-        Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
+    def resizeEvent(self, ev):
+        self.clear(self.current_image)
 
+    def clear(self, filename=None):
+        if filename is None:
+            filename = PLACEHOLDER_IMAGE
+        Pixmap = QtGui.QPixmap(filename)
+        self.current_image = filename
+        print(self.size())
+        Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
         self.setPixmap(Pixmap)
-        self.current_image = PLACEHOLDER_IMAGE
 
 
 class image_selection_box(QtGui.QWidget):
     #One selection box. Contains the image and two buttons
     def __init__(self, *args):
-        apply(QtGui.QWidget.__init__, (self, ) + args)
         QtGui.QWidget.__init__(self)
-
         self.init_widgets()
         self.init_layout()
         self.init_connect()
