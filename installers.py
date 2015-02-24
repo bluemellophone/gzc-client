@@ -30,10 +30,11 @@ def build_pyinstaller():
     build_pyinstaller creates build/gzc-client/* and dist/gzc-client/*
     """
     print('[installer] +--- BUILD_PYINSTALLER ---')
+    import os  # NOQA
     # 1) RUN: PYINSTALLER
     # Run the pyinstaller command (does all the work)
     if sys.platform == 'win32' or sys.platform == 'cygwin':
-        #ut.cmd('pyinstaller', '--runtime-hook', 'rthook_pyqt4.py', '_installers\pyinstaller-client.spec', '-y')
+        #ut.cmd('pyinstaller', '--runtime-hook', 'rthook_pyqt4.py', '_installers/pyinstaller-client.spec', '-y')
         ut.cmd('pyinstaller --runtime-hook rthook_pyqt4.py _installers/pyinstaller-client.spec -y')
     else:
         ut.cmd('pyinstaller', '_installers/pyinstaller-client.spec', '-y')
@@ -185,7 +186,7 @@ def package_installer():
     if sys.platform.startswith('win32'):
         build_win32_inno_installer()
     elif sys.platform.startswith('darwin'):
-        print('RUN: sudo ./_installers/mac_dmg_builder.sh')
+        ut.cmd('./_installers/mac_dmg_builder.sh', sudo=True)
         pass
     elif sys.platform.startswith('linux'):
         raise NotImplementedError('no linux packager (rpm or deb) supported. try running with --build')

@@ -21,7 +21,8 @@ def add_data(a, dst, src):
         # get path relative to cwd
         path1 = truepath_relative(path)
         if sys.platform.startswith('win32'):
-            path2 = fixwin32_shortname(path1)
+            import utool as ut
+            path2 = ut.fixwin32_shortname(path1)
         else:
             path2 = path1
         return path2
