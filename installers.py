@@ -30,9 +30,10 @@ def build_pyinstaller():
     build_pyinstaller creates build/gzc-client/* and dist/gzc-client/*
     """
     print('[installer] +--- BUILD_PYINSTALLER ---')
+    import os  # NOQA
     # 1) RUN: PYINSTALLER
     # Run the pyinstaller command (does all the work)
-    if ut.WIN32:
+    if sys.platform == 'win32' or sys.platform == 'cygwin':
         #ut.cmd('pyinstaller', '--runtime-hook', 'rthook_pyqt4.py', '_installers/pyinstaller-client.spec', '-y')
         ut.cmd('pyinstaller --runtime-hook rthook_pyqt4.py _installers/pyinstaller-client.spec -y')
     else:

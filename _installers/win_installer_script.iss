@@ -16,7 +16,7 @@ AppSupportURL=www.rpi.edu/~crallj/
 AppUpdatesURL=www.rpi.edu/~crallj/
 DefaultDirName={pf}\GZCClient
 DefaultGroupName=GZCClient
-OutputBaseFilename=GZCClient-win32-setup
+OutputBaseFilename=gzc-client-win32-setup
 SetupIconFile=ibsicon.ico
 Compression=lzma
 SolidCompression=yes
@@ -28,13 +28,13 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\dist\GZCClient\GZCClientApp.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\dist\GZCClient\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\dist\gzc-client\GZCClientApp.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\gzc-client\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{group}\GZCClient"; Filename: "{app}\GZCClientApp.exe"
-Name: "{commondesktop}\GZCClient"; Filename: "{app}\GZCClientApp.exe"; Tasks: desktopicon
+Name: "{group}\gzc-client"; Filename: "{app}\GZCClientApp.exe"
+Name: "{commondesktop}\gzc-client"; Filename: "{app}\GZCClientApp.exe"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\GZCClientApp.exe"; Description: "{cm:LaunchProgram,GZCClient}"; Flags: nowait postinstall skipifsilent
