@@ -51,6 +51,7 @@ class image_selection_box_first_last(QtGui.QWidget):
         QtGui.QWidget.__init__(self)
         self.init_widgets()
         self.init_layout()
+        self.init_visual()
 
     def init_widgets(self):
         self.image = image_selection_roll(self)
@@ -67,6 +68,13 @@ class image_selection_box_first_last(QtGui.QWidget):
         grid.addWidget(self.info_text, 3, 0, 1, 0)
         self.setLayout(grid)
         self.clear()
+
+    def init_visual(self):
+        # self.setStyleSheet('background-color: red;')
+        self.setAutoFillBackground(True)
+        p = self.palette()
+        p.setColor(self.backgroundRole(), QtGui.QColor("#e2e2e2"))
+        self.setPalette(p)
 
     def update(self, filename):
         self.image.clear(filename)
