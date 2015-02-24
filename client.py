@@ -9,7 +9,7 @@ from widgets import ImageWidgets as img
 from widgets import GPSWidgets as gps
 from widgets.MainSkel import Ui_MainWindow
 from widgets.GZCQWidgets import QLabelButton
-from clientfuncs import ex_deco
+from clientfuncs import ex_deco, resource_path
 import simplejson as json
 import requests
 
@@ -17,9 +17,9 @@ import requests
 TOGGLE_BUTTON_SIZE = 100
 DEFAULT_DOMAIN    = 'http://localhost:5000'
 DEFAULT_PATH      = abspath(expanduser(join('~', 'Desktop', 'gzc-client-data')))
-TOGGLE_BUTTON_CAM = 'assets/icons/icon_camera_small.png'
-TOGGLE_BUTTON_GPS = 'assets/icons/icon_gps_small.png'
-TOGGLE_BITMAP     = 'assets/icons/bitmap_toggle_small.png'
+TOGGLE_BUTTON_CAM = resource_path(join('assets', 'icons', 'icon_camera_small.png'))
+TOGGLE_BUTTON_GPS = resource_path(join('assets', 'icons', 'icon_gps_small.png'))
+TOGGLE_BITMAP     = resource_path(join('assets', 'icons', 'bitmap_toggle_small.png'))
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):

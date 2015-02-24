@@ -54,3 +54,4 @@ docs/_build/
 target/
 error_log.txt
 data/
+*.pkg

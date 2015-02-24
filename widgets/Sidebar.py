@@ -6,7 +6,7 @@ from GPSFormSkel import Ui_GPSForm
 from GZCQWidgets import QwwColorComboBox
 from os.path import join, basename, exists
 from shutil import rmtree
-from clientfuncs import CopyThread, find_candidates, ex_deco, ensure_structure
+from clientfuncs import CopyThread, find_candidates, ex_deco, ensure_structure, resource_path
 import zipfile
 import random
 import simplejson as json
@@ -14,15 +14,15 @@ import requests
 
 
 LOGO_SIZE     = 200
-LOGO          = 'assets/logo_ibeis_alpha.png'
-# LOGO          = 'assets/logo_kwf_alpha.png'
-# LOGO          = 'assets/logo_kws_alpha.png'
-IMPORT_ICON   = 'assets/icons/icon_import.png'
-BROWSE_ICON   = 'assets/icons/icon_browse.png'
-CLEAR_ICON    = 'assets/icons/icon_trash.png'
-SUBMIT_ICON   = 'assets/icons/icon_upload.png'
-ACCEPTED_ICON = 'assets/icons/icon_accepted.png'
-REJECTED_ICON = 'assets/icons/icon_rejected.png'
+LOGO          = resource_path(join('assets', 'logo_ibeis_alpha.png'))
+# LOGO          = resource_path(join('assets', 'logo_kwf_alpha.png'))
+# LOGO          = resource_path(join('assets', 'logo_kws_alpha.png'))
+IMPORT_ICON   = resource_path(join('assets', 'icons', 'icon_import.png'))
+BROWSE_ICON   = resource_path(join('assets', 'icons', 'icon_browse.png'))
+CLEAR_ICON    = resource_path(join('assets', 'icons', 'icon_trash.png'))
+SUBMIT_ICON   = resource_path(join('assets', 'icons', 'icon_upload.png'))
+ACCEPTED_ICON = resource_path(join('assets', 'icons', 'icon_accepted.png'))
+REJECTED_ICON = resource_path(join('assets', 'icons', 'icon_rejected.png'))
 
 CAR_COLORS = [('Select Color', '#F6F6F6')] + [
     ('white',    '#FFFFFF'),
@@ -151,7 +151,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 self.submitButton.setEnabled(True)
             else:
                 self.submitButton.setEnabled(False)
-            # GPS - Step 3 (Importing/Submitting)
+            # GPS - Step 3 (Importing / Submitting)
             if self.complete_gps_step_3:
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
                 self.submitButton.setText('Submit')

@@ -1,14 +1,15 @@
 from __future__ import absolute_import, division, print_function
 from PyQt4 import QtCore, QtGui
+from clientfuncs import resource_path
 from os import path
 import time
 import random
 import copy
 
 
-PLACEHOLDER_IMAGE = 'assets/placeholder.png'
-ZEBRA_ICON        = 'assets/icons/icon_zebra.png'
-GIRAFFE_ICON      = 'assets/icons/icon_giraffe.png'
+PLACEHOLDER_IMAGE = resource_path('assets/placeholder.png')
+ZEBRA_ICON        = resource_path('assets/icons/icon_zebra.png')
+GIRAFFE_ICON      = resource_path('assets/icons/icon_giraffe.png')
 
 
 class image_selection_roll_first_last(QtGui.QLabel):
