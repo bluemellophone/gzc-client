@@ -20,41 +20,43 @@ class first_last_image(QtGui.QFrame):
         self.init_layout()
 
     def init_widgets(self):
-        # Init Elements
-        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
-        self.setLineWidth(2)
         # Init Image
         self.image = QtGui.QLabel()
-        self.image.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
-        self.image.setAlignment(QtCore.Qt.AlignCenter)
         # Init time
         self.image_time = QtGui.QLabel(parent=self)
-        self.image_time.setAlignment(QtCore.Qt.AlignCenter)
         # Init label
-        self.info_text = QtGui.QLabel('', self)
-        self.info_text.setAlignment(QtCore.Qt.AlignCenter)
-
-    def init_layout(self):
+        self.info_text = QtGui.QLabel(parent=self)
+        # Layout
         grid = QtGui.QGridLayout()
         grid.addWidget(self.image, 0, 0, 1, 0)
         grid.addWidget(self.image_time, 2, 0, 1, 0)
         grid.addWidget(self.info_text, 3, 0, 1, 0)
         self.setLayout(grid)
+
+    def init_layout(self):
+        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
+        self.setLineWidth(2)
+        self.image_time.setAlignment(QtCore.Qt.AlignCenter)
+        self.info_text.setAlignment(QtCore.Qt.AlignCenter)
+        self.image.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
+        self.image.setAlignment(QtCore.Qt.AlignCenter)
         self.clear()
 
     def resizeEvent(self, ev):
+        print("RESIZE - F / L")
         self.clear(self.current_image)
 
     def update(self, filename):
         self.clear(filename)
 
     def clear(self, filename=None):
+        print("CLEAR - F / L")
         if filename is None:
             filename = PLACEHOLDER_IMAGE
         Pixmap = QtGui.QPixmap(filename)
         self.current_image = filename
         print(self.size())
-        Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
+        Pixmap = Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
         self.image.setPixmap(Pixmap)
         # Set label
         if filename == PLACEHOLDER_IMAGE:
@@ -71,7 +73,7 @@ class image_selection_roll(QtGui.QLabel):
 
     def init_layout(self):
         self.setAlignment(QtCore.Qt.AlignCenter)
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
+        self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
         self.clear()
 
     def mouseReleaseEvent(self, ev):
@@ -99,15 +101,17 @@ class image_selection_roll(QtGui.QLabel):
             return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
 
     def resizeEvent(self, ev):
+        print("RESIZE - SR")
         self.clear(self.current_image)
 
     def clear(self, filename=None):
+        print("CLEAR - SR")
         if filename is None:
             filename = PLACEHOLDER_IMAGE
         Pixmap = QtGui.QPixmap(filename)
         self.current_image = filename
         print(self.size())
-        Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
+        Pixmap = Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
         self.setPixmap(Pixmap)
 
 
