@@ -185,7 +185,7 @@ def package_installer():
     if sys.platform.startswith('win32'):
         build_win32_inno_installer()
     elif sys.platform.startswith('darwin'):
-        ut.cmd('sudo ./_installers/mac_dmg_builder.sh')
+        print('RUN: sudo ./_installers/mac_dmg_builder.sh')
         pass
     elif sys.platform.startswith('linux'):
         raise NotImplementedError('no linux packager (rpm or deb) supported. try running with --build')
