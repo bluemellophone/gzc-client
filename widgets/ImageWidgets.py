@@ -7,62 +7,76 @@ import copy
 from os.path import abspath
 
 
-IMAGE_SIZE = 150
 PLACEHOLDER_IMAGE = abspath('assets/placeholder.png')
 ZEBRA_ICON        = abspath('assets/icons/icon_zebra.png')
 GIRAFFE_ICON      = abspath('assets/icons/icon_giraffe.png')
 
 
-class first_last_image(QtGui.QFrame):
+class image_selection_roll_first_last(QtGui.QLabel):
+    #Modify the QtGui.QLabel functionality to allow it to act like a button
     def __init__(self, *args):
-        QtGui.QWidget.__init__(self)
-        self.init_widgets()
+        QtGui.QLabel.__init__(self)
         self.init_layout()
 
-    def init_widgets(self):
-        # Init Image
-        self.image = QtGui.QLabel()
-        # Init time
-        self.image_time = QtGui.QLabel(parent=self)
-        # Init label
-        self.info_text = QtGui.QLabel(parent=self)
-        # Layout
-        grid = QtGui.QGridLayout()
-        grid.addWidget(self.image, 0, 0, 1, 0)
-        grid.addWidget(self.image_time, 2, 0, 1, 0)
-        grid.addWidget(self.info_text, 3, 0, 1, 0)
-        self.setLayout(grid)
-
     def init_layout(self):
-        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Raised)
-        self.setLineWidth(2)
-        self.image_time.setAlignment(QtCore.Qt.AlignCenter)
-        self.info_text.setAlignment(QtCore.Qt.AlignCenter)
-        self.image.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
-        self.image.setAlignment(QtCore.Qt.AlignCenter)
+        self.setAlignment(QtCore.Qt.AlignCenter)
+        self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
         self.clear()
 
-    def resizeEvent(self, ev):
-        print("RESIZE - F / L")
+    def get_timestamp(self):
+        #lol need to ensure path consistancy!
+        chdir(path.dirname(path.realpath(__file__)))
+
+        if self.current_image == PLACEHOLDER_IMAGE:
+            return 'Awaiting images...'
+        else:
+            return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
+
+    def triggerResize(self):
         self.clear(self.current_image)
 
-    def update(self, filename):
-        self.clear(filename)
-
     def clear(self, filename=None):
-        print("CLEAR - F / L")
         if filename is None:
             filename = PLACEHOLDER_IMAGE
         Pixmap = QtGui.QPixmap(filename)
         self.current_image = filename
         print(self.size())
         Pixmap = Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
-        self.image.setPixmap(Pixmap)
-        # Set label
-        if filename == PLACEHOLDER_IMAGE:
-            self.image_time.setText('Awaiting images...')
-        else:
-            self.image_time.setText(time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image))))
+        self.setPixmap(Pixmap)
+
+
+class image_selection_box_first_last(QtGui.QWidget):
+    #One selection box. Contains the image and two buttons
+    def __init__(self, *args):
+        QtGui.QWidget.__init__(self)
+        self.init_widgets()
+        self.init_layout()
+
+    def init_widgets(self):
+        self.image = image_selection_roll(self)
+        self.image_time = QtGui.QLabel(self.image.get_timestamp(), self)
+        self.image_time.setAlignment(QtCore.Qt.AlignCenter)
+        self.info_text = QtGui.QLabel(parent=self)
+        self.info_text.setAlignment(QtCore.Qt.AlignCenter)
+        self.info_text.setMinimumHeight(25)
+
+    def init_layout(self):
+        grid = QtGui.QGridLayout()
+        grid.addWidget(self.image, 0, 0, 1, 0)
+        grid.addWidget(self.image_time, 2, 0, 1, 0)
+        grid.addWidget(self.info_text, 3, 0, 1, 0)
+        self.setLayout(grid)
+        self.clear()
+
+    def update(self, filename):
+        self.image.clear(filename)
+
+    def triggerResize(self):
+        self.image.triggerResize()
+
+    def clear(self):
+        self.image.clear()
+        self.image_time.setText('Awaiting images...')
 
 
 class image_selection_roll(QtGui.QLabel):
@@ -100,17 +114,14 @@ class image_selection_roll(QtGui.QLabel):
         else:
             return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
 
-    def resizeEvent(self, ev):
-        print("RESIZE - SR")
+    def triggerResize(self):
         self.clear(self.current_image)
 
     def clear(self, filename=None):
-        print("CLEAR - SR")
         if filename is None:
             filename = PLACEHOLDER_IMAGE
         Pixmap = QtGui.QPixmap(filename)
         self.current_image = filename
-        print(self.size())
         Pixmap = Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
         self.setPixmap(Pixmap)
 
@@ -143,19 +154,12 @@ class image_selection_box(QtGui.QWidget):
 
     def init_layout(self):
         grid = QtGui.QGridLayout()
-        # grid.addItem(QtGui.QSpacerItem(0, 0, vPolicy=QGui.QSizep.MinimumExpanding), 0, 0, 1, 0)
-        # grid.addWidget(self.image, 1, 0, 1, 0)
-        # grid.addItem(QtGui.QSpacerItem(0, 0, vPolicy=QtGui.QSizePolicy.MinimumExpanding), 2, 0, 1, 0)
-        # grid.addWidget(self.image_time, 3, 0, 1, 0)
-        # grid.addWidget(self.select_zebra, 4, 0)
-        # grid.addWidget(self.select_giraffe, 4, 1)
-
         grid.addWidget(self.image, 0, 0, 1, 0)
         grid.addWidget(self.image_time, 2, 0, 1, 0)
         grid.addWidget(self.select_zebra, 3, 0)
         grid.addWidget(self.select_giraffe, 3, 1)
-
         self.setLayout(grid)
+        self.clear()
 
     def init_connect(self):
         self.connect(self.image, QtCore.SIGNAL('clicked()'), self.reroll)
@@ -182,12 +186,24 @@ class image_selection_box(QtGui.QWidget):
             self.select_group.setExclusive(True)
         self.emit(QtCore.SIGNAL('images_modified'))
 
+    def option_selected(self):
+        self.emit(QtCore.SIGNAL('images_modified'))
+
     def is_selected(self):
         enabled = self.select_zebra.isEnabled() and self.select_giraffe.isEnabled()
         return not enabled or int(self.select_group.checkedId()) != -1
 
-    def option_selected(self):
-        self.emit(QtCore.SIGNAL('images_modified'))
+    def get_selection(self):
+        enabled = self.select_zebra.isEnabled() and self.select_giraffe.isEnabled()
+        if not enabled:
+            return (None, 'Ignore')
+        checked = self.select_group.checkedButton()
+        if checked is None:
+            return (None, 'Unassigned')
+        return (path.basename(self.image.current_image), checked.text())
+
+    def triggerResize(self):
+        self.image.triggerResize()
 
     def clear(self):
         self.image.clear()
@@ -200,15 +216,6 @@ class image_selection_box(QtGui.QWidget):
             self.select_group.setExclusive(False)
             checked.setChecked(False)
             self.select_group.setExclusive(True)
-
-    def get_selection(self):
-        enabled = self.select_zebra.isEnabled() and self.select_giraffe.isEnabled()
-        if not enabled:
-            return (None, 'Ignore')
-        checked = self.select_group.checkedButton()
-        if checked is None:
-            return (None, 'Unassigned')
-        return (path.basename(self.image.current_image), checked.text())
 
 
 class selection_group(QtGui.QWidget):
@@ -223,7 +230,7 @@ class selection_group(QtGui.QWidget):
         # self.init_connect()
 
     def init_widgets(self):
-        self.first_image = first_last_image(self)
+        self.first_image = image_selection_box_first_last(self)
         self.first_image.info_text.setText('First Image in Directory')
         self.image_boxes = []
         for i in range(10):
@@ -231,7 +238,7 @@ class selection_group(QtGui.QWidget):
             self.image_boxes.append(box)
             self.connect(box, QtCore.SIGNAL('images_modified'), self.images_modified)
 
-        self.last_image = first_last_image(self)
+        self.last_image = image_selection_box_first_last(self)
         self.last_image.info_text.setText('Last Image in Directory')
 
     def all_images_selected(self):
@@ -312,6 +319,12 @@ class selection_group(QtGui.QWidget):
         self.last_image.clear()
         for image_box in self.image_boxes:
             image_box.clear()
+
+    def triggerResize(self):
+        self.first_image.triggerResize()
+        self.last_image.triggerResize()
+        for image_box in self.image_boxes:
+            image_box.triggerResize()
 
     def get_filename(self):
         if len(self.active_files) ==  0:

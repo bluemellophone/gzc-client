@@ -93,6 +93,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def resizeEvent(self, ev):
         self.toggleButton.move(self.width() - self.toggleButton.width(), 0)
+        self.imageDisplay.triggerResize()
 
     def specifyDomain(self, checked):
         self.domainInput.setTextValue(self.domain)

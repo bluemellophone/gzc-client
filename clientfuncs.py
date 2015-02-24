@@ -216,7 +216,7 @@ def ex_deco(action_func):
         # log.write(traceback.format_exc(ex))
         # log.close()
         msg_box = QtGui.QErrorMessage(self)
-        msg_box.showMessage(ex.message)
+        msg_box.showMessage(str(ex.message))
     #is_method = isinstance(action_func, types.MethodType)
     # is_method =  (len(argspec.args) > 0 and argspec.args[0] == 'self')
     def func_wrapper(self, *args):
