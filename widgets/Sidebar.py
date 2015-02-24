@@ -13,14 +13,16 @@ import simplejson as json
 import requests
 
 
-LOGO_SIZE = 200
-LOGO        = abspath('assets/logo_ibeis_alpha.png')
-# LOGO        = abspath('assets/logo_kwf_alpha.png')
-# LOGO        = abspath('assets/logo_kws_alpha.png')
-IMPORT_ICON = abspath('assets/icons/icon_import.png')
-SUBMIT_ICON = abspath('assets/icons/icon_upload.png')
-BROWSE_ICON = abspath('assets/icons/icon_browse.png')
-CLEAR_ICON  = abspath('assets/icons/icon_trash.png')
+LOGO_SIZE     = 200
+LOGO          = abspath('assets/logo_ibeis_alpha.png')
+# LOGO          = abspath('assets/logo_kwf_alpha.png')
+# LOGO          = abspath('assets/logo_kws_alpha.png')
+IMPORT_ICON   = abspath('assets/icons/icon_import.png')
+BROWSE_ICON   = abspath('assets/icons/icon_browse.png')
+CLEAR_ICON    = abspath('assets/icons/icon_trash.png')
+SUBMIT_ICON   = abspath('assets/icons/icon_upload.png')
+ACCEPTED_ICON = abspath('assets/icons/icon_accepted.png')
+REJECTED_ICON = abspath('assets/icons/icon_rejected.png')
 
 CAR_COLORS = [('Select Color', '#F6F6F6')] + [
     ('white',    '#FFFFFF'),
@@ -128,6 +130,14 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             else:
                 self.submitButton.setIcon(QtGui.QIcon(IMPORT_ICON))
                 self.submitButton.setText('Import Card')
+            # Image - Step 6 (Submit)
+            if self.complete_image_step_6 is not None:
+                if self.complete_image_step_6:
+                    self.submitButton.setIcon(QtGui.QIcon(ACCEPTED_ICON))
+                    self.submitButton.setText('Images Accepted')
+                else:
+                    self.submitButton.setIcon(QtGui.QIcon(REJECTED_ICON))
+                    self.submitButton.setText('Images Rejected')
         elif self.parent.currentDisplay == 1:
             # GPS - Step 0 (always show)
             self.gpsForm.idLayout.show()
@@ -148,6 +158,14 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             else:
                 self.submitButton.setIcon(QtGui.QIcon(IMPORT_ICON))
                 self.submitButton.setText('Import Track')
+            # Image - Step 4 (Submit)
+            if self.complete_gps_step_4 is not None:
+                if self.complete_gps_step_4:
+                    self.submitButton.setIcon(QtGui.QIcon(ACCEPTED_ICON))
+                    self.submitButton.setText('Track Accepted')
+                else:
+                    self.submitButton.setIcon(QtGui.QIcon(REJECTED_ICON))
+                    self.submitButton.setText('Track Rejected')
 
     def move_file_list(self, file_list):
         self.parent.imageDisplay.first_image.current_image = file_list.pop(0)
@@ -326,7 +344,11 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # Response
         response = json.loads(r.text)
         if response['status']['code'] != 0:
+            self.complete_image_step_6 = False
+            self.updateStatus()
             raise IOError('Server responded with an error' + response['status']['message'])
+        self.complete_image_step_6 = True
+        self.updateStatus()
 
     @ex_deco
     def submitGPS(self):
@@ -361,7 +383,11 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # Response
         response = json.loads(r.text)
         if response['status']['code'] != 0:
+            self.complete_gps_step_4 = False
+            self.updateStatus()
             raise IOError('Server responded with an error' + response['status']['message'])
+        self.complete_gps_step_4 = True
+        self.updateStatus()
 
     def clear(self):
         # Reset cursor
@@ -382,9 +408,11 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.complete_image_step_3_time = False
         self.complete_image_step_4 = False
         self.complete_image_step_5 = False
+        self.complete_image_step_6 = None
         self.complete_gps_step_1 = False
         self.complete_gps_step_2 = False
         self.complete_gps_step_3 = False
+        self.complete_gps_step_4 = None
         # Update overall display
         if self.parent.currentDisplay == 0:
             # Clear imageForm and imageDisplay
