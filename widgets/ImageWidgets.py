@@ -33,12 +33,15 @@ class image_selection_roll_first_last(QtGui.QLabel):
             return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
 
     def triggerResize(self):
-        self.clear(self.current_image)
+        self.clear(self.current_image, reuse=False)
 
-    def clear(self, filename=None):
+    def clear(self, filename=None, reuse=False):
         if filename is None:
             filename = PLACEHOLDER_IMAGE
-        Pixmap = QtGui.QPixmap(filename)
+        if reuse:
+            Pixmap = self.pixmap()
+        else:
+            Pixmap = QtGui.QPixmap(filename)
         self.current_image = filename
         print(self.size())
         Pixmap = Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
@@ -123,12 +126,15 @@ class image_selection_roll(QtGui.QLabel):
             return time.strftime('%d/%m/%y, %H:%M:%S', time.gmtime(path.getmtime(self.current_image)))
 
     def triggerResize(self):
-        self.clear(self.current_image)
+        self.clear(self.current_image, reuse=False)
 
-    def clear(self, filename=None):
+    def clear(self, filename=None, reuse=False):
         if filename is None:
             filename = PLACEHOLDER_IMAGE
-        Pixmap = QtGui.QPixmap(filename)
+        if reuse:
+            Pixmap = self.pixmap()
+        else:
+            Pixmap = QtGui.QPixmap(filename)
         self.current_image = filename
         Pixmap = Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
         self.setPixmap(Pixmap)
