@@ -142,6 +142,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.currentDisplay = (self.currentDisplay + 1) % 2
         self.clear()
 
+    def displayGPXTrack(self, gpx_track):
+        self.gpsDisplay.clear(gpx_track)
+
     def clearSidebar(self):
         self.sidebar.clear()
 

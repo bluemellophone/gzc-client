@@ -243,6 +243,9 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 rmtree(dst_directory)
             if pre_extracted_gpx_path is not None:
                 self.gps_file_list.append(pre_extracted_gpx_path)
+                with open(pre_extracted_gpx_path) as gpx_file:
+                    gpx_track = gpx_file.read()
+                    self.parent.displayGPXTrack(gpx_track)
             else:
                 print('call igotu2gpx', dst_directory)
             self.copyThread = CopyThread(self.gps_file_list, [dst_directory])
