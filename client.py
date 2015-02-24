@@ -4,6 +4,7 @@ import sys
 from os.path import abspath, join, expanduser
 import signal
 import widgets  # NOQA
+import numpy as np # NOQA
 from widgets import Sidebar as sb
 from widgets import ImageWidgets as img
 from widgets import GPSWidgets as gps
@@ -12,7 +13,6 @@ from widgets.GZCQWidgets import QLabelButton
 from clientfuncs import ex_deco, resource_path
 import simplejson as json
 import requests
-
 
 TOGGLE_BUTTON_SIZE = 100
 DEFAULT_DOMAIN    = 'http://localhost:5000'

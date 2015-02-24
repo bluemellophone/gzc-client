@@ -17,12 +17,11 @@ def clean_pyinstaller():
     cwd = get_setup_dpath()
     ut.remove_files_in_dir(cwd, 'GZCClient.pkg', recursive=False)
     ut.remove_files_in_dir(cwd, 'GZCClientApp.pkg', recursive=False)
-    ut.remove_files_in_dir(cwd, 'qt_menu.nib', recursive=False)
-    ut.remove_files_in_dir(cwd, 'qt_menu.nib', recursive=True)
     ut.delete(join(cwd, 'dist/gzc-client'))
     ut.delete(join(cwd, 'gzc-client-win32-setup.exe'))
     ut.delete(join(cwd, 'build'))
     ut.delete(join(cwd, 'dist'))
+    ut.delete(join(cwd, 'qt_menu.nib'))
     print('[installer] L___ FINSHED CLEAN_PYINSTALLER ___')
 
 
@@ -42,19 +41,18 @@ def build_pyinstaller():
     # 2) POST: PROCESSING
     # Perform some post processing steps on the mac
 
-    # if sys.platform == 'darwin' and exists('dist/GZCClient.app/Contents/'):
-    #     copy_list = [
-    #         ('ibsicon.icns', 'Resources/icon-windowed.icns'),
-    #         ('Info.plist', 'Info.plist'),
-    #     ]
-    #     srcdir = '_installers'
-    #     dstdir = 'dist/GZCClient.app/Contents/'
-    #     for srcname, dstname in copy_list:
-    #         src = join(srcdir, srcname)
-    #         dst = join(dstdir, dstname)
-    #         ut.copy(src, dst)
+    if sys.platform == 'darwin' and exists('dist/GZCClient.app/Contents/'):
+        copy_list = [
+            ('ibsicon.icns', 'Resources/icon-windowed.icns'),
+            ('Info.plist', 'Info.plist'),
+        ]
+        srcdir = '_installers'
+        dstdir = 'dist/GZCClient.app/Contents/'
+        for srcname, dstname in copy_list:
+            src = join(srcdir, srcname)
+            dst = join(dstdir, dstname)
+            ut.copy(src, dst)
     print('[installer] L___ FINISH BUILD_PYINSTALLER ___')
-    # ut.cmd('./_scripts/mac_dmg_builder.sh')
 
 
 def ensure_inno_isinstalled():
@@ -187,7 +185,7 @@ def package_installer():
     if sys.platform.startswith('win32'):
         build_win32_inno_installer()
     elif sys.platform.startswith('darwin'):
-        # ut.cmd('sudo ./_installers/mac_dmg_builder.sh')
+        ut.cmd('./_installers/mac_dmg_builder.sh', sudo=True)
         pass
     elif sys.platform.startswith('linux'):
         raise NotImplementedError('no linux packager (rpm or deb) supported. try running with --build')

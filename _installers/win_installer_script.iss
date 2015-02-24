@@ -7,16 +7,16 @@
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{47BE3DA2-261D-4672-9849-18BB2EB382FC}
-AppName=IBEIS
+AppName=GZCClient
 AppVersion=1
-;AppVerName=IBEIS 1
+;AppVerName=GZCClient 1
 AppPublisher=Rensselaer Polytechnic Institute
 AppPublisherURL=www.rpi.edu/~crallj/
 AppSupportURL=www.rpi.edu/~crallj/
 AppUpdatesURL=www.rpi.edu/~crallj/
-DefaultDirName={pf}\IBEIS
-DefaultGroupName=IBEIS
-OutputBaseFilename=ibeis-win32-setup
+DefaultDirName={pf}\GZCClient
+DefaultGroupName=GZCClient
+OutputBaseFilename=GZCClient-win32-setup
 SetupIconFile=ibsicon.ico
 Compression=lzma
 SolidCompression=yes
@@ -28,13 +28,13 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\dist\ibeis\IBEISApp.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\dist\ibeis\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\dist\GZCClient\GZCClientApp.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\GZCClient\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{group}\ibeis"; Filename: "{app}\IBEISApp.exe"
-Name: "{commondesktop}\ibeis"; Filename: "{app}\IBEISApp.exe"; Tasks: desktopicon
+Name: "{group}\GZCClient"; Filename: "{app}\GZCClientApp.exe"
+Name: "{commondesktop}\GZCClient"; Filename: "{app}\GZCClientApp.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\IBEISApp.exe"; Description: "{cm:LaunchProgram,IBEIS}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\GZCClientApp.exe"; Description: "{cm:LaunchProgram,GZCClient}"; Flags: nowait postinstall skipifsilent
