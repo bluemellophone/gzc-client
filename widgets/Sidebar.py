@@ -4,7 +4,7 @@ from SidebarSkel import Ui_Sidebar
 from ImageFormSkel import Ui_ImageForm
 from GPSFormSkel import Ui_GPSForm
 from GZCQWidgets import QwwColorComboBox
-from os.path import join, basename, exists, abspath
+from os.path import join, basename, exists
 from shutil import rmtree
 from clientfuncs import CopyThread, find_candidates, ex_deco, ensure_structure
 import zipfile
@@ -14,15 +14,15 @@ import requests
 
 
 LOGO_SIZE     = 200
-LOGO          = abspath('assets/logo_ibeis_alpha.png')
-# LOGO          = abspath('assets/logo_kwf_alpha.png')
-# LOGO          = abspath('assets/logo_kws_alpha.png')
-IMPORT_ICON   = abspath('assets/icons/icon_import.png')
-BROWSE_ICON   = abspath('assets/icons/icon_browse.png')
-CLEAR_ICON    = abspath('assets/icons/icon_trash.png')
-SUBMIT_ICON   = abspath('assets/icons/icon_upload.png')
-ACCEPTED_ICON = abspath('assets/icons/icon_accepted.png')
-REJECTED_ICON = abspath('assets/icons/icon_rejected.png')
+LOGO          = 'assets/logo_ibeis_alpha.png'
+# LOGO          = 'assets/logo_kwf_alpha.png'
+# LOGO          = 'assets/logo_kws_alpha.png'
+IMPORT_ICON   = 'assets/icons/icon_import.png'
+BROWSE_ICON   = 'assets/icons/icon_browse.png'
+CLEAR_ICON    = 'assets/icons/icon_trash.png'
+SUBMIT_ICON   = 'assets/icons/icon_upload.png'
+ACCEPTED_ICON = 'assets/icons/icon_accepted.png'
+REJECTED_ICON = 'assets/icons/icon_rejected.png'
 
 CAR_COLORS = [('Select Color', '#F6F6F6')] + [
     ('white',    '#FFFFFF'),
@@ -77,7 +77,6 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.clear()
 
     # Slots
-    @ex_deco
     def submitClicked(self, *args):
         if self.parent.currentDisplay == 0:
             if self.complete_image_step_5:
@@ -94,6 +93,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.clear()
 
     # Functions
+    @ex_deco
     def updateStatus(self):
         if self.parent.currentDisplay == 0:
             # Image - Step 0 (always show)
@@ -167,19 +167,23 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                     self.submitButton.setIcon(QtGui.QIcon(REJECTED_ICON))
                     self.submitButton.setText('Track Rejected')
 
+    @ex_deco
     def move_file_list(self, file_list):
         self.parent.imageDisplay.first_image.current_image = file_list.pop(0)
         self.parent.imageDisplay.last_image.current_image = file_list.pop()
         # self.image_selection_group.stored_files = file_list
 
+    @ex_deco
     def update_recent_file_image(self, index, filename):
         self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.image_file_list), ))
         add_to_display = index in self.image_file_list_random_indices
         self.parent.imageDisplay.add_filename(filename, add_to_display=add_to_display)
 
+    @ex_deco
     def update_recent_file_gps(self, index, filename):
         self.sidebarStatus.setText('Copying GPX file...')
 
+    @ex_deco
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
         self.sidebarStatus.setText('Copying completed')
@@ -389,6 +393,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.complete_gps_step_4 = True
         self.updateStatus()
 
+    @ex_deco
     def clear(self):
         # Reset cursor
         QtGui.QApplication.restoreOverrideCursor()
@@ -429,6 +434,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # Update status
         self.updateStatus()
 
+    @ex_deco
     def imagesSelectedOverride(self, imgList):
         # possibly do more tests for validity of list here
         self.clear()
@@ -491,7 +497,6 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
             self.parent.complete_image_step_3_time = False
         self.parent.updateStatus()
 
-    # Functions
     def open_directory(self):
         def truncate(path):
             if len(directory) > 40:
@@ -507,6 +512,8 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         self.parent.import_directory = directory
         self.parent.updateStatus()
 
+    # Functions
+    @ex_deco
     def clear(self):
         self.driveLabel.setText('Select a Directory...')
         self.colorInput.setCurrentIndex(0)
@@ -556,6 +563,7 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
         self.parent.updateStatus()
 
     # Functions
+    @ex_deco
     def clear(self):
         self.colorInput.setCurrentIndex(0)
         self.numberInput.setCurrentIndex(0)

@@ -1,15 +1,14 @@
 from __future__ import absolute_import, division, print_function
 from PyQt4 import QtCore, QtGui
-from os import path, chdir
+from os import path
 import time
 import random
 import copy
-from os.path import abspath
 
 
-PLACEHOLDER_IMAGE = abspath('assets/placeholder.png')
-ZEBRA_ICON        = abspath('assets/icons/icon_zebra.png')
-GIRAFFE_ICON      = abspath('assets/icons/icon_giraffe.png')
+PLACEHOLDER_IMAGE = 'assets/placeholder.png'
+ZEBRA_ICON        = 'assets/icons/icon_zebra.png'
+GIRAFFE_ICON      = 'assets/icons/icon_giraffe.png'
 
 
 class image_selection_roll_first_last(QtGui.QLabel):
@@ -24,9 +23,6 @@ class image_selection_roll_first_last(QtGui.QLabel):
         self.clear()
 
     def get_timestamp(self):
-        #lol need to ensure path consistancy!
-        chdir(path.dirname(path.realpath(__file__)))
-
         if self.current_image == PLACEHOLDER_IMAGE:
             return 'Awaiting images...'
         else:
@@ -117,9 +113,6 @@ class image_selection_roll(QtGui.QLabel):
         self.clear(image_file)
 
     def get_timestamp(self):
-        #lol need to ensure path consistancy!
-        chdir(path.dirname(path.realpath(__file__)))
-
         if self.current_image == PLACEHOLDER_IMAGE:
             return 'Awaiting images...'
         else:

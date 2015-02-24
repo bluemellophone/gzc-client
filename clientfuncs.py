@@ -12,6 +12,37 @@ import subprocess
 import numpy as np
 
 
+def ex_deco(action_func):
+    #import types
+    # import inspect
+    #import utool as ut
+    # #ut.embed()
+    # argspec = inspect.getargspec(action_func)
+
+    def logerr(ex, self=None):
+        print ('EXCEPTION RAISED! ' + traceback.format_exc(ex))
+        # log = open('error_log.txt', 'w')
+        # log.write(traceback.format_exc(ex))
+        # log.close()
+        msg_box = QtGui.QErrorMessage(self)
+        msg_box.showMessage(str(ex.message))
+    #is_method = isinstance(action_func, types.MethodType)
+    # is_method =  (len(argspec.args) > 0 and argspec.args[0] == 'self')
+    def func_wrapper(self, *args):
+        # print('+----------<2>')
+        # print(action_func)
+        # print(argspec)
+        # print('self=%r' % (self,))
+        # print('args=%r' % (args,))
+        # print('L__________')
+        try:
+            return action_func(self, *args)
+        except Exception as ex:
+            logerr(ex, self)
+
+    return func_wrapper
+
+
 class CopyThread(QtCore.QThread):
     def __init__(self, filenames, destinations):
         QtCore.QThread.__init__(self)
@@ -21,6 +52,7 @@ class CopyThread(QtCore.QThread):
     def __del__(self):
         self.wait()
 
+    @ex_deco
     def run(self):
         for index, filepath in enumerate(self.filenames):
             if not isfile(filepath):
@@ -40,6 +72,7 @@ class ImportThread(QtCore.QThread):
         QtCore.QThread.__init__(thrd)
         thrd.gpswgt = gpswgt
 
+    @ex_deco
     def run(thrd):
         #When hooked up to a i-gotu gps dongle
         data = thrd.gpswgt.compile_data()
@@ -138,6 +171,7 @@ class CoordinateMap:
         return (x_loc, y_loc)
 
 
+@ex_deco
 def find_candidates(search_path, search_str, verbose=False):
     transform_one_list = [
         (lambda x: x),                       # Search for original
@@ -203,37 +237,7 @@ def find_candidates(search_path, search_str, verbose=False):
     return found_list
 
 
-def ex_deco(action_func):
-    #import types
-    # import inspect
-    #import utool as ut
-    # #ut.embed()
-    # argspec = inspect.getargspec(action_func)
-
-    def logerr(ex, self=None):
-        print ('EXCEPTION RAISED! ' + traceback.format_exc(ex))
-        # log = open('error_log.txt', 'w')
-        # log.write(traceback.format_exc(ex))
-        # log.close()
-        msg_box = QtGui.QErrorMessage(self)
-        msg_box.showMessage(str(ex.message))
-    #is_method = isinstance(action_func, types.MethodType)
-    # is_method =  (len(argspec.args) > 0 and argspec.args[0] == 'self')
-    def func_wrapper(self, *args):
-        # print('+----------<2>')
-        # print(action_func)
-        # print(argspec)
-        # print('self=%r' % (self,))
-        # print('args=%r' % (args,))
-        # print('L__________')
-        try:
-            return action_func(self, *args)
-        except Exception as ex:
-            logerr(ex, self)
-
-    return func_wrapper
-
-
+@ex_deco
 def ensure_structure(data, kind, car_number, car_color, person=None):
     data       = data.lower()
     kind       = kind.lower()
@@ -262,6 +266,7 @@ def ensure_structure(data, kind, car_number, car_color, person=None):
     return person_dir
 
 
+@ex_deco
 def convert_gpx_to_json(gpx_str):
     json_list = []
     root = ET.fromstring(gpx_str)
@@ -291,6 +296,7 @@ def convert_gpx_to_json(gpx_str):
     return { "track": json_list }
 
 
+@ex_deco
 def import_gpx(data):
     DEFAULT_DATA_DIR = 'data'
     command = "igotu2gpx --action dump --format gpx"

@@ -1,23 +1,25 @@
 #!/usr/bin/env python
 from PyQt4 import QtGui, QtCore
 import sys
-from os.path import abspath
+from os.path import abspath, join, expanduser
 import signal
+import widgets  # NOQA
 from widgets import Sidebar as sb
 from widgets import ImageWidgets as img
 from widgets import GPSWidgets as gps
 from widgets.MainSkel import Ui_MainWindow
 from widgets.GZCQWidgets import QLabelButton
+from clientfuncs import ex_deco
 import simplejson as json
 import requests
 
 
 TOGGLE_BUTTON_SIZE = 100
 DEFAULT_DOMAIN    = 'http://localhost:5000'
-DEFAULT_PATH      = abspath('data')
-TOGGLE_BUTTON_CAM = abspath('assets/icons/icon_camera_small.png')
-TOGGLE_BUTTON_GPS = abspath('assets/icons/icon_gps_small.png')
-TOGGLE_BITMAP     = abspath('assets/icons/bitmap_toggle_small.png')
+DEFAULT_PATH      = abspath(expanduser(join('~', 'Desktop', 'gzc-client-data')))
+TOGGLE_BUTTON_CAM = 'assets/icons/icon_camera_small.png'
+TOGGLE_BUTTON_GPS = 'assets/icons/icon_gps_small.png'
+TOGGLE_BITMAP     = 'assets/icons/bitmap_toggle_small.png'
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
@@ -129,32 +131,41 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             pass
 
     # Functions
+    @ex_deco
     def domainChanged(self):
         self.domain = str(self.domainInput.textValue())
 
+    @ex_deco
     def pathChanged(self):
         path_str = str(self.pathInput.textValue())
         self.path_list = map(abspath, path_str.split(','))
 
+    @ex_deco
     def allImagesSelected(self):
         return self.imageDisplay.all_images_selected()
 
+    @ex_deco
     def switchWidgets(self):
         self.currentDisplay = (self.currentDisplay + 1) % 2
         self.clear()
 
+    @ex_deco
     def displayGPXTrack(self, gpx_track):
         self.gpsDisplay.clear(gpx_track)
 
+    @ex_deco
     def clearSidebar(self):
         self.sidebar.clear()
 
+    @ex_deco
     def clearImageDisplay(self):
         self.imageDisplay.clear()
 
+    @ex_deco
     def clearGPSDisplay(self):
         self.gpsDisplay.clear()
 
+    @ex_deco
     def clear(self):
         self.imageDisplay.hide()
         self.gpsDisplay.hide()
