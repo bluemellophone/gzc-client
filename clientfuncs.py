@@ -140,7 +140,7 @@ def find_candidates(search_path, search_str, verbose=False):
     return found_list
 
 
-@ex_deco
+# @ex_deco
 def ensure_structure(data, kind, car_number, car_color, person=None):
     data       = data.lower()
     kind       = kind.lower()
