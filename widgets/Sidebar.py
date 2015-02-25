@@ -7,7 +7,8 @@ from widgets.GPSFormSkel import Ui_GPSForm
 from widgets.GZCQWidgets import QwwColorComboBox
 from os.path import join, basename, exists
 from shutil import rmtree
-from clientfuncs import CopyThread, find_candidates, ex_deco, ensure_structure, resource_path
+import utool as ut
+from clientfuncs import CopyFiles, ExtractGPS, find_candidates, ex_deco, ensure_structure, resource_path
 import zipfile
 import random
 import simplejson as json
@@ -24,6 +25,8 @@ CLEAR_ICON    = resource_path(join('assets', 'icons', 'icon_trash.png'))
 SUBMIT_ICON   = resource_path(join('assets', 'icons', 'icon_upload.png'))
 ACCEPTED_ICON = resource_path(join('assets', 'icons', 'icon_accepted.png'))
 REJECTED_ICON = resource_path(join('assets', 'icons', 'icon_rejected.png'))
+RESOURCE_PATH = ut.get_app_resource_dir('gzc-client')
+RESOURCE_TEMPORARY_TRACK = join(RESOURCE_PATH, 'track.gpx')
 
 CAR_COLORS = [('Select Color', '#F6F6F6')] + [
     ('white',    '#FFFFFF'),
@@ -44,7 +47,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def __init__(self, parent):
         QtGui.QWidget.__init__(self)
         self.parent = parent
-        self.copyThread = None
+        self.CopyFiles = None
         self.setupUi(self)
         self.initWidgets()
         self.initConnect()
@@ -190,24 +193,62 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # self.image_selection_group.stored_files = file_list
 
     @ex_deco
-    def update_recent_file_image(self, index, filename):
-        self.sidebarStatus.setText('Copying %s / %s' % (index + 1, len(self.image_file_list), ))
+    def update_recent_file_image(self, index, length, filename):
+        self.sidebarStatus.setText('Copying %s / %s' % (index, length, ))
         add_to_display = index in self.image_file_list_random_indices
         self.parent.imageDisplay.add_filename(filename, add_to_display=add_to_display)
 
     @ex_deco
-    def update_recent_file_gps(self, index, filename):
-        self.sidebarStatus.setText('Copying GPX file...')
+    def update_recent_file_gps(self, index, length, filename):
+        # print("CAUGHT %s %s" % (index, length, ))
+        self.sidebarStatus.setText('Copying %s / %s' % (index, length, ))
 
     @ex_deco
     def reset_cursor(self):
         QtGui.QApplication.restoreOverrideCursor()
         self.sidebarStatus.setText('Copying completed')
+        self.updateStatus()
+
+    @ex_deco
+    def copy_completed(self):
         if self.parent.currentDisplay == 0 and len(self.image_file_list) > 0:
             self.complete_image_step_4 = True
         elif self.parent.currentDisplay == 1:
             self.complete_gps_step_3 = True
+        self.reset_cursor()
+
+    @ex_deco
+    def gps_execption(self, exception):
+        QtGui.QApplication.restoreOverrideCursor()
         self.updateStatus()
+        raise exception
+
+    @ex_deco
+    def extract_completed(self, gpx_content):
+        with open(RESOURCE_TEMPORARY_TRACK, 'w') as track:
+            track.write(gpx_content)
+        self.duplicate_gpx(RESOURCE_TEMPORARY_TRACK)
+
+    @ex_deco
+    def duplicate_gpx(self, pre_extracted_gpx_path):
+        # Get data from form
+        car_number    = str(self.gpsForm.numberInput.currentText())
+        car_color     = str(self.gpsForm.colorInput.currentText())
+
+        for index, path in enumerate(self.parent.path_list):
+            dst_directory = ensure_structure(path, 'gps', car_number, car_color)
+            if exists(dst_directory):
+                print('Target directory already exists... deleting')
+                rmtree(dst_directory)
+            self.gps_file_list.append(pre_extracted_gpx_path)
+            with open(pre_extracted_gpx_path) as gpx_file:
+                gpx_track = gpx_file.read()
+                self.parent.displayGPXTrack(gpx_track)
+            self.CopyFiles = CopyFiles(self.gps_file_list, [dst_directory])
+            if index == 0:
+                self.connect(self.CopyFiles, QtCore.SIGNAL('file_done'), self.update_recent_file_gps)
+                self.connect(self.CopyFiles, QtCore.SIGNAL('completed'), self.copy_completed)
+            self.CopyFiles.start()
 
     @ex_deco
     def copyImage(self):
@@ -252,47 +293,33 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             if exists(dst_directory):
                 print('Target directory already exists... deleting')
                 rmtree(dst_directory)
-            self.copyThread = CopyThread(self.image_file_list, [dst_directory])
+            self.CopyFiles = CopyFiles(self.image_file_list, [dst_directory])
             if index == 0:
-                self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file_image)
-                self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
-            self.copyThread.start()
+                self.connect(self.CopyFiles, QtCore.SIGNAL('file_done'), self.update_recent_file_image)
+                self.connect(self.CopyFiles, QtCore.SIGNAL('completed'), self.copy_completed)
+            self.CopyFiles.start()
 
     @ex_deco
     def copyGPS(self, pre_extracted_gpx_path=None):
         # Change cursor to busy
         QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-        self.sidebarStatus.setText('Copying GPS Track')
+        self.sidebarStatus.setText('Copying GPS Track...')
 
         # Assert filled out
         color_index  = self.gpsForm.colorInput.currentIndex()
         number_index = self.gpsForm.numberInput.currentIndex()
         if color_index == 0 or number_index == 0:
+            self.reset_cursor()
             raise ValueError('Cannot import GPX file without specifying a car color and car number')
 
-        # Get data from form
-        car_number    = str(self.gpsForm.numberInput.currentText())
-        car_color     = str(self.gpsForm.colorInput.currentText())
-
-        for index, path in enumerate(self.parent.path_list):
-            dst_directory = ensure_structure(path, 'gps', car_number, car_color)
-            if exists(dst_directory):
-                print('Target directory already exists... deleting')
-                rmtree(dst_directory)
-            if pre_extracted_gpx_path is not None:
-                self.gps_file_list.append(pre_extracted_gpx_path)
-                with open(pre_extracted_gpx_path) as gpx_file:
-                    gpx_track = gpx_file.read()
-                    self.parent.displayGPXTrack(gpx_track)
-            else:
-                print('call igotu2gpx', dst_directory)
-                self.reset_cursor()
-                raise NotImplementedError('i-GotU is not operational on this machine.  Use \'Manually Select GPX File\' from the File menu')
-            self.copyThread = CopyThread(self.gps_file_list, [dst_directory])
-            if index == 0:
-                self.connect(self.copyThread, QtCore.SIGNAL('file_done'), self.update_recent_file_gps)
-                self.connect(self.copyThread, QtCore.SIGNAL('completed'), self.reset_cursor)
-            self.copyThread.start()
+        if pre_extracted_gpx_path is not None:
+            self.duplicate_gpx(pre_extracted_gpx_path)
+        else:
+            self.ExtractGPS = ExtractGPS()
+            self.connect(self.ExtractGPS, QtCore.SIGNAL('track_done'), self.update_recent_file_gps)
+            self.connect(self.ExtractGPS, QtCore.SIGNAL('completed'), self.extract_completed)
+            self.connect(self.ExtractGPS, QtCore.SIGNAL('__EXCEPTION__'), self.gps_execption)
+            self.ExtractGPS.start()
 
     @ex_deco
     def submitImage(self):
@@ -417,9 +444,9 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         QtGui.QApplication.restoreOverrideCursor()
         self.sidebarStatus.setText('')
         # Stop any ongoing copy thread
-        if self.copyThread is not None:
-            self.copyThread.terminate()
-            self.copyThread.quit()
+        if self.CopyFiles is not None:
+            self.CopyFiles.terminate()
+            self.CopyFiles.quit()
         # Clear attributes
         self.import_directory = None
         self.image_file_list = []

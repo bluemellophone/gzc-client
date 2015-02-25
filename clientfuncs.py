@@ -9,6 +9,19 @@ import traceback
 import subprocess
 
 
+def resource_path(relative_path, _file='.'):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = dirname(_file)
+    return join(base_path, relative_path)
+
+
+IGOTU2GPX_BASE = resource_path(join('libs', 'igotu2gpx'))
+
+
 def ex_deco(action_func):
     #import types
     # import inspect
@@ -21,8 +34,12 @@ def ex_deco(action_func):
         # log = open('error_log.txt', 'w')
         # log.write(traceback.format_exc(ex))
         # log.close()
-        msg_box = QtGui.QErrorMessage(self)
+        try:
+            msg_box = QtGui.QErrorMessage(self)
+        except:
+            msg_box = QtGui.QErrorMessage(self.parent())
         msg_box.showMessage(str(ex.message))
+
     #is_method = isinstance(action_func, types.MethodType)
     # is_method =  (len(argspec.args) > 0 and argspec.args[0] == 'self')
     def func_wrapper(self, *args):
@@ -40,17 +57,7 @@ def ex_deco(action_func):
     return func_wrapper
 
 
-def resource_path(relative_path, _file='.'):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = dirname(_file)
-    return join(base_path, relative_path)
-
-
-class CopyThread(QtCore.QThread):
+class CopyFiles(QtCore.QThread):
     def __init__(self, filenames, destinations):
         QtCore.QThread.__init__(self)
         self.filenames = filenames
@@ -59,19 +66,72 @@ class CopyThread(QtCore.QThread):
     def __del__(self):
         self.wait()
 
-    @ex_deco
     def run(self):
+        length = len(self.filenames)
         for index, filepath in enumerate(self.filenames):
             if not isfile(filepath):
                 continue
             for outdir in self.destinations:
                 if not exists(outdir):
                     makedirs(outdir)
-                # time.sleep(2)
                 shutil.copy2(filepath, outdir)
-                self.emit(QtCore.SIGNAL('file_done'), index, join(outdir, filepath))
+                self.emit(QtCore.SIGNAL('file_done'), index, length, join(outdir, filepath))
         self.emit(QtCore.SIGNAL('completed'))
-        return None
+
+
+class ExtractGPS(QtCore.QThread):
+    def __init__(self):
+        QtCore.QThread.__init__(self)
+
+    def __del__(self):
+        self.wait()
+
+    def findLib(self):
+        if sys.platform == 'darwin':
+            self.igotu2gpx_path = join(IGOTU2GPX_BASE, 'darwin', 'MacOS', 'igotu2gpx')
+        else:
+            raise NotImplementedError('Automatic i-GotU extraction is not operational on this machine.  Use \'Manually Select GPX File\' from the File menu')
+
+    def contactDongle(self):
+        args = [self.igotu2gpx_path, '--action', 'info', '2>&1']
+        print(' '.join(args))
+        p = subprocess.Popen(' '.join(args), stdout=subprocess.PIPE, shell=True)
+        try:
+            for line in p.stdout:
+                # print(line)
+                if 'Unable to download' in line:
+                    raise RuntimeError('i-GotU GPS dongle not connected.  Check connection and try again.')
+        except IOError:
+            pass
+
+    def run(self):
+        try:
+            # Ensure can find libs and connected
+            self.findLib()
+            self.contactDongle()
+            # Run import
+            args = [self.igotu2gpx_path, '--action', 'dump', '2>&1']
+            print(' '.join(args))
+            p = subprocess.Popen(' '.join(args), stdout=subprocess.PIPE, shell=True)
+            gpx_content = []
+            try:
+                for line in p.stdout:
+                    # print(line)
+                    if 'Downloaded block' in line:
+                        line = line.strip().split()
+                        index, length = line[-1].split('/')
+                        self.emit(QtCore.SIGNAL('track_done'), index, length, '')
+                    elif 'Unable to download' in line:
+                        raise RuntimeError('i-GotU GPS dongle has been disconnected during import.  Check connection and try again.')
+                    elif 'Downloading tracks' not in line:
+                        gpx_content.append(line)
+                    else:
+                        print('IGNORING LINE: %s' % (line.strip(), ))
+            except IOError:
+                pass
+        except RuntimeError as rte:
+            self.emit(QtCore.SIGNAL('__EXCEPTION__'), rte)
+        self.emit(QtCore.SIGNAL('completed'), ''.join(gpx_content))
 
 
 @ex_deco
@@ -167,27 +227,3 @@ def ensure_structure(data, kind, car_number, car_color, person=None):
         mkdir(person_dir)
     # Return peron dir
     return person_dir
-
-
-@ex_deco
-def import_gpx(data):
-    DEFAULT_DATA_DIR = 'data'
-    command = "igotu2gpx --action dump --format gpx"
-    args = command.split()
-    p = subprocess.Popen(args, stdout=subprocess.PIPE)
-    stdout, stderr = p.communicate()
-    if len(stdout) == 0:
-        raise IOError
-    # Process gps for car
-    car_color  = data['car_color'].lower()
-    car_number = str(data['car_number'])
-    # Ensure the folder
-    car_dir = ensure_structure(DEFAULT_DATA_DIR, 'gps', car_number, car_color)
-    gps_path  = join(car_dir, 'track.gpx')
-
-    # Save track.gpx into folder
-    f = open(gps_path, 'w')
-    f.write(stdout)
-    f.close()
-
-    return stdout

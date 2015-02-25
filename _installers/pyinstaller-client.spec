@@ -86,7 +86,7 @@ if APPLE:
     pathex.append('/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/')
 
 ##################################
-# QT Gui dependencies
+# QT Gui and HDF5 dependencies
 ##################################
 if APPLE:
     walk_path = '/opt/local/Library/Frameworks/QtGui.framework/Versions/4/Resources/qt_menu.nib'
@@ -97,13 +97,20 @@ if APPLE:
             DATATUP_LIST.append((toc_dst, toc_src))
 
 ##################################
-# Assets & Icon
+# Assets, Libs, and Icon
 ##################################
 walk_path = 'assets'
 for root, dirs, files in os.walk(walk_path):
     for icon_fname in files:
         toc_src = join(abspath(root), icon_fname)
         toc_dst = join(root, icon_fname)
+        DATATUP_LIST.append((toc_dst, toc_src))
+
+walk_path = 'libs'
+for root, dirs, files in os.walk(walk_path):
+    for lib_fname in files:
+        toc_src = join(abspath(root), lib_fname)
+        toc_dst = join(root, lib_fname)
         DATATUP_LIST.append((toc_dst, toc_src))
 
 # App Icon File

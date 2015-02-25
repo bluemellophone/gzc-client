@@ -150,7 +150,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             'domain':    self.domain,
             'path_list': self.path_list,
         }
-        print(temp)
         with open(RESOURCE_CONFIG, 'w') as config:
             json.dump(temp, config)
 
@@ -161,9 +160,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             self._save_config()
         with open(RESOURCE_CONFIG, 'r') as config:
             temp = config.read()
-        print(temp)
         config = json.loads(temp)
-        print(config)
         self.domain = config.get('domain', None)
         self.path_list = config.get('path_list', None)
         if self.domain is None or self.path_list is None:
