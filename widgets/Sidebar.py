@@ -82,17 +82,17 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # self.submitButton.setAutoFillBackground(True)
         # self.submitButton.setPalette(pal)
         # self.submitButton.update()
-        self.submitButton.setStyleSheet('''
-            font: 35px;
-            margin: 0 1px 0 1px;
-            color: black;
-            background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                              stop: 0 #2198c0, stop: 1 #0d5ca6);
-            border-style: outset;
-            border-radius: 3px;
-            border-width: 1px;
-            border-color: #0c457e;
-        ''')
+        # self.submitButton.setStyleSheet('''
+        #     font: 35px;
+        #     margin: 0 1px 0 1px;
+        #     color: black;
+        #     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+        #                                       stop: 0 #2198c0, stop: 1 #0d5ca6);
+        #     border-style: outset;
+        #     border-radius: 3px;
+        #     border-width: 1px;
+        #     border-color: #0c457e;
+        # ''')
 
     # Slots
     def submitClicked(self, *args):

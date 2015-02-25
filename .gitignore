@@ -55,3 +55,4 @@ target/
 error_log.txt
 data/
 *.pkg
+_test/stress*
