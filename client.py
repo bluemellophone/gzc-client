@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, division, print_function
 from PyQt4 import QtGui, QtCore
 import sys
-from os.path import abspath, join, expanduser
+from os.path import abspath, join, expanduser, exists
 import signal
 import widgets  # NOQA
 import numpy as np # NOQA
+import utool as ut
 from widgets import Sidebar as sb
 from widgets import ImageWidgets as img
 from widgets import GPSWidgets as gps
@@ -14,20 +16,22 @@ from clientfuncs import ex_deco, resource_path
 import simplejson as json
 import requests
 
+RESOURCE_PATH      = ut.get_app_resource_dir('gzc-client')
+RESOURCE_CONFIG    = join(RESOURCE_PATH, 'config.json')
 TOGGLE_BUTTON_SIZE = 100
-DEFAULT_DOMAIN    = 'http://localhost:5000'
-DEFAULT_PATH      = abspath(expanduser(join('~', 'Desktop', 'gzc-client-data')))
-TOGGLE_BUTTON_CAM = resource_path(join('assets', 'icons', 'icon_camera_small.png'))
-TOGGLE_BUTTON_GPS = resource_path(join('assets', 'icons', 'icon_gps_small.png'))
-TOGGLE_BITMAP     = resource_path(join('assets', 'icons', 'bitmap_toggle_small.png'))
+DEFAULT_DOMAIN     = 'http://localhost:5000'
+DEFAULT_PATH       = abspath(expanduser(join('~', 'Desktop', 'gzc-client-data')))
+TOGGLE_BUTTON_CAM  = resource_path(join('assets', 'icons', 'icon_camera_small.png'))
+TOGGLE_BUTTON_GPS  = resource_path(join('assets', 'icons', 'icon_gps_small.png'))
+TOGGLE_BITMAP      = resource_path(join('assets', 'icons', 'bitmap_toggle_small.png'))
 
 
 class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self):
         QtGui.QWidget.__init__(self)
+        # Load configuration
+        self._load_config()
         # Load toggle button icons and bitmap
-        self.domain = DEFAULT_DOMAIN
-        self.path_list = [DEFAULT_PATH]
         self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(TOGGLE_BUTTON_SIZE, TOGGLE_BUTTON_SIZE)
         self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(TOGGLE_BUTTON_SIZE, TOGGLE_BUTTON_SIZE)
         self.toggle_button_bitmap = QtGui.QPixmap(TOGGLE_BITMAP).scaled(TOGGLE_BUTTON_SIZE, TOGGLE_BUTTON_SIZE)
@@ -131,14 +135,50 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             pass
 
     # Functions
+
+    @ex_deco
+    def _save_config(self, domain=None, path_list=None):
+        if domain is None:
+            self.domain = DEFAULT_DOMAIN
+        else:
+            self.domain = domain
+        if path_list is None:
+            self.path_list = [DEFAULT_PATH]
+        else:
+            self.path_list = path_list
+        temp = {
+            'domain':    self.domain,
+            'path_list': self.path_list,
+        }
+        print(temp)
+        with open(RESOURCE_CONFIG, 'w') as config:
+            json.dump(temp, config)
+
+    @ex_deco
+    def _load_config(self):
+        ut.ensuredir(RESOURCE_PATH)
+        if not exists(RESOURCE_CONFIG):
+            self._save_config()
+        with open(RESOURCE_CONFIG, 'r') as config:
+            temp = config.read()
+        print(temp)
+        config = json.loads(temp)
+        print(config)
+        self.domain = config.get('domain', None)
+        self.path_list = config.get('path_list', None)
+        if self.domain is None or self.path_list is None:
+            self._save_config()
+
     @ex_deco
     def domainChanged(self):
         self.domain = str(self.domainInput.textValue())
+        self._save_config(self.domain, self.path_list)
 
     @ex_deco
     def pathChanged(self):
         path_str = str(self.pathInput.textValue())
         self.path_list = [ abspath(expanduser(path.strip())) for path in path_str.split(',') ]
+        self._save_config(self.domain, self.path_list)
 
     @ex_deco
     def allImagesSelected(self):

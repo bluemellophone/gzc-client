@@ -1,9 +1,10 @@
+from __future__ import absolute_import, division, print_function
 import sys
 from PyQt4 import QtCore, QtGui
-from SidebarSkel import Ui_Sidebar
-from ImageFormSkel import Ui_ImageForm
-from GPSFormSkel import Ui_GPSForm
-from GZCQWidgets import QwwColorComboBox
+from widgets.SidebarSkel import Ui_Sidebar
+from widgets.ImageFormSkel import Ui_ImageForm
+from widgets.GPSFormSkel import Ui_GPSForm
+from widgets.GZCQWidgets import QwwColorComboBox
 from os.path import join, basename, exists
 from shutil import rmtree
 from clientfuncs import CopyThread, find_candidates, ex_deco, ensure_structure, resource_path
