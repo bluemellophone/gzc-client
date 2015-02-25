@@ -7,7 +7,7 @@ gzc_source=pack.temp
 gzc_working=pack.temp.dmg
 gzc_title=GZCClient
 gzc_applicationName=GZCClient.app
-gzc_size=256000
+gzc_size=512000
 gzc_backgroundPictureName=background.png
 gzc_finalDMGName=GZCClient.dmg
 
