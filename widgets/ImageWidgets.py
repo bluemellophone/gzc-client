@@ -41,7 +41,6 @@ class image_selection_roll_first_last(QtGui.QLabel):
         else:
             Pixmap = QtGui.QPixmap(filename)
         self.current_image = filename
-        print(self.size())
         Pixmap = Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
         self.setPixmap(Pixmap)
 

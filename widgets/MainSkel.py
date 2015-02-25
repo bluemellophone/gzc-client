@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Main.ui'
 #
-# Created: Mon Feb 23 16:53:17 2015
+# Created: Wed Feb 25 09:56:27 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,9 +26,9 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(800, 852)
+        MainWindow.resize(1400, 872)
         self.centralwidget = QtGui.QWidget(MainWindow)
-        self.centralwidget.setMinimumSize(QtCore.QSize(0, 830))
+        self.centralwidget.setMinimumSize(QtCore.QSize(1400, 850))
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(self.centralwidget)
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addLayout(self.layout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1400, 22))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuOptions = QtGui.QMenu(self.menubar)
         self.menuOptions.setObjectName(_fromUtf8("menuOptions"))

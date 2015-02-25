@@ -36,7 +36,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.initWidgets()
         self.initConnect()
         self.initVisuals()
-        self.resize(1400, 850)
         self.clear()
 
     def initWidgets(self):
@@ -189,5 +188,7 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     window = MainWindow()
     signal.signal(signal.SIGINT, signal.SIG_DFL)
+    # window.showMaximized()
     window.show()
+    window.clear()
     sys.exit(app.exec_())
