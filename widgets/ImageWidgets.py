@@ -19,6 +19,8 @@ class image_selection_roll_first_last(QtGui.QLabel):
         self.init_layout()
 
     def init_layout(self):
+        # self.setMaximumWidth(10)
+        # self.setMaximumHeight(10)
         self.setAlignment(QtCore.Qt.AlignCenter)
         self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.MinimumExpanding)
 
@@ -39,6 +41,7 @@ class image_selection_roll_first_last(QtGui.QLabel):
         else:
             Pixmap = QtGui.QPixmap(filename)
         self.current_image = filename
+        print(self.size())
         Pixmap = Pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio)
         self.setPixmap(Pixmap)
 
@@ -65,7 +68,6 @@ class image_selection_box_first_last(QtGui.QWidget):
         grid.addWidget(self.image_time, 2, 0, 1, 0)
         grid.addWidget(self.info_text, 3, 0, 1, 0)
         self.setLayout(grid)
-        self.clear()
 
     def init_visual(self):
         # self.setStyleSheet('background-color: red;')
@@ -74,7 +76,6 @@ class image_selection_box_first_last(QtGui.QWidget):
         p.setColor(self.backgroundRole(), QtGui.QColor("#e2e2e2"))
         self.setPalette(p)
         self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-        self.clear()
 
     def update(self, filename):
         self.image.clear(filename)
@@ -168,7 +169,6 @@ class image_selection_box(QtGui.QWidget):
         grid.addWidget(self.select_giraffe, 3, 1)
         self.setLayout(grid)
         self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-        self.clear()
 
     def init_connect(self):
         self.connect(self.image, QtCore.SIGNAL('clicked()'), self.reroll)
