@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GPSForm.ui'
 #
-# Created: Thu Feb 26 00:11:23 2015
+# Created: Thu Feb 26 10:11:07 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_GPSForm(object):
     def setupUi(self, GPSForm):
         GPSForm.setObjectName(_fromUtf8("GPSForm"))
-        GPSForm.resize(458, 494)
+        GPSForm.resize(539, 494)
         font = QtGui.QFont()
         font.setPointSize(12)
         GPSForm.setFont(font)
@@ -36,10 +36,10 @@ class Ui_GPSForm(object):
         self.layout.setSpacing(15)
         self.layout.setObjectName(_fromUtf8("layout"))
         self.idLayout = QtGui.QGroupBox(GPSForm)
+        self.idLayout.setMinimumSize(QtCore.QSize(0, 120))
+        self.idLayout.setMaximumSize(QtCore.QSize(16777215, 120))
         font = QtGui.QFont()
         font.setPointSize(-1)
-        font.setBold(True)
-        font.setWeight(75)
         self.idLayout.setFont(font)
         self.idLayout.setStyleSheet(_fromUtf8("font-size:20px;color:#333;"))
         self.idLayout.setFlat(False)
@@ -47,31 +47,29 @@ class Ui_GPSForm(object):
         self.formLayout_4 = QtGui.QFormLayout(self.idLayout)
         self.formLayout_4.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)
         self.formLayout_4.setObjectName(_fromUtf8("formLayout_4"))
-        self.colorInputContainer = QtGui.QVBoxLayout()
-        self.colorInputContainer.setObjectName(_fromUtf8("colorInputContainer"))
-        self.formLayout_4.setLayout(0, QtGui.QFormLayout.FieldRole, self.colorInputContainer)
         self.numerLabel = QtGui.QLabel(self.idLayout)
         self.numerLabel.setMinimumSize(QtCore.QSize(159, 0))
         self.numerLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.numerLabel.setObjectName(_fromUtf8("numerLabel"))
         self.formLayout_4.setWidget(1, QtGui.QFormLayout.LabelRole, self.numerLabel)
-        self.colorLabel = QtGui.QLabel(self.idLayout)
-        self.colorLabel.setMinimumSize(QtCore.QSize(159, 0))
-        self.colorLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.colorLabel.setObjectName(_fromUtf8("colorLabel"))
-        self.formLayout_4.setWidget(0, QtGui.QFormLayout.LabelRole, self.colorLabel)
         self.numberInput = QtGui.QComboBox(self.idLayout)
         self.numberInput.setMinimumSize(QtCore.QSize(0, 30))
         self.numberInput.setObjectName(_fromUtf8("numberInput"))
         self.formLayout_4.setWidget(1, QtGui.QFormLayout.FieldRole, self.numberInput)
+        self.colorLabel = QtGui.QLabel(self.idLayout)
+        self.colorLabel.setMinimumSize(QtCore.QSize(159, 0))
+        self.colorLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.colorLabel.setObjectName(_fromUtf8("colorLabel"))
+        self.formLayout_4.setWidget(2, QtGui.QFormLayout.LabelRole, self.colorLabel)
+        self.colorInputContainer = QtGui.QVBoxLayout()
+        self.colorInputContainer.setObjectName(_fromUtf8("colorInputContainer"))
+        self.formLayout_4.setLayout(2, QtGui.QFormLayout.FieldRole, self.colorInputContainer)
         self.layout.addWidget(self.idLayout)
         spacerItem = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Maximum)
         self.layout.addItem(spacerItem)
         self.syncLayout = QtGui.QGroupBox(GPSForm)
         font = QtGui.QFont()
         font.setPointSize(-1)
-        font.setBold(True)
-        font.setWeight(75)
         self.syncLayout.setFont(font)
         self.syncLayout.setStyleSheet(_fromUtf8("font-size:20px;color:#333;"))
         self.syncLayout.setFlat(False)

@@ -30,7 +30,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self):
         QtGui.QWidget.__init__(self)
         # Load configuration
-        self._load_config()
+        self.loadConfig()
         # Load toggle button icons and bitmap
         self.toggle_button_cam_ic = QtGui.QPixmap(TOGGLE_BUTTON_CAM).scaled(TOGGLE_BUTTON_SIZE, TOGGLE_BUTTON_SIZE)
         self.toggle_button_gps_ic = QtGui.QPixmap(TOGGLE_BUTTON_GPS).scaled(TOGGLE_BUTTON_SIZE, TOGGLE_BUTTON_SIZE)
@@ -106,7 +106,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.domainInput.show()
 
     def specifyFilepaths(self, checked):
-        self.pathInput.setTextValue(','.join(self.path_list))
+        self.pathInput.setTextValue(','.join(self.backupDestinationPaths))
         self.pathInput.show()
 
     def manuallySelectImages(self, checked):
@@ -115,7 +115,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         qFiles = dialog.getOpenFileNames(self, 'Select image files')
         # convert QStringList to a python list of strings
         files = [str(f) for f in qFiles]
-        self.sidebar.imagesSelectedOverride(files)
+        self.sidebar.imageManualSelection(files)
 
     def manuallySelectGPS(self, checked):
         dialog = QtGui.QFileDialog()
@@ -135,47 +135,46 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             pass
 
     # Functions
-
     @ex_deco
-    def _save_config(self, domain=None, path_list=None):
+    def saveConfig(self, domain=None, backupDestinationPaths=None):
         if domain is None:
             self.domain = DEFAULT_DOMAIN
         else:
             self.domain = domain
-        if path_list is None:
-            self.path_list = [DEFAULT_PATH]
+        if backupDestinationPaths is None:
+            self.backupDestinationPaths = [DEFAULT_PATH]
         else:
-            self.path_list = path_list
+            self.backupDestinationPaths = backupDestinationPaths
         temp = {
             'domain':    self.domain,
-            'path_list': self.path_list,
+            'backupDestinationPaths': self.backupDestinationPaths,
         }
         with open(RESOURCE_CONFIG, 'w') as config:
             json.dump(temp, config)
 
     @ex_deco
-    def _load_config(self):
+    def loadConfig(self):
         ut.ensuredir(RESOURCE_PATH)
         if not exists(RESOURCE_CONFIG):
-            self._save_config()
+            self.saveConfig()
         with open(RESOURCE_CONFIG, 'r') as config:
             temp = config.read()
         config = json.loads(temp)
         self.domain = config.get('domain', None)
-        self.path_list = config.get('path_list', None)
-        if self.domain is None or self.path_list is None:
-            self._save_config()
+        self.backupDestinationPaths = config.get('backupDestinationPaths', None)
+        if self.domain is None or self.backupDestinationPaths is None:
+            self.saveConfig()
 
     @ex_deco
     def domainChanged(self):
         self.domain = str(self.domainInput.textValue())
-        self._save_config(self.domain, self.path_list)
+        self.saveConfig(self.domain, self.backupDestinationPaths)
 
     @ex_deco
     def pathChanged(self):
         path_str = str(self.pathInput.textValue())
-        self.path_list = [ abspath(expanduser(path.strip())) for path in path_str.split(',') ]
-        self._save_config(self.domain, self.path_list)
+        self.backupDestinationPaths = [ abspath(expanduser(path.strip())) for path in path_str.split(',') ]
+        self.saveConfig(self.domain, self.backupDestinationPaths)
 
     @ex_deco
     def allImagesSelected(self):
@@ -189,6 +188,26 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     @ex_deco
     def displayGPXTrack(self, gpx_track):
         self.gpsDisplay.clear(gpx_track)
+
+    @ex_deco
+    def getImageDisplayFirstImage(self):
+        return self.imageDisplay.first_image.current_image
+
+    @ex_deco
+    def getImageDisplayLastImage(self):
+        return self.imageDisplay.last_image.current_image
+
+    @ex_deco
+    def getImageDisplayImageBoxes(self):
+        return self.imageDisplay.image_boxes
+
+    @ex_deco
+    def setImageDisplayFirstImage(self, filename):
+        self.imageDisplay.first_image.current_image = filename
+
+    @ex_deco
+    def setImageDisplayLastImage(self, filename):
+        self.imageDisplay.last_image.current_image = filename
 
     @ex_deco
     def clearSidebar(self):

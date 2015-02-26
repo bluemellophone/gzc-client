@@ -15,20 +15,23 @@ import simplejson as json
 import requests
 
 
-LOGO_SIZE     = 200
-LOGO          = resource_path(join('assets', 'logo_ibeis_alpha.png'))
-# LOGO          = resource_path(join('assets', 'logo_kwf_alpha.png'))
-# LOGO          = resource_path(join('assets', 'logo_kws_alpha.png'))
-IMPORT_ICON   = resource_path(join('assets', 'icons', 'icon_import.png'))
-BROWSE_ICON   = resource_path(join('assets', 'icons', 'icon_browse.png'))
-CLEAR_ICON    = resource_path(join('assets', 'icons', 'icon_trash.png'))
-SUBMIT_ICON   = resource_path(join('assets', 'icons', 'icon_upload.png'))
-ACCEPTED_ICON = resource_path(join('assets', 'icons', 'icon_accepted.png'))
-REJECTED_ICON = resource_path(join('assets', 'icons', 'icon_rejected.png'))
-RESOURCE_PATH = ut.get_app_resource_dir('gzc-client')
+LOGO_SIZE      = 200
+LOGO           = resource_path(join('assets', 'logo_ibeis_alpha.png'))
+# LOGO           = resource_path(join('assets', 'logo_kwf_alpha.png'))
+# LOGO           = resource_path(join('assets', 'logo_kws_alpha.png'))
+IMPORT_ICON    = resource_path(join('assets', 'icons', 'icon_import.png'))
+BROWSE_ICON    = resource_path(join('assets', 'icons', 'icon_browse.png'))
+CLEAR_ICON     = resource_path(join('assets', 'icons', 'icon_trash.png'))
+WAITING_ICON   = resource_path(join('assets', 'icons', 'icon_trash.png'))
+SUBMIT_ICON    = resource_path(join('assets', 'icons', 'icon_upload.png'))
+ACCEPTED_ICON  = resource_path(join('assets', 'icons', 'icon_accepted.png'))
+REJECTED_ICON  = resource_path(join('assets', 'icons', 'icon_rejected.png'))
+RESOURCE_PATH  = ut.get_app_resource_dir('gzc-client')
+RESOURCE_EMPTY = join(RESOURCE_PATH, '.empty')
+DIRECTORY_OVERRIDE_STR   = '<<<override>>>'
 RESOURCE_TEMPORARY_TRACK = join(RESOURCE_PATH, 'track.gpx')
 
-CAR_COLORS = [('Select Color', '#F6F6F6')] + [
+CAR_COLORS_COMBO    = [('Select Color', '#F6F6F6')] + [
     ('white',    '#FFFFFF'),
     ('red',        '#D9534F'),
     ('orange', '#EF7A4C'),
@@ -38,9 +41,12 @@ CAR_COLORS = [('Select Color', '#F6F6F6')] + [
     ('purple', '#6F5499'),
     ('black',    '#333333'),
 ]
-CAR_NUMBER = ['Select Number'] + map(str, range(1, 26))  # 51
-PERSON_LETTERS = ['Select Letter'] + ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
-TIME_HOUR_RANGE = range(6, 23)
+CAR_COLORS           = [ color[0] for color in CAR_COLORS_COMBO[1:] ]
+CAR_NUMBERS          = map(str, range(1, 26))  # 51
+CAR_NUMBERS_COMBO    = ['Select Number'] + CAR_NUMBERS
+PERSON_LETTERS       = ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
+PERSON_LETTERS_COMBO = ['Select Letter'] + PERSON_LETTERS
+TIME_HOUR_RANGE      = map(str, range(6, 23))
 
 PALETTE_BASE = '''
     font: 35px;
@@ -61,7 +67,7 @@ PALETTE_DEFAULT = '''
 PALETTE_SUBMIT =  '''
     color: #ffffff;
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                      stop: 0 #2198c0, stop: 1 #0c457e;);
+                                      stop: 0 #2198c0, stop: 1 #0c457e);
     border-color: #0c457e;
 '''
 PALETTE_ACCEPT =  '''
@@ -81,8 +87,9 @@ PALETTE_REJECT =  '''
 class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def __init__(self, parent):
         QtGui.QWidget.__init__(self)
-        self.parent = parent
-        self.CopyFiles = None
+        self.parent     = parent
+        self.CopyFiles  = None
+        self.ExtractGPS = None
         self.setupUi(self)
         self.initWidgets()
         self.initConnect()
@@ -97,7 +104,6 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         self.form.addWidget(self.gpsForm)
         # Load logos
         self.initLogos()
-        self.parent.clearGPSDisplay()
 
     def initLogos(self):
         logo = QtGui.QPixmap(LOGO).scaled(QtCore.QSize(LOGO_SIZE, LOGO_SIZE), QtCore.Qt.KeepAspectRatio, 1)
@@ -119,262 +125,323 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
     # Slots
     def submitClicked(self, *args):
-        if self.parent.currentDisplay == 0:
-            if self.complete_image_step_5:
-                self.submitImage()
+        if self.currentDisplay() == 0:
+            if self.imageStatus < 8:
+                self.copyImages()
             else:
-                self.copyImage()
-        elif self.parent.currentDisplay == 1:
-            if self.complete_gps_step_3:
-                self.submitGPS()
-            else:
+                self.submitImages()
+        elif self.currentDisplay() == 1:
+            if self.gpsStatus < 4:
                 self.copyGPS()
+            else:
+                self.submitGPS()
 
     def clearClicked(self):
         self.clear()
 
-    # Functions
+    # Convenience
     @ex_deco
-    def updateStatus(self):
-        if self.parent.currentDisplay == 0:
-            # Image - Step 0 (always show)
-            self.imageForm.driveLayout.show()
-            self.imageForm.nameInput.setEnabled(True)
-            # Image - Step 1
-            if self.complete_image_step_1:
-                self.imageForm.idLayout.show()
-            else:
-                self.imageForm.idLayout.hide()
-            # Image - Step 2
-            if self.complete_image_step_2:
-                if self.import_directory == "overridden":
-                    self.imageForm.nameInput.setEnabled(False)
-                    self.imageForm.nameInput.setText(basename(self.image_file_list[0]))
-                    self.complete_image_step_3_name = True
-                self.imageForm.syncLayout.show()
-            else:
-                self.imageForm.syncLayout.hide()
-            # Image - Step 3
-            if self.complete_image_step_3_name:
-                self.submitButton.setEnabled(True)
-            else:
-                self.submitButton.setEnabled(False)
-            # Image - Step 4 (Import)
-            if self.complete_image_step_4:
-                self.complete_image_step_5 = self.parent.allImagesSelected()
-            else:
-                self.complete_image_step_5 = False
-            # Image - Step 5 (Images)
-            if self.complete_image_step_5 and self.complete_image_step_3_time:
-                self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_SUBMIT)
-                self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
-                self.submitButton.setText('Submit')
-            else:
-                self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_DEFAULT)
-                self.submitButton.setIcon(QtGui.QIcon(IMPORT_ICON))
-                self.submitButton.setText('Import Card')
-            # Image - Step 6 (Submit)
-            if self.complete_image_step_6 is not None:
-                if self.complete_image_step_6:
-                    self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_ACCEPT)
-                    self.submitButton.setIcon(QtGui.QIcon(ACCEPTED_ICON))
-                    self.submitButton.setText('Images Accepted')
-                else:
-                    self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_ACCEPT)
-                    self.submitButton.setIcon(QtGui.QIcon(REJECTED_ICON))
-                    self.submitButton.setText('Images Rejected')
-        elif self.parent.currentDisplay == 1:
-            # GPS - Step 0 (always show)
-            self.gpsForm.idLayout.show()
-            # GPS - Step 1 (Car Information)
-            if self.complete_gps_step_1:
-                self.gpsForm.syncLayout.show()
-                self.submitButton.setEnabled(True)
-            else:
-                self.gpsForm.syncLayout.hide()
-                self.submitButton.setEnabled(False)
-            # GPS - Step 2 (Sync Information)
-            # GPS - Step 3 (Importing / Submitting)
-            if self.complete_gps_step_2 and self.complete_gps_step_3:
-                self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_SUBMIT)
-                self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
-                self.submitButton.setText('Submit')
-            else:
-                self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_DEFAULT)
-                self.submitButton.setIcon(QtGui.QIcon(IMPORT_ICON))
-                self.submitButton.setText('Import Track')
-            # Image - Step 4 (Submit)
-            if self.complete_gps_step_4 is not None:
-                if self.complete_gps_step_4:
-                    self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_ACCEPT)
-                    self.submitButton.setIcon(QtGui.QIcon(ACCEPTED_ICON))
-                    self.submitButton.setText('Track Accepted')
-                else:
-                    self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_REJECT)
-                    self.submitButton.setIcon(QtGui.QIcon(REJECTED_ICON))
-                    self.submitButton.setText('Track Rejected')
+    def setSubmitButtonLook(self, text=None, icon=None, palette=None):
+        if text is not None:
+            self.submitButton.setText(text)
+        if icon is not None:
+            self.submitButton.setIcon(QtGui.QIcon(icon))
+        if palette is not None:
+            self.submitButton.setStyleSheet(PALETTE_BASE + palette)
 
     @ex_deco
-    def move_file_list(self, file_list):
-        self.parent.imageDisplay.first_image.current_image = file_list.pop(0)
-        self.parent.imageDisplay.last_image.current_image = file_list.pop()
-        # self.image_selection_group.stored_files = file_list
+    def currentDisplay(self):
+        return self.parent.currentDisplay
 
     @ex_deco
-    def update_recent_file_image(self, index, length, filename):
-        self.sidebarStatus.setText('Copying %s / %s' % (index, length, ))
-        add_to_display = index in self.image_file_list_random_indices
+    def clearCursor(self):
+        QtGui.QApplication.restoreOverrideCursor()
+        self.updateStatus()
+
+    @ex_deco
+    def setWaitCursor(self):
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+
+    @ex_deco
+    def copyFilesImageCopied(self, index, length, filename):
+        self.sidebarStatus.setText('Copying Image %s / %s' % (index, length, ))
+        add_to_display = index in self.imageImportFilesRandomIndices
         self.parent.imageDisplay.add_filename(filename, add_to_display=add_to_display)
 
     @ex_deco
-    def update_recent_file_gps(self, index, length, filename):
-        # print("CAUGHT %s %s" % (index, length, ))
-        self.sidebarStatus.setText('Copying %s / %s' % (index, length, ))
+    def copyFilesGPSCopied(self, index, length, filename):
+        # print('CAUGHT %s %s' % (index, length, ))
+        self.sidebarStatus.setText('Copying Track %s / %s' % (index, length, ))
 
     @ex_deco
-    def reset_cursor(self):
-        QtGui.QApplication.restoreOverrideCursor()
-        self.sidebarStatus.setText('Copying completed')
-        self.updateStatus()
+    def copyFilesCompleted(self, filenames):
+        if self.currentDisplay() == 0:
+            self.imageCopied = True
+        elif self.currentDisplay() == 1:
+            self.gpsCopied = True
+        self.clearCursor()
 
     @ex_deco
-    def copy_completed(self):
-        if self.parent.currentDisplay == 0 and len(self.image_file_list) > 0:
-            self.complete_image_step_4 = True
-        elif self.parent.currentDisplay == 1:
-            self.complete_gps_step_3 = True
-        self.reset_cursor()
-
-    @ex_deco
-    def gps_execption(self, exception):
-        QtGui.QApplication.restoreOverrideCursor()
-        self.updateStatus()
+    def copyFilesException(self, exception):
+        # This is to throw the exception and ex_deco in the correct thread
+        self.clearCursor()
         raise exception
 
     @ex_deco
-    def extract_completed(self, gpx_content):
+    def extractGPSException(self, exception):
+        # This is to throw the exception and ex_deco in the correct thread
+        self.clearCursor()
+        raise exception
+
+    @ex_deco
+    def extractGPSCompleted(self, gpx_content):
         with open(RESOURCE_TEMPORARY_TRACK, 'w') as track:
             track.write(gpx_content)
-        self.duplicate_gpx(RESOURCE_TEMPORARY_TRACK)
+        self.copyGPX(RESOURCE_TEMPORARY_TRACK)
+
+    # Functions
+    def updateStatus(self):
+        self.sidebarStatus.setText('')
+        self.submitButton.setEnabled(False)
+        self.setSubmitButtonLook('Fill Form', IMPORT_ICON, PALETTE_DEFAULT)
+        self.imageStatus = 0
+        self.gpsStatus = 0
+        if self.currentDisplay() == 0:
+            # Show base case elements
+            self.imageForm.driveLayout.show()
+            self.imageForm.idLayout.hide()
+            self.imageForm.syncLayout.hide()
+            self.imageForm.nameInput.setEnabled(True)
+            # Gather form values
+            carNumber    = self.imageForm.getNumber()
+            carColor     = self.imageForm.getColor()
+            personLetter = self.imageForm.getLetter()
+            imageName    = self.imageForm.getImageName()
+            timeHour     = self.imageForm.getHour()
+            # Image - Step 1
+            if self.imageImportDirectory is None:
+                self.sidebarStatus.setText('Specify the SD Card directory')
+                return
+            self.imageStatus += 1
+            self.imageForm.idLayout.show()
+            # Image - Step 2
+            if carNumber not in CAR_NUMBERS:
+                self.sidebarStatus.setText('Specify the car number')
+                return
+            self.imageStatus += 1
+            if carColor not in CAR_COLORS:
+                self.sidebarStatus.setText('Specify the car color')
+                return
+            self.imageStatus += 1
+            if personLetter not in PERSON_LETTERS:
+                self.sidebarStatus.setText('Specify the person letter')
+                return
+            self.imageStatus += 1
+            self.imageForm.syncLayout.show()
+            if self.imageImportDirectory == DIRECTORY_OVERRIDE_STR:
+                self.imageForm.nameInput.setEnabled(False)
+            # Image - Step 3 (Copy Images)
+            if imageName == '':
+                self.sidebarStatus.setText('Specify the image name to search')
+                return
+            self.imageStatus += 1
+            self.submitButton.setEnabled(True)
+            self.setSubmitButtonLook('Import Images', IMPORT_ICON)
+            # Image - Step 4 (Sync and Select)
+            if not self.imageCopied:
+                self.sidebarStatus.setText('Import the card\'s images')
+                return
+            self.imageStatus += 1
+            self.submitButton.setEnabled(False)
+            self.setSubmitButtonLook('Images Imported', WAITING_ICON, PALETTE_DEFAULT)
+            if timeHour not in TIME_HOUR_RANGE:
+                self.sidebarStatus.setText('Specify the sync time hour and minute')
+                return
+            self.imageStatus += 1
+            if not self.parent.allImagesSelected():
+                self.sidebarStatus.setText('Select the species for all images')
+                return
+            self.imageStatus += 1
+            self.submitButton.setEnabled(True)
+            self.setSubmitButtonLook('Submit Images', SUBMIT_ICON, PALETTE_SUBMIT)
+            # Image - Step 5 (Submit)
+            if self.imageSubmitted is None:
+                self.sidebarStatus.setText('Submit the images for processing')
+                return
+            self.imageStatus += 1
+            if self.imageSubmitted:
+                self.setSubmitButtonLook('Images Accepted', ACCEPTED_ICON, PALETTE_ACCEPT)
+            else:
+                self.setSubmitButtonLook('Images Rejected', REJECTED_ICON, PALETTE_REJECT)
+            self.imageStatus += 1
+            self.submitButton.setEnabled(False)
+            self.sidebarStatus.setText('Clear the form to start the next submission')
+        elif self.currentDisplay() == 1:
+            # Show base case elements
+            self.gpsForm.idLayout.show()
+            self.gpsForm.syncLayout.hide()
+            # Gather form values
+            carNumber    = self.gpsForm.getNumber()
+            carColor     = self.gpsForm.getColor()
+            timeHour     = self.gpsForm.getHour()
+            # GPS - Step 1
+            if carNumber not in CAR_NUMBERS:
+                self.sidebarStatus.setText('Specify the car number')
+                return
+            self.gpsStatus += 1
+            if carColor not in CAR_COLORS:
+                self.sidebarStatus.setText('Specify the car color')
+                return
+            self.gpsStatus += 1
+            self.gpsForm.syncLayout.show()
+            # GPS - Step 3 (Copy GPSs)
+            self.submitButton.setEnabled(True)
+            self.setSubmitButtonLook('Import Track', IMPORT_ICON)
+            # GPS - Step 4 (Sync and Select)
+            if not self.gpsCopied:
+                self.sidebarStatus.setText('Import the dongle\'s GPS track')
+                return
+            self.gpsStatus += 1
+            self.submitButton.setEnabled(False)
+            self.setSubmitButtonLook('Track Imported', WAITING_ICON, PALETTE_DEFAULT)
+            if timeHour not in TIME_HOUR_RANGE:
+                self.sidebarStatus.setText('Specify the sync time hour and minute')
+                return
+            self.gpsStatus += 1
+            self.submitButton.setEnabled(True)
+            self.setSubmitButtonLook('Submit Track', SUBMIT_ICON, PALETTE_SUBMIT)
+            # Image - Step 5 (Submit)
+            if self.gpsSubmitted is None:
+                self.sidebarStatus.setText('Submit the GPS track for processing')
+                return
+            self.gpsStatus += 1
+            if self.gpsSubmitted:
+                self.setSubmitButtonLook('Track Accepted', ACCEPTED_ICON, PALETTE_ACCEPT)
+            else:
+                self.setSubmitButtonLook('Track Rejected', REJECTED_ICON, PALETTE_REJECT)
+            self.gpsStatus += 1
+            self.submitButton.setEnabled(False)
+            self.sidebarStatus.setText('Clear the form to start the next submission')
+
+    def clear(self, clearCopyCache=True, ignoreImage=False, ignoreGPS=False):
+        # Always clear these attributes
+        self.imageCopied = False
+        self.gpsCopied = False
+        self.imageSubmitted = None  # None because we use booleans for error checking
+        self.gpsSubmitted = None  # None because we use booleans for error checking
+        self.imageImportFilesRandomIndices = set()
+        if clearCopyCache:
+            # Clear copy cache
+            self.imageImportDirectory = None
+            self.imageImportFiles = []
+            self.gpsImportFiles = []
+        # Stop any ongoing copy or extract thread
+        if self.CopyFiles is not None:
+            self.CopyFiles.terminate()
+            self.CopyFiles.quit()
+        if self.ExtractGPS is not None:
+            self.ExtractGPS.terminate()
+            self.ExtractGPS.quit()
+        # Update overall display
+        if self.currentDisplay() == 0:
+            if not ignoreImage:
+                self.imageForm.clear()
+            self.parent.clearImageDisplay()
+            self.imageForm.show()
+            self.gpsForm.hide()
+        elif self.currentDisplay() == 1:
+            if not ignoreGPS:
+                self.gpsForm.clear()
+            self.parent.clearGPSDisplay()
+            self.imageForm.hide()
+            self.gpsForm.show()
+        # Clear cursor, which calls updateStatus
+        self.clearCursor()
+
+    # Images
+    @ex_deco
+    def imageManualSelection(self, filepaths):
+        if len(filepaths) < 3:
+            raise IOError('Please select at least three images to import when manually selecting images (fisrt, last and at least one query image)')
+        self.clear()
+        self.imageImportDirectory = DIRECTORY_OVERRIDE_STR
+        self.imageImportFiles = filepaths
+        self.imageForm.driveLabel.setText('Manual Selection')
+        self.imageForm.nameInput.setText(basename(self.imageImportFiles[0]))
+        self.updateStatus()
 
     @ex_deco
-    def duplicate_gpx(self, pre_extracted_gpx_path):
-        # Get data from form
-        car_number    = str(self.gpsForm.numberInput.currentText())
-        car_color     = str(self.gpsForm.colorInput.currentText())
-
-        for index, path in enumerate(self.parent.path_list):
-            dst_directory = ensure_structure(path, 'gps', car_number, car_color)
-            if exists(dst_directory):
-                print('Target directory already exists... deleting')
-                rmtree(dst_directory)
-            self.gps_file_list.append(pre_extracted_gpx_path)
-            with open(pre_extracted_gpx_path) as gpx_file:
-                gpx_track = gpx_file.read()
-                self.parent.displayGPXTrack(gpx_track)
-            self.CopyFiles = CopyFiles(self.gps_file_list, [dst_directory])
-            if index == 0:
-                self.connect(self.CopyFiles, QtCore.SIGNAL('file_done'), self.update_recent_file_gps)
-                self.connect(self.CopyFiles, QtCore.SIGNAL('completed'), self.copy_completed)
-            self.CopyFiles.start()
-
-    @ex_deco
-    def copyImage(self):
-        # Change cursor to busy
-        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-        # Clear imageDisplay
-        self.parent.clearImageDisplay()
+    def copyImages(self):
+        self.clear(clearCopyCache=False, ignoreImage=True)
+        self.setWaitCursor()
         # Get information from form
-        car_number    = str(self.imageForm.numberInput.currentText())
-        car_color     = str(self.imageForm.colorInput.currentText())
-        person_letter = str(self.imageForm.letterInput.currentText())
-        # print('IMPORT SELF %r' % (self,))
-        #print('IMPORT ARGS %r' % (args,))
-        directory = self.import_directory
-        # print (directory)
-        if directory is None or directory == '':
-            self.reset_cursor()
-            raise IOError('Please select the directory that contains the photos you wish to import from.')
-            return
-        if str(self.imageForm.nameInput.text()) == '':
-            self.reset_cursor()
-            raise IOError('The first image name must be defined.')
-            return
-        if directory != "overridden":
-            self.image_file_list = find_candidates(directory, str(self.imageForm.nameInput.text()))
-            # Create random indices
-            self.image_file_list_random_indices = set()
-            while len(self.image_file_list_random_indices) < min(10, len(self.image_file_list)):
-                rand_index = random.randint(0, len(self.image_file_list) - 1)
-                self.image_file_list_random_indices.add(rand_index)
-        if len(self.image_file_list) == 0:
-            self.reset_cursor()
-            raise IOError('Could not find any files for selected directory. Please check your first image name.')
-            return
-        #send this file list to the selection group i am a bad programmer
-        self.file_bases = [basename(f) for f in self.image_file_list]
-        # print self.file_bases
-        self.move_file_list(self.file_bases)
-
-        for index, path in enumerate(self.parent.path_list):
-            dst_directory = ensure_structure(path, 'images', car_number, car_color, person_letter)
-            if exists(dst_directory):
-                print('Target directory already exists... deleting')
-                rmtree(dst_directory)
-            self.CopyFiles = CopyFiles(self.image_file_list, [dst_directory])
-            if index == 0:
-                self.connect(self.CopyFiles, QtCore.SIGNAL('file_done'), self.update_recent_file_image)
-                self.connect(self.CopyFiles, QtCore.SIGNAL('completed'), self.copy_completed)
-            self.CopyFiles.start()
-
-    @ex_deco
-    def copyGPS(self, pre_extracted_gpx_path=None):
-        # Change cursor to busy
-        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-        self.sidebarStatus.setText('Copying GPS Track...')
-
-        # Assert filled out
-        color_index  = self.gpsForm.colorInput.currentIndex()
-        number_index = self.gpsForm.numberInput.currentIndex()
-        if color_index == 0 or number_index == 0:
-            self.reset_cursor()
-            raise ValueError('Cannot import GPX file without specifying a car color and car number')
-
-        if pre_extracted_gpx_path is not None:
-            self.duplicate_gpx(pre_extracted_gpx_path)
-        else:
-            self.ExtractGPS = ExtractGPS()
-            self.connect(self.ExtractGPS, QtCore.SIGNAL('track_done'), self.update_recent_file_gps)
-            self.connect(self.ExtractGPS, QtCore.SIGNAL('completed'), self.extract_completed)
-            self.connect(self.ExtractGPS, QtCore.SIGNAL('__EXCEPTION__'), self.gps_execption)
-            self.ExtractGPS.start()
+        carNumber    = self.imageForm.getNumber()
+        carColor     = self.imageForm.getColor()
+        personLetter = self.imageForm.getLetter()
+        imageName    = self.imageForm.getImageName()
+        # Sanity checks (round 1)
+        if self.imageImportDirectory is None or self.imageImportDirectory == '':
+            self.clearCursor()
+            raise IOError('Please select the directory that contains the photos you wish to import from')
+        if carNumber not in CAR_NUMBERS or carColor not in CAR_COLORS or personLetter not in PERSON_LETTERS:
+            self.clearCursor()
+            raise IOError('Please select the correct car number, color and person letter')
+        if imageName == '':
+            self.clearCursor()
+            raise IOError('The first image name must be defined')
+        # Find candidates if searching
+        if self.imageImportDirectory != DIRECTORY_OVERRIDE_STR:
+            self.imageImportFiles = find_candidates(self.imageImportDirectory, imageName)
+        # Sanity checks (round 2)
+        if len(self.imageImportFiles) == 0:
+            self.clearCursor()
+            raise IOError('Could not find any files for selected directory. Please check your first image name')
+        # Create random indices
+        while len(self.imageImportFilesRandomIndices) < min(10, len(self.imageImportFiles)):
+            index = random.randint(0, len(self.imageImportFiles) - 1)
+            self.imageImportFilesRandomIndices.add(index)
+        # Set the first and last images
+        filenames = [basename(f) for f in self.imageImportFiles]
+        self.parent.setImageDisplayFirstImage(filenames.pop(0))
+        self.parent.setImageDisplayLastImage(filenames.pop())
+        # Ensure path exists for all destinations
+        destinationPaths = []
+        for index, path in enumerate(self.parent.backupDestinationPaths):
+            personPath = ensure_structure(path, 'images', carNumber, carColor, personLetter)
+            if exists(personPath):
+                print('Target person directory already exists... deleting')
+                rmtree(personPath)
+            destinationPaths.append(personPath)
+        # Start copy thread
+        self.CopyFiles = CopyFiles(self.imageImportFiles, destinationPaths)
+        self.connect(self.CopyFiles, QtCore.SIGNAL('fileCopied'), self.copyFilesImageCopied)
+        self.connect(self.CopyFiles, QtCore.SIGNAL('completed'), self.copyFilesCompleted)
+        self.connect(self.CopyFiles, QtCore.SIGNAL('__EXCEPTION__'), self.copyFilesException)
+        self.CopyFiles.start()
 
     @ex_deco
-    def submitImage(self):
+    def submitImages(self):
         # Get path and domain from parent
-        path   = self.parent.path_list[0]
+        path   = self.parent.backupDestinationPaths[0]
         domain = '%s/images/submit' % (self.parent.domain)
-
         # Get data from form
-        car_number    = str(self.imageForm.numberInput.currentText())
-        car_color     = str(self.imageForm.colorInput.currentText())
-        person_letter = str(self.imageForm.letterInput.currentText())
-        time_hour     = str(self.imageForm.timeInput.time().hour())
-        time_minute   = str(self.imageForm.timeInput.time().minute())
-
+        carNumber    = self.imageForm.getNumber()
+        carColor     = self.imageForm.getColor()
+        personLetter = self.imageForm.getLetter()
+        timeHour     = self.imageForm.getHour()
+        timeMinute   = self.imageForm.getMinute()
         # Establish source and destination folders
-        src_directory = ensure_structure(path, 'images', car_number, car_color, person_letter)
-        dst_directory = ensure_structure(path, 'zip', car_number, car_color)
-
+        srcDirectory = ensure_structure(path, 'images', carNumber, carColor, personLetter)
+        dstDirectory = ensure_structure(path, 'zip', carNumber, carColor)
         # Gather selected images from the GUI
-        first   = self.parent.imageDisplay.first_image.current_image
-        last    = self.parent.imageDisplay.last_image.current_image
+        first   = self.parent.getImageDisplayFirstImage()
+        last    = self.parent.getImageDisplayLastImage()
         zebra   = []
         giraffe = []
-        for IB in self.parent.imageDisplay.image_boxes:
+        for IB in self.parent.getImageDisplayImageBoxes():
             (select_path, select_type) = IB.get_selection()
             if select_type == 'Unassigned':
-                raise IOError('Please make sure all image boxes have been identified as either zebra of giraffe.')
+                raise IOError('Please make sure all image boxes have been identified as either zebra of giraffe')
                 return
             elif select_type == 'Zebra':
                 zebra.append(select_path)
@@ -382,141 +449,129 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 giraffe.append(select_path)
             elif select_type == 'Ignore':
                 pass
-
-        # Make empty if needed
-        if len(zebra) == 0 or len(giraffe) == 0:
-            with open(join(src_directory, '.empty'), 'w') as empty:
+        # Make empty file
+        if not exists(RESOURCE_EMPTY):
+            with open(RESOURCE_EMPTY, 'w') as empty:
                 empty.write('')
-
         # Create zip archive
-        zip_path = join(dst_directory, person_letter + '.zip')
+        zip_path = join(dstDirectory, personLetter + '.zip')
         with zipfile.ZipFile(zip_path, 'w') as zip_archive:
-            zip_archive.write(join(src_directory, first), 'first.jpg')
-            zip_archive.write(join(src_directory, last), 'last.jpg')
+            zip_archive.write(join(srcDirectory, first), 'first.jpg')
+            zip_archive.write(join(srcDirectory, last), 'last.jpg')
             if len(zebra) == 0:
-                zip_archive.write(join(src_directory, '.empty'), join('zebra', '.empty'))
+                zip_archive.write(RESOURCE_EMPTY, join('zebra', '.empty'))
             if len(giraffe) == 0:
-                zip_archive.write(join(src_directory, '.empty'), join('giraffe', '.empty'))
+                zip_archive.write(RESOURCE_EMPTY, join('giraffe', '.empty'))
             for filename in zebra:
-                zip_archive.write(join(src_directory, filename), join('zebra', filename))
+                zip_archive.write(join(srcDirectory, filename), join('zebra', filename))
             for filename in giraffe:
-                zip_archive.write(join(src_directory, filename), join('giraffe', filename))
-
+                zip_archive.write(join(srcDirectory, filename), join('giraffe', filename))
         # Format data
         data = {
-            'car_color': car_color,
-            'car_number': car_number,
-            'person_letter': person_letter,
-            'image_first_time_hour': time_hour,
-            'image_first_time_minute': time_minute,
+            'car_number': carNumber,
+            'car_color': carColor,
+            'person_letter': personLetter,
+            'image_first_time_hour': timeHour,
+            'image_first_time_minute': timeMinute,
         }
         content = open(zip_path, 'rb')
         files = {
             'image_archive': content,
         }
-
         # Send POST request
         r = requests.post(domain, data=data, files=files)
-
         # Response
         response = json.loads(r.text)
         if response['status']['code'] != 0:
-            self.complete_image_step_6 = False
+            self.imageSubmitted = False
             self.updateStatus()
-            raise IOError('Server responded with an error' + response['status']['message'])
-        self.complete_image_step_6 = True
+            raise IOError('Server responded with an error: %r' % (response, ))
+        self.imageSubmitted = True
         self.updateStatus()
+
+    # GPS
+    @ex_deco
+    def copyGPX(self, preextractedGPXPath):
+        # Get data from form
+        carNumber = self.gpsForm.getNumber()
+        carColor  = self.gpsForm.getColor()
+        # Sanity checks
+        if carNumber not in CAR_NUMBERS or carColor not in CAR_COLORS:
+            self.clearCursor()
+            raise IOError('Please select the correct car number and color')
+        # Load GPX path
+        self.gpsImportFiles = [preextractedGPXPath]
+        with open(preextractedGPXPath) as gpxFile:
+            gpxTrack = gpxFile.read()
+            self.parent.displayGPXTrack(gpxTrack)
+        # Ensure path exists for all destinations
+        destinationPaths = []
+        for index, path in enumerate(self.parent.backupDestinationPaths):
+            carPath = ensure_structure(path, 'gps', carNumber, carColor)
+            if exists(carPath):
+                print('Target car directory already exists... deleting')
+                rmtree(carPath)
+            destinationPaths.append(carPath)
+        # Start copy thread
+        self.CopyFiles = CopyFiles(self.gpsImportFiles, destinationPaths)
+        self.connect(self.CopyFiles, QtCore.SIGNAL('fileCopied'), self.copyFilesGPSCopied)
+        self.connect(self.CopyFiles, QtCore.SIGNAL('completed'), self.copyFilesCompleted)
+        self.connect(self.CopyFiles, QtCore.SIGNAL('__EXCEPTION__'), self.copyFilesException)
+        self.CopyFiles.start()
+
+    @ex_deco
+    def copyGPS(self, preextractedGPXPath=None):
+        self.clear(clearCopyCache=False, ignoreGPS=True)
+        self.setWaitCursor()
+        # Get data from form
+        carNumber = self.gpsForm.getNumber()
+        carColor  = self.gpsForm.getColor()
+        # Sanity checks
+        if carNumber not in CAR_NUMBERS or carColor not in CAR_COLORS:
+            self.clearCursor()
+            raise IOError('Please select the correct car number and color')
+        # Extract the data from the GPS dongle or process the preextractedGPXPath
+        if preextractedGPXPath is None:
+            self.ExtractGPS = ExtractGPS()
+            self.connect(self.ExtractGPS, QtCore.SIGNAL('trackExtracted'), self.copyFilesGPSCopied)
+            self.connect(self.ExtractGPS, QtCore.SIGNAL('completed'), self.extractGPSCompleted)
+            self.connect(self.ExtractGPS, QtCore.SIGNAL('__EXCEPTION__'), self.extractGPSException)
+            self.ExtractGPS.start()
+        else:
+            self.copyGPX(preextractedGPXPath)
 
     @ex_deco
     def submitGPS(self):
         # Get path and domain from parent
-        path   = self.parent.path_list[0]
+        path   = self.parent.backupDestinationPaths[0]
         domain = '%s/gps/submit' % (self.parent.domain)
-
         # Get data from form
-        car_number    = str(self.gpsForm.numberInput.currentText())
-        car_color     = str(self.gpsForm.colorInput.currentText())
-        time_hour     = str(self.gpsForm.timeInput.time().hour())
-        time_minute   = str(self.gpsForm.timeInput.time().minute())
-
+        carNumber    = self.gpsForm.getNumber()
+        carColor     = self.gpsForm.getColor()
+        timeHour    = self.gpsForm.getHour()
+        timeMinute  = self.gpsForm.getMinute()
         # Establish source folder
-        src_directory = ensure_structure(path, 'gps', car_number, car_color)
-
+        srcDirectory = ensure_structure(path, 'gps', carNumber, carColor)
         # Format data
         data = {
-            'car_color': car_color,
-            'car_number': car_number,
-            'gps_start_time_hour': time_hour,
-            'gps_start_time_minute': time_minute,
+            'car_number': carNumber,
+            'car_color': carColor,
+            'gps_start_time_hour': timeHour,
+            'gps_start_time_minute': timeMinute,
         }
-        content = open(join(src_directory, 'track.gpx'), 'rb')
+        content = open(join(srcDirectory, 'track.gpx'), 'rb')
         files = {
             'gps_data': content,
         }
-
         # Send POST request
         r = requests.post(domain, data=data, files=files)
-
         # Response
         response = json.loads(r.text)
         if response['status']['code'] != 0:
-            self.complete_gps_step_4 = False
+            self.gpsSubmitted = False
             self.updateStatus()
-            raise IOError('Server responded with an error' + response['status']['message'])
-        self.complete_gps_step_4 = True
-        self.updateStatus()
-
-    @ex_deco
-    def clear(self):
-        # Reset buttons
-        self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_DEFAULT)
-        # Reset cursor
-        QtGui.QApplication.restoreOverrideCursor()
-        self.sidebarStatus.setText('')
-        # Stop any ongoing copy thread
-        if self.CopyFiles is not None:
-            self.CopyFiles.terminate()
-            self.CopyFiles.quit()
-        # Clear attributes
-        self.import_directory = None
-        self.image_file_list = []
-        self.gps_file_list = []
-        # Clear Flags
-        self.complete_image_step_1 = False
-        self.complete_image_step_2 = False
-        self.complete_image_step_3_name = False
-        self.complete_image_step_3_time = False
-        self.complete_image_step_4 = False
-        self.complete_image_step_5 = False
-        self.complete_image_step_6 = None
-        self.complete_gps_step_1 = False
-        self.complete_gps_step_2 = False
-        self.complete_gps_step_3 = False
-        self.complete_gps_step_4 = None
-        # Update overall display
-        if self.parent.currentDisplay == 0:
-            # Clear imageForm and imageDisplay
-            self.imageForm.clear()
-            self.parent.clearImageDisplay()
-            self.imageForm.show()
-            self.gpsForm.hide()
-        elif self.parent.currentDisplay == 1:
-            # Clear gpsForm and gpsDisplay
-            self.gpsForm.clear()
-            self.parent.clearGPSDisplay()
-            self.imageForm.hide()
-            self.gpsForm.show()
-        # Update status
-        self.updateStatus()
-
-    @ex_deco
-    def imagesSelectedOverride(self, imgList):
-        # possibly do more tests for validity of list here
-        self.clear()
-        self.import_directory = "overridden"
-        self.imageForm.driveLabel.setText("Images selected manually...")
-        self.complete_image_step_1 = True
-        self.image_file_list = imgList
+            raise IOError('Server responded with an error: %r' % (response, ))
+        self.gpsSubmitted = True
         self.updateStatus()
 
 
@@ -529,63 +584,54 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         self.initConnect()
 
     def initWidgets(self):
-        self.numberInput.addItems(CAR_NUMBER)
-        self.letterInput.addItems(PERSON_LETTERS)
+        self.numberInput.addItems(CAR_NUMBERS_COMBO)
+        self.letterInput.addItems(PERSON_LETTERS_COMBO)
         self.colorInput = QwwColorComboBox()
         self.colorInputContainer.addWidget(self.colorInput)
-        for (color_name, color_hex) in CAR_COLORS:
+        for (color_name, color_hex) in CAR_COLORS_COMBO:
             color = QtGui.QColor(color_hex)
             self.colorInput.addColor(color, color_name)
         self.driveBrowse.setIcon(QtGui.QIcon(BROWSE_ICON))
 
     def initConnect(self):
-        self.driveBrowse.clicked.connect(self.open_directory)
-        self.colorInput.currentIndexChanged[int].connect(self.check_identification)
-        self.numberInput.currentIndexChanged[int].connect(self.check_identification)
-        self.letterInput.currentIndexChanged[int].connect(self.check_identification)
-        self.nameInput.textEdited.connect(self.check_sync_name)
-        self.timeInput.timeChanged.connect(self.check_sync_time)
+        self.driveBrowse.clicked.connect(self.browseDirectory)
+        self.colorInput.currentIndexChanged[int].connect(self.parent.updateStatus)
+        self.numberInput.currentIndexChanged[int].connect(self.parent.updateStatus)
+        self.letterInput.currentIndexChanged[int].connect(self.parent.updateStatus)
+        self.nameInput.textEdited.connect(self.parent.updateStatus)
+        self.timeInput.timeChanged.connect(self.parent.updateStatus)
 
     # Slots
-    def check_identification(self, ignore):
-        color_index  = self.colorInput.currentIndex()
-        number_index = self.numberInput.currentIndex()
-        letter_index = self.letterInput.currentIndex()
-        if color_index > 0 and number_index > 0 and letter_index > 0:
-            self.parent.complete_image_step_2 = True
-        else:
-            self.parent.complete_image_step_2 = False
-        self.parent.updateStatus()
-
-    def check_sync_name(self, value):
-        if len(value) > 0:
-            self.parent.complete_image_step_3_name = True
-        else:
-            self.parent.complete_image_step_3_name = False
-        self.parent.updateStatus()
-
-    def check_sync_time(self, value):
-        hour = int(str(value.hour()))
-        if hour in TIME_HOUR_RANGE:
-            self.parent.complete_image_step_3_time = True
-        else:
-            self.parent.complete_image_step_3_time = False
-        self.parent.updateStatus()
-
-    def open_directory(self):
-        def truncate(path):
+    def browseDirectory(self):
+        def _truncate(path):
             if len(directory) > 40:
                 return '...' + directory[-40:]
             else:
                 return directory
         directory = str(QtGui.QFileDialog.getExistingDirectory(self, 'Select Directory'))
         if len(directory) > 0:
-            self.driveLabel.setText(truncate(directory))
-            self.parent.complete_image_step_1 = True
-        else:
-            self.parent.complete_image_step_1 = False
-        self.parent.import_directory = directory
-        self.parent.updateStatus()
+            self.driveLabel.setText(_truncate(directory))
+            self.parent.imageImportDirectory = directory
+            self.parent.updateStatus()
+
+    # Convenience
+    def getNumber(self):
+        return str(self.numberInput.currentText())
+
+    def getColor(self):
+        return str(self.colorInput.currentText())
+
+    def getLetter(self):
+        return str(self.letterInput.currentText())
+
+    def getHour(self):
+        return str(self.timeInput.time().hour())
+
+    def getMinute(self):
+        return str(self.timeInput.time().minute())
+
+    def getImageName(self):
+        return str(self.nameInput.text())
 
     # Functions
     @ex_deco
@@ -594,6 +640,7 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         self.colorInput.setCurrentIndex(0)
         self.numberInput.setCurrentIndex(0)
         self.letterInput.setCurrentIndex(0)
+        self.nameInput.setEnabled(True)
         self.nameInput.setText('')
         self.timeInput.setTime(QtCore.QTime(0, 0, 0, 0))
 
@@ -609,33 +656,28 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
     def initWidgets(self):
         self.colorInput = QwwColorComboBox()
         self.colorInputContainer.addWidget(self.colorInput)
-        self.numberInput.addItems(CAR_NUMBER)
-        for (color_name, color_hex) in CAR_COLORS:
+        self.numberInput.addItems(CAR_NUMBERS_COMBO)
+        for (color_name, color_hex) in CAR_COLORS_COMBO:
             color = QtGui.QColor(color_hex)
             self.colorInput.addColor(color, color_name)
 
     def initConnect(self):
-        self.colorInput.currentIndexChanged[int].connect(self.check_identification)
-        self.numberInput.currentIndexChanged[int].connect(self.check_identification)
-        self.timeInput.timeChanged.connect(self.check_sync_time)
+        self.colorInput.currentIndexChanged[int].connect(self.parent.updateStatus)
+        self.numberInput.currentIndexChanged[int].connect(self.parent.updateStatus)
+        self.timeInput.timeChanged.connect(self.parent.updateStatus)
 
-    # Slots
-    def check_identification(self, ignore):
-        color_index  = self.colorInput.currentIndex()
-        number_index = self.numberInput.currentIndex()
-        if color_index > 0 and number_index > 0:
-            self.parent.complete_gps_step_1 = True
-        else:
-            self.parent.complete_gps_step_1 = False
-        self.parent.updateStatus()
+    # Convenience
+    def getNumber(self):
+        return str(self.numberInput.currentText())
 
-    def check_sync_time(self, value):
-        hour = int(str(value.hour()))
-        if hour in TIME_HOUR_RANGE:
-            self.parent.complete_gps_step_2 = True
-        else:
-            self.parent.complete_gps_step_2 = False
-        self.parent.updateStatus()
+    def getColor(self):
+        return str(self.colorInput.currentText())
+
+    def getHour(self):
+        return str(self.timeInput.time().hour())
+
+    def getMinute(self):
+        return str(self.timeInput.time().minute())
 
     # Functions
     @ex_deco

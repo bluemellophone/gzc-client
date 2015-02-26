@@ -75,8 +75,8 @@ class CopyFiles(QtCore.QThread):
                 if not exists(outdir):
                     makedirs(outdir)
                 shutil.copy2(filepath, outdir)
-                self.emit(QtCore.SIGNAL('file_done'), index, length, join(outdir, filepath))
-        self.emit(QtCore.SIGNAL('completed'))
+                self.emit(QtCore.SIGNAL('fileCopied'), index, length, join(outdir, filepath))
+        self.emit(QtCore.SIGNAL('completed'), self.filenames)
 
 
 class ExtractGPS(QtCore.QThread):
@@ -120,7 +120,7 @@ class ExtractGPS(QtCore.QThread):
                     if 'Downloaded block' in line:
                         line = line.strip().split()
                         index, length = line[-1].split('/')
-                        self.emit(QtCore.SIGNAL('track_done'), index, length, '')
+                        self.emit(QtCore.SIGNAL('trackExtracted'), index, length, '')
                     elif 'Unable to download' in line:
                         raise RuntimeError('i-GotU GPS dongle has been disconnected during import.  Check connection and try again.')
                     elif 'Downloading tracks' not in line:
