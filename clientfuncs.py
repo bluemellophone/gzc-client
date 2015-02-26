@@ -89,6 +89,8 @@ class ExtractGPS(QtCore.QThread):
     def findLib(self):
         if sys.platform == 'darwin':
             self.igotu2gpx_path = join(IGOTU2GPX_BASE, 'darwin', 'MacOS', 'igotu2gpx')
+        elif sys.platform == 'win32' or sys.platform == 'cygwin':
+            self.igotu2gpx_path = join(IGOTU2GPX_BASE, 'win32', 'bin', 'igotu2gpx.exe')
         else:
             raise NotImplementedError('Automatic i-GotU extraction is not operational on this machine.  Use \'Manually Select GPX File\' from the File menu')
 
