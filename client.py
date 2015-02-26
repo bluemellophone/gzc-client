@@ -104,6 +104,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def specifyDomain(self, checked):
         self.domainInput.setTextValue(self.domain)
         self.domainInput.show()
+        self.checkServerResponse(self.domain)
 
     def specifyFilepaths(self, checked):
         self.pathInput.setTextValue(','.join(self.backupDestinationPaths))

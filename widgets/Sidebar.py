@@ -51,8 +51,7 @@ TIME_HOUR_RANGE      = map(str, range(6, 23))
 PALETTE_BASE = '''
     font: 35px;
     margin: 0 1px 0 1px;
-    border-style: outset;
-    border-radius: 3px;
+    border-style: groove;
     border-width: 1px;
 '''
 PALETTE_CLEAR = '''
