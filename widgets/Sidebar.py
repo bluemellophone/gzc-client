@@ -42,6 +42,41 @@ CAR_NUMBER = ['Select Number'] + map(str, range(1, 26))  # 51
 PERSON_LETTERS = ['Select Letter'] + ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
 TIME_HOUR_RANGE = range(6, 23)
 
+PALETTE_BASE = '''
+    font: 35px;
+    margin: 0 1px 0 1px;
+    border-style: outset;
+    border-radius: 3px;
+    border-width: 1px;
+'''
+PALETTE_CLEAR = '''
+    margin-left: 10px;
+    color: #333333;
+    border-color: #da534f;
+'''
+PALETTE_DEFAULT = '''
+    color: #333333;
+    border-color: #afafaf;
+'''
+PALETTE_SUBMIT =  '''
+    color: #ffffff;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #2198c0, stop: 1 #0c457e;);
+    border-color: #0c457e;
+'''
+PALETTE_ACCEPT =  '''
+    color: #ffffff;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #5cb85c, stop: 1 #4cae4c);
+    border-color: #4cae4c;
+'''
+PALETTE_REJECT =  '''
+    color: #ffffff;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #d9534f, stop: 1 #d43f3a);
+    border-color: #d43f3a;
+'''
+
 
 class Sidebar(QtGui.QWidget, Ui_Sidebar):
     def __init__(self, parent):
@@ -77,25 +112,10 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # Setup clear icon
         self.clearButton.setText('')
         self.clearButton.setIcon(QtGui.QIcon(CLEAR_ICON))
+        # Set clear button palette
+        self.clearButton.setStyleSheet(PALETTE_BASE + PALETTE_CLEAR)
         # Clear Sidebar
         self.clear()
-
-        # pal = self.submitButton.palette()
-        # pal.setColor(QtGui.QPalette.Button, QtGui.QColor('#ffff00'))
-        # self.submitButton.setAutoFillBackground(True)
-        # self.submitButton.setPalette(pal)
-        # self.submitButton.update()
-        # self.submitButton.setStyleSheet('''
-        #     font: 35px;
-        #     margin: 0 1px 0 1px;
-        #     color: black;
-        #     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-        #                                       stop: 0 #2198c0, stop: 1 #0d5ca6);
-        #     border-style: outset;
-        #     border-radius: 3px;
-        #     border-width: 1px;
-        #     border-color: #0c457e;
-        # ''')
 
     # Slots
     def submitClicked(self, *args):
@@ -146,17 +166,21 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
                 self.complete_image_step_5 = False
             # Image - Step 5 (Images)
             if self.complete_image_step_5 and self.complete_image_step_3_time:
+                self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_SUBMIT)
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
                 self.submitButton.setText('Submit')
             else:
+                self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_DEFAULT)
                 self.submitButton.setIcon(QtGui.QIcon(IMPORT_ICON))
                 self.submitButton.setText('Import Card')
             # Image - Step 6 (Submit)
             if self.complete_image_step_6 is not None:
                 if self.complete_image_step_6:
+                    self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_ACCEPT)
                     self.submitButton.setIcon(QtGui.QIcon(ACCEPTED_ICON))
                     self.submitButton.setText('Images Accepted')
                 else:
+                    self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_ACCEPT)
                     self.submitButton.setIcon(QtGui.QIcon(REJECTED_ICON))
                     self.submitButton.setText('Images Rejected')
         elif self.parent.currentDisplay == 1:
@@ -172,17 +196,21 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             # GPS - Step 2 (Sync Information)
             # GPS - Step 3 (Importing / Submitting)
             if self.complete_gps_step_2 and self.complete_gps_step_3:
+                self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_SUBMIT)
                 self.submitButton.setIcon(QtGui.QIcon(SUBMIT_ICON))
                 self.submitButton.setText('Submit')
             else:
+                self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_DEFAULT)
                 self.submitButton.setIcon(QtGui.QIcon(IMPORT_ICON))
                 self.submitButton.setText('Import Track')
             # Image - Step 4 (Submit)
             if self.complete_gps_step_4 is not None:
                 if self.complete_gps_step_4:
+                    self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_ACCEPT)
                     self.submitButton.setIcon(QtGui.QIcon(ACCEPTED_ICON))
                     self.submitButton.setText('Track Accepted')
                 else:
+                    self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_REJECT)
                     self.submitButton.setIcon(QtGui.QIcon(REJECTED_ICON))
                     self.submitButton.setText('Track Rejected')
 
@@ -440,6 +468,8 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
 
     @ex_deco
     def clear(self):
+        # Reset buttons
+        self.submitButton.setStyleSheet(PALETTE_BASE + PALETTE_DEFAULT)
         # Reset cursor
         QtGui.QApplication.restoreOverrideCursor()
         self.sidebarStatus.setText('')
