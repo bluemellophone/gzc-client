@@ -6,7 +6,7 @@ from os.path import join, exists, abspath
 # Pyinstaller Variables (enumerated for readability, not needed)
 #Analysis = Analysis  # NOQA
 
-def add_data(a, dst, src):
+def add_data(a, dst, src, dtype=None):
     def platform_path(path):
         def truepath_relative(path, otherpath=None):
             from os.path import normpath, relpath
@@ -37,13 +37,14 @@ def add_data(a, dst, src):
     if not os.path.exists(dirname(dst)) and dirname(dst) != "":
         os.makedirs(dirname(dst))
     _pretty_path = lambda str_: str_.replace('\\', '/')
-    # Default datatype is DATA
-    dtype = 'DATA'
-    # Infer datatype from extension
-    #extension = splitext(dst)[1].lower()
-    #if extension == LIB_EXT.lower():
-    if LIB_EXT[1:] in dst.split('.'):
-        dtype = 'BINARY'
+    if dtype is None:
+        # Default datatype is DATA
+        dtype = 'DATA'
+        # Infer datatype from extension
+        #extension = splitext(dst)[1].lower()
+        #if extension == LIB_EXT.lower():
+        if LIB_EXT[1:] in dst.split('.'):
+            dtype = 'BINARY'
     assert exists(src_), 'src_=%r does not exist'
     a.datas.append((dst, src_, dtype))
 
@@ -111,7 +112,7 @@ for root, dirs, files in os.walk(walk_path):
     for lib_fname in files:
         toc_src = join(abspath(root), lib_fname)
         toc_dst = join(root, lib_fname)
-        DATATUP_LIST.append((toc_dst, toc_src))
+        DATATUP_LIST.append((toc_dst, toc_src, 'DATA'))
 
 # App Icon File
 ICON_EXT = {'darwin': '.icns',
@@ -130,10 +131,6 @@ exe_name = {'win32':  'build/GZCClientApp.exe',
             'darwin': 'build/pyi.darwin/GZCClientApp/GZCClientApp',
             'linux2': 'build/GZCClientApp.ln'}[PLATFORM]
 
-print('[installer] Checking Data')
-for (dst, src) in DATATUP_LIST:
-    assert exists(src), 'checkpath for src=%r failed' % (src,)
-
 print('[installer] Running Analysis')
 a = Analysis(  # NOQA
     ['client.py'],
@@ -144,8 +141,13 @@ a = Analysis(  # NOQA
 )
 
 print('[installer] Adding %d Datatups' % (len(DATATUP_LIST,)))
-for (dst, src) in DATATUP_LIST:
-    add_data(a, dst, src)
+for tup in DATATUP_LIST:
+    if len(tup) == 2:
+        (dst, src) = tup
+        add_data(a, dst, src)
+    elif len(tup) == 3:
+        (dst, src, dtype) = tup
+        add_data(a, dst, src, dtype)
 
 print('[installer] Adding %d Binaries' % (len(BINARYTUP_LIST),))
 for binarytup in BINARYTUP_LIST:
