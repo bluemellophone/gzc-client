@@ -6,7 +6,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{A57C5DDA-4623-4CB0-8964-E95326706904}
+AppId={{47BE3DA2-261D-4672-9849-18BB2EB382FC}
 AppName=GZCClient
 AppVersion=1
 ;AppVerName=GZCClient 1
