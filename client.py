@@ -5,7 +5,7 @@ import sys
 from os.path import abspath, join, expanduser, exists
 import signal
 import widgets  # NOQA
-import numpy as np # NOQA
+import numpy as np  # NOQA
 import utool as ut
 from widgets import Sidebar as sb
 from widgets import ImageWidgets as img
@@ -138,6 +138,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     # Functions
     @ex_deco
     def saveConfig(self, domain=None, backupDestinationPaths=None):
+        print('[client] saveConfig')
         if domain is None:
             self.domain = DEFAULT_DOMAIN
         else:
@@ -155,6 +156,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     @ex_deco
     def loadConfig(self):
+        print('[client] loadConfig')
         ut.ensuredir(RESOURCE_PATH)
         if not exists(RESOURCE_CONFIG):
             self.saveConfig()
@@ -169,11 +171,13 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     @ex_deco
     def domainChanged(self):
         self.domain = str(self.domainInput.textValue())
+        print('[client] domainChanged. self.domain = %r ' % (self.domain,))
         self.saveConfig(self.domain, self.backupDestinationPaths)
 
     @ex_deco
     def pathChanged(self):
         path_str = str(self.pathInput.textValue())
+        print('[client] pathChanged. path_str = %r ' % (path_str,))
         self.backupDestinationPaths = [ abspath(expanduser(path.strip())) for path in path_str.split(',') ]
         self.saveConfig(self.domain, self.backupDestinationPaths)
 
@@ -224,6 +228,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     @ex_deco
     def clear(self):
+        print('[client] clear')
         self.imageDisplay.hide()
         self.gpsDisplay.hide()
         self.actionManuallySelectImages.setEnabled(False)

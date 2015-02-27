@@ -10,13 +10,17 @@ import subprocess
 
 
 def resource_path(relative_path, _file='.'):
-    ''' Get absolute path to resource, works for dev and for PyInstaller '''
+    """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
     except AttributeError:
         base_path = dirname(_file)
-    return join(base_path, relative_path)
+    path = join(base_path, relative_path)
+    print('[clientfuncs] returning resource path = %r' % (path,))
+    if not exists(path):
+        print('... WARNING path does not exist')
+    return path
 
 
 IGOTU2GPX_BASE = resource_path(join('libs', 'igotu2gpx'))
@@ -59,11 +63,13 @@ def ex_deco(action_func):
 
 class CopyFiles(QtCore.QThread):
     def __init__(self, filenames, destinations):
+        print('[CopyFiles] __init__')
         QtCore.QThread.__init__(self)
         self.filenames = filenames
         self.destinations = destinations
 
     def __del__(self):
+        # IT IS DANGEROUS TO OVERRIDE __DEL__ CAN THIS BE REMOVED?
         self.wait()
 
     def run(self):
@@ -81,23 +87,30 @@ class CopyFiles(QtCore.QThread):
 
 class ExtractGPS(QtCore.QThread):
     def __init__(self):
+        print('[ExtractGPS] __init__')
         QtCore.QThread.__init__(self)
 
     def __del__(self):
+        # IT IS DANGEROUS TO OVERRIDE __DEL__ CAN THIS BE REMOVED?
         self.wait()
 
     def findLib(self):
-        print('FINDING LIB FOR SYSTEM: %r' % (sys.platform, ))
+        print('[ExtractGPS] FINDING LIB FOR SYSTEM: %r' % (sys.platform, ))
         if sys.platform == 'darwin':
             self.igotu2gpx_path = join(IGOTU2GPX_BASE, 'darwin', 'MacOS', 'igotu2gpx')
         elif sys.platform == 'win32' or sys.platform == 'cygwin':
             self.igotu2gpx_path = join(IGOTU2GPX_BASE, 'win32', 'bin', 'igotu2gpx.exe')
         else:
-            raise NotImplementedError('Automatic i-GotU extraction is not operational on this machine.  Use \'Manually Select GPX File\' from the File menu')
+            msg = '\n'.join([
+                'Automatic i-GotU extraction is not operational on this machine.',
+                ' Use \'Manually Select GPX File\' from the File menu',
+            ])
+            raise NotImplementedError(msg)
 
     def contactDongle(self):
+        print('[ExtractGPS] contactDongle')
         args = [self.igotu2gpx_path, '--action', 'info', '2>&1']
-        print(' '.join(args))
+        print('[ExtractGPS] running: ' + ' '.join(args))
         p = subprocess.Popen(' '.join(args), stdout=subprocess.PIPE, shell=True)
         try:
             for line in p.stdout:
@@ -105,7 +118,9 @@ class ExtractGPS(QtCore.QThread):
                 if 'Unable to download' in line:
                     raise RuntimeError('i-GotU Libs working! ...as far as I can tell')
                     # raise RuntimeError('i-GotU GPS dongle not connected.  Check connection and try again.')
-        except IOError:
+        except IOError as ex:
+            print('[ExtractGPS] Caught IOError:')
+            print('ex = %s' % (str(ex),))
             pass
 
     def run(self):
@@ -115,7 +130,7 @@ class ExtractGPS(QtCore.QThread):
             self.contactDongle()
             # Run import
             args = [self.igotu2gpx_path, '--action', 'dump', '2>&1']
-            print(' '.join(args))
+            print('[FindLib.run] ' + ' '.join(args))
             p = subprocess.Popen(' '.join(args), stdout=subprocess.PIPE, shell=True)
             gpx_content = []
             try:
@@ -131,8 +146,9 @@ class ExtractGPS(QtCore.QThread):
                         gpx_content.append(line)
                     else:
                         print('IGNORING LINE: %s' % (line.strip(), ))
-            except IOError:
-                pass
+            except IOError as ex:
+                print('[ExtractGPS] Caught IOError:')
+                print('ex = %s' % (str(ex),))
         except RuntimeError as rte:
             self.emit(QtCore.SIGNAL('__EXCEPTION__'), rte)
         self.emit(QtCore.SIGNAL('completed'), ''.join(gpx_content))
@@ -140,6 +156,7 @@ class ExtractGPS(QtCore.QThread):
 
 @ex_deco
 def find_candidates(search_path, search_str, verbose=False):
+    print('[clientfuncs.find_candidates]')
     transform_one_list = [
         (lambda x: x),                       # Search for original
         (lambda x: x.lower()),               # Search for lowercase version
@@ -175,7 +192,7 @@ def find_candidates(search_path, search_str, verbose=False):
     if len(search_str.strip()) == 0:
         return direct.files()
     if verbose:
-        print('TESTING FOR %d TRANSFORMS ON %d FILES' % (len(transform_list) ** 2, len(direct.files())))
+        print('[clientfuncs.find_candidates] TESTING FOR %d TRANSFORMS ON %d FILES' % (len(transform_list) ** 2, len(direct.files())))
     found_list = []
     found = False
     for candidate_path in direct.files():
@@ -206,6 +223,7 @@ def find_candidates(search_path, search_str, verbose=False):
 
 # @ex_deco
 def ensure_structure(data, kind, car_number, car_color, person=None):
+    print('[clientfuncs.ensure_structure]')
     data       = data.lower()
     kind       = kind.lower()
     car_number = car_number.lower()
