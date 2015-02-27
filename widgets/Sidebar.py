@@ -41,12 +41,18 @@ CAR_COLORS_COMBO    = [('Select Color', '#F6F6F6')] + [
     ('purple', '#6F5499'),
     ('black',    '#333333'),
 ]
-CAR_COLORS           = [ color[0] for color in CAR_COLORS_COMBO[1:] ]
-CAR_NUMBERS          = map(str, range(1, 26))  # 51
-CAR_NUMBERS_COMBO    = ['Select Number'] + CAR_NUMBERS
-PERSON_LETTERS       = ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
-PERSON_LETTERS_COMBO = ['Select Letter'] + PERSON_LETTERS
-TIME_HOUR_RANGE      = map(str, range(6, 23))
+CAR_COLORS              = [ color[0] for color in CAR_COLORS_COMBO[1:] ]
+CAR_NUMBERS             = map(str, range(1, 26))  # 51
+CAR_NUMBERS_COMBO       = ['Select Number'] + CAR_NUMBERS
+PERSON_LETTERS          = ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
+PERSON_LETTERS_COMBO    = ['Select Letter'] + PERSON_LETTERS
+TIME_HOUR_RANGE         = map(str, range(6, 23))
+TIME_HOUR_RANGE_COMBO   = ['Select Hour'] + TIME_HOUR_RANGE
+TIME_MINUTE_RANGE       = map(str, range(0, 61))
+TIME_MINUTE_RANGE_COMBO = ['Select Hour'] + TIME_MINUTE_RANGE
+TRACK_RANGE             = map(str, range(1, 6))
+TRACK_RANGE_COMBO       = ['Select Track'] + TRACK_RANGE
+
 
 PALETTE_BASE = '''
     font: 35px;
@@ -130,7 +136,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             else:
                 self.submitImages()
         elif self.currentDisplay() == 1:
-            if self.gpsStatus < 4:
+            if self.gpsStatus < 5:
                 self.copyGPS()
             else:
                 self.submitGPS()
@@ -283,6 +289,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             carNumber    = self.gpsForm.getNumber()
             carColor     = self.gpsForm.getColor()
             timeHour     = self.gpsForm.getHour()
+            trackNumber  = self.gpsForm.getTrack()
             # GPS - Step 1
             if carNumber not in CAR_NUMBERS:
                 self.sidebarStatus.setText('Specify the car number')
@@ -305,6 +312,10 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             self.setSubmitButtonLook('Track Imported', WAITING_ICON, PALETTE_DEFAULT)
             if timeHour not in TIME_HOUR_RANGE:
                 self.sidebarStatus.setText('Specify the sync time hour and minute')
+                return
+            self.gpsStatus += 1
+            if trackNumber not in TRACK_RANGE:
+                self.sidebarStatus.setText('Specify the track number')
                 return
             self.gpsStatus += 1
             self.submitButton.setEnabled(True)
@@ -591,6 +602,8 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
             color = QtGui.QColor(color_hex)
             self.colorInput.addColor(color, color_name)
         self.driveBrowse.setIcon(QtGui.QIcon(BROWSE_ICON))
+        self.timeHour.addItems(TIME_HOUR_RANGE_COMBO)
+        self.timeMinute.addItems(TIME_MINUTE_RANGE_COMBO)
 
     def initConnect(self):
         self.driveBrowse.clicked.connect(self.browseDirectory)
@@ -598,7 +611,8 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         self.numberInput.currentIndexChanged[int].connect(self.parent.updateStatus)
         self.letterInput.currentIndexChanged[int].connect(self.parent.updateStatus)
         self.nameInput.textEdited.connect(self.parent.updateStatus)
-        self.timeInput.timeChanged.connect(self.parent.updateStatus)
+        self.timeHour.currentIndexChanged[int].connect(self.parent.updateStatus)
+        self.timeMinute.currentIndexChanged[int].connect(self.parent.updateStatus)
 
     # Slots
     def browseDirectory(self):
@@ -624,10 +638,10 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         return str(self.letterInput.currentText())
 
     def getHour(self):
-        return str(self.timeInput.time().hour())
+        return str(self.timeHour.currentText())
 
     def getMinute(self):
-        return str(self.timeInput.time().minute())
+        return str(self.timeMinute.currentText())
 
     def getImageName(self):
         return str(self.nameInput.text())
@@ -641,7 +655,6 @@ class ImageForm(QtGui.QWidget, Ui_ImageForm):
         self.letterInput.setCurrentIndex(0)
         self.nameInput.setEnabled(True)
         self.nameInput.setText('')
-        self.timeInput.setTime(QtCore.QTime(0, 0, 0, 0))
 
 
 class GPSForm(QtGui.QWidget, Ui_GPSForm):
@@ -653,17 +666,21 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
         self.initConnect()
 
     def initWidgets(self):
+        self.timeHour.addItems(TIME_HOUR_RANGE_COMBO)
+        self.timeMinute.addItems(TIME_MINUTE_RANGE_COMBO)
         self.colorInput = QwwColorComboBox()
         self.colorInputContainer.addWidget(self.colorInput)
         self.numberInput.addItems(CAR_NUMBERS_COMBO)
         for (color_name, color_hex) in CAR_COLORS_COMBO:
             color = QtGui.QColor(color_hex)
             self.colorInput.addColor(color, color_name)
+        self.trackNumber.addItems(TRACK_RANGE_COMBO)
 
     def initConnect(self):
         self.colorInput.currentIndexChanged[int].connect(self.parent.updateStatus)
         self.numberInput.currentIndexChanged[int].connect(self.parent.updateStatus)
-        self.timeInput.timeChanged.connect(self.parent.updateStatus)
+        self.timeHour.currentIndexChanged[int].connect(self.parent.updateStatus)
+        self.timeMinute.currentIndexChanged[int].connect(self.parent.updateStatus)
 
     # Convenience
     def getNumber(self):
@@ -673,17 +690,19 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
         return str(self.colorInput.currentText())
 
     def getHour(self):
-        return str(self.timeInput.time().hour())
+        return str(self.timeHour.currentText())
 
     def getMinute(self):
-        return str(self.timeInput.time().minute())
+        return str(self.timeMinute.currentText())
+
+    def getTrack(self):
+        return str(self.trackNumber.currentText())
 
     # Functions
     @ex_deco
     def clear(self):
         self.colorInput.setCurrentIndex(0)
         self.numberInput.setCurrentIndex(0)
-        self.timeInput.setTime(QtCore.QTime(0, 0, 0, 0))
 
 
 if __name__ == '__main__':
