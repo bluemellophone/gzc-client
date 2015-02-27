@@ -106,9 +106,9 @@ def ensure_inno_script():
         AppVersion=1
         ;AppVerName=GZCClient 1
         AppPublisher=Rensselaer Polytechnic Institute
-        AppPublisherURL=www.rpi.edu/~crallj/
-        AppSupportURL=www.rpi.edu/~crallj/
-        AppUpdatesURL=www.rpi.edu/~crallj/
+        AppPublisherURL=ibeis.org
+        AppSupportURL=ibeis.org
+        AppUpdatesURL=ibeis.org
         DefaultDirName={pf}\GZCClient
         DefaultGroupName=GZCClient
         OutputBaseFilename=gzc-client-win32-setup
