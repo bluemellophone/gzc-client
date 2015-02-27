@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GPSForm.ui'
 #
-# Created: Thu Feb 26 10:59:17 2015
+# Created: Fri Feb 27 19:59:30 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -40,6 +40,8 @@ class Ui_GPSForm(object):
         self.idLayout.setMaximumSize(QtCore.QSize(16777215, 120))
         font = QtGui.QFont()
         font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.idLayout.setFont(font)
         self.idLayout.setStyleSheet(_fromUtf8("font-size:20px;color:#333;"))
         self.idLayout.setFlat(False)
@@ -68,8 +70,12 @@ class Ui_GPSForm(object):
         spacerItem = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Maximum)
         self.layout.addItem(spacerItem)
         self.syncLayout = QtGui.QGroupBox(GPSForm)
+        self.syncLayout.setMinimumSize(QtCore.QSize(0, 122))
+        self.syncLayout.setMaximumSize(QtCore.QSize(16777215, 122))
         font = QtGui.QFont()
         font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.syncLayout.setFont(font)
         self.syncLayout.setStyleSheet(_fromUtf8("font-size:20px;color:#333;"))
         self.syncLayout.setFlat(False)
@@ -82,12 +88,21 @@ class Ui_GPSForm(object):
         self.timeLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.timeLabel.setObjectName(_fromUtf8("timeLabel"))
         self.formLayout_6.setWidget(0, QtGui.QFormLayout.LabelRole, self.timeLabel)
-        self.timeInput = QtGui.QTimeEdit(self.syncLayout)
-        self.timeInput.setMinimumSize(QtCore.QSize(0, 30))
-        self.timeInput.setAlignment(QtCore.Qt.AlignCenter)
-        self.timeInput.setButtonSymbols(QtGui.QAbstractSpinBox.NoButtons)
-        self.timeInput.setObjectName(_fromUtf8("timeInput"))
-        self.formLayout_6.setWidget(0, QtGui.QFormLayout.FieldRole, self.timeInput)
+        self.label = QtGui.QLabel(self.syncLayout)
+        self.label.setObjectName(_fromUtf8("label"))
+        self.formLayout_6.setWidget(2, QtGui.QFormLayout.LabelRole, self.label)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
+        self.timeHour = QtGui.QComboBox(self.syncLayout)
+        self.timeHour.setObjectName(_fromUtf8("timeHour"))
+        self.horizontalLayout.addWidget(self.timeHour)
+        self.timeMinute = QtGui.QComboBox(self.syncLayout)
+        self.timeMinute.setObjectName(_fromUtf8("timeMinute"))
+        self.horizontalLayout.addWidget(self.timeMinute)
+        self.formLayout_6.setLayout(0, QtGui.QFormLayout.FieldRole, self.horizontalLayout)
+        self.trackNumber = QtGui.QComboBox(self.syncLayout)
+        self.trackNumber.setObjectName(_fromUtf8("trackNumber"))
+        self.formLayout_6.setWidget(2, QtGui.QFormLayout.FieldRole, self.trackNumber)
         self.layout.addWidget(self.syncLayout)
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.layout.addItem(spacerItem1)
@@ -103,5 +118,5 @@ class Ui_GPSForm(object):
         self.colorLabel.setText(_translate("GPSForm", "Car Color", None))
         self.syncLayout.setTitle(_translate("GPSForm", "Step 2 - Synchronize", None))
         self.timeLabel.setText(_translate("GPSForm", "Car Start Time", None))
-        self.timeInput.setDisplayFormat(_translate("GPSForm", "HH:mm", None))
+        self.label.setText(_translate("GPSForm", "Track Number", None))
 

@@ -41,6 +41,8 @@
        <property name="font">
         <font>
          <pointsize>-1</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -122,9 +124,23 @@
      </item>
      <item>
       <widget class="QGroupBox" name="syncLayout">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>122</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>122</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <pointsize>-1</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -156,24 +172,25 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QTimeEdit" name="timeInput">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-          <property name="displayFormat">
-           <string>HH:mm</string>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Track Number</string>
           </property>
          </widget>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QComboBox" name="timeHour"/>
+          </item>
+          <item>
+           <widget class="QComboBox" name="timeMinute"/>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="trackNumber"/>
         </item>
        </layout>
       </widget>

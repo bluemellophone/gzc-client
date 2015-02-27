@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ImageForm.ui'
 #
-# Created: Thu Feb 26 10:59:17 2015
+# Created: Fri Feb 27 19:59:30 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,8 +43,6 @@ class Ui_ImageForm(object):
         self.driveLayout.setSizeIncrement(QtCore.QSize(0, 1))
         font = QtGui.QFont()
         font.setPointSize(-1)
-        font.setBold(True)
-        font.setWeight(75)
         self.driveLayout.setFont(font)
         self.driveLayout.setStyleSheet(_fromUtf8("font-size:20px; color:#333;"))
         self.driveLayout.setFlat(False)
@@ -78,8 +76,6 @@ class Ui_ImageForm(object):
         self.idLayout.setSizeIncrement(QtCore.QSize(0, 1))
         font = QtGui.QFont()
         font.setPointSize(-1)
-        font.setBold(True)
-        font.setWeight(75)
         self.idLayout.setFont(font)
         self.idLayout.setStyleSheet(_fromUtf8("font-size:20px; color:#333;"))
         self.idLayout.setFlat(False)
@@ -124,8 +120,6 @@ class Ui_ImageForm(object):
         self.syncLayout.setMaximumSize(QtCore.QSize(16777215, 126))
         font = QtGui.QFont()
         font.setPointSize(-1)
-        font.setBold(True)
-        font.setWeight(75)
         self.syncLayout.setFont(font)
         self.syncLayout.setStyleSheet(_fromUtf8("font-size:20px; color:#333;"))
         self.syncLayout.setFlat(False)
@@ -148,14 +142,15 @@ class Ui_ImageForm(object):
         self.timeLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.timeLabel.setObjectName(_fromUtf8("timeLabel"))
         self.formLayout_6.setWidget(1, QtGui.QFormLayout.LabelRole, self.timeLabel)
-        self.timeInput = QtGui.QTimeEdit(self.syncLayout)
-        self.timeInput.setMinimumSize(QtCore.QSize(0, 30))
-        self.timeInput.setStyleSheet(_fromUtf8(""))
-        self.timeInput.setAlignment(QtCore.Qt.AlignCenter)
-        self.timeInput.setReadOnly(False)
-        self.timeInput.setButtonSymbols(QtGui.QAbstractSpinBox.NoButtons)
-        self.timeInput.setObjectName(_fromUtf8("timeInput"))
-        self.formLayout_6.setWidget(1, QtGui.QFormLayout.FieldRole, self.timeInput)
+        self.horizontalLayout_2 = QtGui.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+        self.timeHour = QtGui.QComboBox(self.syncLayout)
+        self.timeHour.setObjectName(_fromUtf8("timeHour"))
+        self.horizontalLayout_2.addWidget(self.timeHour)
+        self.timeMinute = QtGui.QComboBox(self.syncLayout)
+        self.timeMinute.setObjectName(_fromUtf8("timeMinute"))
+        self.horizontalLayout_2.addWidget(self.timeMinute)
+        self.formLayout_6.setLayout(1, QtGui.QFormLayout.FieldRole, self.horizontalLayout_2)
         self.layout.addWidget(self.syncLayout)
         spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.layout.addItem(spacerItem2)
@@ -176,5 +171,4 @@ class Ui_ImageForm(object):
         self.syncLayout.setTitle(_translate("ImageForm", "Step 3 - Synchronize", None))
         self.nameLabel.setText(_translate("ImageForm", "First Image Name", None))
         self.timeLabel.setText(_translate("ImageForm", "First Image Time", None))
-        self.timeInput.setDisplayFormat(_translate("ImageForm", "HH:mm", None))
 

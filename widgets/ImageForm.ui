@@ -56,8 +56,6 @@
        <property name="font">
         <font>
          <pointsize>-1</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -159,8 +157,6 @@
        <property name="font">
         <font>
          <pointsize>-1</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -292,8 +288,6 @@
        <property name="font">
         <font>
          <pointsize>-1</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -352,29 +346,14 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QTimeEdit" name="timeInput">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-          <property name="displayFormat">
-           <string>HH:mm</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QComboBox" name="timeHour"/>
+          </item>
+          <item>
+           <widget class="QComboBox" name="timeMinute"/>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
