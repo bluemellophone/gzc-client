@@ -305,7 +305,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             self.setSubmitButtonLook('Import Track', IMPORT_ICON)
             # GPS - Step 4 (Sync and Select)
             if not self.gpsCopied:
-                self.sidebarStatus.setText('Import the dongle\'s GPS track')
+                self.sidebarStatus.setText('Import the dongle\'s GPS track (this may take a while)')
                 return
             self.gpsStatus += 1
             self.submitButton.setEnabled(False)
