@@ -121,47 +121,47 @@ class ExtractGPS(QtCore.QThread):
             for line in p.stdout:
                 # print(line)
                 if 'Unable to download' in line:
-                    raise RuntimeError('i-GotU Libs working! ...as far as I can tell')
-                    # raise RuntimeError('i-GotU GPS dongle not connected.  Check connection and try again.')
+                    raise RuntimeError('i-GotU GPS dongle not connected.  Check connection and try again.')
         except IOError:
             # THIS IS SUPPOSED TO BE A SILENT ERROR DUE TO subprocess STREAM ISSUES
             pass
         self.operational = True
 
     def run(self):
-        if self.operational:
             gpx_content = []
             try:
                 # Ensure can find libs and connected
                 self.findLib()
                 self.contactDongle()
-                # Run import
-                args = [self.igotu2gpx_path, '--action', 'dump', '2>&1']
-                print('[FindLib.run] ' + ' '.join(args))
-                p = subprocess.Popen(' '.join(args), stdout=subprocess.PIPE, shell=True)
-                try:
-                    for line in p.stdout:
-                        # print(line)
-                        if 'Downloaded block' in line:
-                            line = line.strip().split()
-                            index, length = line[-1].split('/')
-                            self.emit(QtCore.SIGNAL('trackExtracted'), index, length, '')
-                        elif 'Unable to download' in line:
-                            raise RuntimeError('i-GotU GPS dongle has been disconnected during import.  Check connection and try again.')
-                        elif 'Downloading tracks' not in line:
-                            gpx_content.append(line)
-                        else:
-                            print('IGNORING LINE: %s' % (line.strip(), ))
-                except IOError:
-                    # THIS IS SUPPOSED TO BE A SILENT ERROR DUE TO subprocess STREAM ISSUES
-                    pass
+                # Check for operational
+                if self.operational:
+                    # Run import
+                    args = [self.igotu2gpx_path, '--action', 'dump', '2>&1']
+                    print('[FindLib.run] ' + ' '.join(args))
+                    p = subprocess.Popen(' '.join(args), stdout=subprocess.PIPE, shell=True)
+                    try:
+                        for line in p.stdout:
+                            # print(line)
+                            if 'Downloaded block' in line:
+                                line = line.strip().split()
+                                index, length = line[-1].split('/')
+                                self.emit(QtCore.SIGNAL('trackExtracted'), index, length, '')
+                            elif 'Unable to download' in line:
+                                raise RuntimeError('i-GotU GPS dongle has been disconnected during import.  Check connection and try again.')
+                            elif 'Downloading tracks' not in line:
+                                gpx_content.append(line)
+                            else:
+                                print('IGNORING LINE: %s' % (line.strip(), ))
+                    except IOError:
+                        # THIS IS SUPPOSED TO BE A SILENT ERROR DUE TO subprocess STREAM ISSUES
+                        pass
+                else:
+                    self.emit(QtCore.SIGNAL('__EXCEPTION__'), RuntimeError('i-GotU GPS dongle not operational.  Check connection and try again.'))
             except RuntimeError as ex:
                 print('[ExtractGPS] Caught RuntimeError:')
                 print('ex = %s' % (str(ex),))
                 self.emit(QtCore.SIGNAL('__EXCEPTION__'), ex)
             self.emit(QtCore.SIGNAL('completed'), ''.join(gpx_content))
-        else:
-            raise RuntimeError('Could not contact dongle. Check connection and try again.')
 
 
 @ex_deco
