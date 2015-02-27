@@ -56,6 +56,9 @@ def ex_deco(action_func):
         try:
             return action_func(self, *args)
         except Exception as ex:
+            print('About to log exception: ')
+            print(' * type(ex) = %r' % (type(ex,)))
+            print(' * ex = %r' % (ex,))
             logerr(ex, self)
 
     return func_wrapper
@@ -151,6 +154,8 @@ class ExtractGPS(QtCore.QThread):
                 print('[ExtractGPS] Caught IOError:')
                 print('ex = %s' % (str(ex),))
         except RuntimeError as rte:
+            print('[ExtractGPS] Caught RuntimeError:')
+            print('ex = %s' % (str(ex),))
             self.emit(QtCore.SIGNAL('__EXCEPTION__'), rte)
         self.emit(QtCore.SIGNAL('completed'), ''.join(gpx_content))
 
