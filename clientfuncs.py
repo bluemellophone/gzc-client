@@ -157,10 +157,12 @@ class ExtractGPS(QtCore.QThread):
                         pass
                 else:
                     self.emit(QtCore.SIGNAL('__EXCEPTION__'), RuntimeError('i-GotU GPS dongle not operational.  Check connection and try again.'))
+                    return
             except RuntimeError as ex:
                 print('[ExtractGPS] Caught RuntimeError:')
                 print('ex = %s' % (str(ex),))
                 self.emit(QtCore.SIGNAL('__EXCEPTION__'), ex)
+                return
             self.emit(QtCore.SIGNAL('completed'), ''.join(gpx_content))
 
 

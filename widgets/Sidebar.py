@@ -22,7 +22,7 @@ LOGO           = resource_path(join('assets', 'logo_ibeis_alpha.png'))
 IMPORT_ICON    = resource_path(join('assets', 'icons', 'icon_import.png'))
 BROWSE_ICON    = resource_path(join('assets', 'icons', 'icon_browse.png'))
 CLEAR_ICON     = resource_path(join('assets', 'icons', 'icon_trash.png'))
-WAITING_ICON   = resource_path(join('assets', 'icons', 'icon_trash.png'))
+WAITING_ICON   = resource_path(join('assets', 'icons', 'icon_import.png'))
 SUBMIT_ICON    = resource_path(join('assets', 'icons', 'icon_upload.png'))
 ACCEPTED_ICON  = resource_path(join('assets', 'icons', 'icon_accepted.png'))
 REJECTED_ICON  = resource_path(join('assets', 'icons', 'icon_rejected.png'))
@@ -223,6 +223,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             personLetter = self.imageForm.getLetter()
             imageName    = self.imageForm.getImageName()
             timeHour     = self.imageForm.getHour()
+            timeMinute   = self.imageForm.getMinute()
             # Image - Step 1
             if self.imageImportDirectory is None:
                 self.sidebarStatus.setText('Specify the SD Card directory')
@@ -254,12 +255,12 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             self.setSubmitButtonLook('Import Images', IMPORT_ICON)
             # Image - Step 4 (Sync and Select)
             if not self.imageCopied:
-                self.sidebarStatus.setText('Import the card\'s images')
+                self.sidebarStatus.setText('Import the card\'s images (this may take a minute or two)')
                 return
             self.imageStatus += 1
             self.submitButton.setEnabled(False)
             self.setSubmitButtonLook('Images Imported', WAITING_ICON, PALETTE_DEFAULT)
-            if timeHour not in TIME_HOUR_RANGE:
+            if timeHour not in TIME_HOUR_RANGE or timeMinute not in TIME_MINUTE_RANGE:
                 self.sidebarStatus.setText('Specify the sync time hour and minute')
                 return
             self.imageStatus += 1
@@ -289,6 +290,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             carNumber    = self.gpsForm.getNumber()
             carColor     = self.gpsForm.getColor()
             timeHour     = self.gpsForm.getHour()
+            timeMinute   = self.imageForm.getMinute()
             trackNumber  = self.gpsForm.getTrack()
             # GPS - Step 1
             if carNumber not in CAR_NUMBERS:
@@ -305,12 +307,12 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             self.setSubmitButtonLook('Import Track', IMPORT_ICON)
             # GPS - Step 4 (Sync and Select)
             if not self.gpsCopied:
-                self.sidebarStatus.setText('Import the dongle\'s GPS track (this may take a while)')
+                self.sidebarStatus.setText('Import the dongle\'s GPS track (this may take a minute or two)')
                 return
             self.gpsStatus += 1
             self.submitButton.setEnabled(False)
             self.setSubmitButtonLook('Track Imported', WAITING_ICON, PALETTE_DEFAULT)
-            if timeHour not in TIME_HOUR_RANGE:
+            if timeHour not in TIME_HOUR_RANGE or timeMinute not in TIME_MINUTE_RANGE:
                 self.sidebarStatus.setText('Specify the sync time hour and minute')
                 return
             self.gpsStatus += 1
@@ -683,6 +685,7 @@ class GPSForm(QtGui.QWidget, Ui_GPSForm):
         self.numberInput.currentIndexChanged[int].connect(self.parent.updateStatus)
         self.timeHour.currentIndexChanged[int].connect(self.parent.updateStatus)
         self.timeMinute.currentIndexChanged[int].connect(self.parent.updateStatus)
+        self.trackNumber.currentIndexChanged[int].connect(self.parent.updateStatus)
 
     # Convenience
     def getNumber(self):
