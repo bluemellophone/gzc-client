@@ -47,9 +47,9 @@ CAR_NUMBERS_COMBO       = ['Select Number'] + CAR_NUMBERS
 PERSON_LETTERS          = ['a', 'b', 'c', 'd', 'e', 'f']  # , 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz']
 PERSON_LETTERS_COMBO    = ['Select Letter'] + PERSON_LETTERS
 TIME_HOUR_RANGE         = map(str, range(6, 23))
-TIME_HOUR_RANGE_COMBO   = ['Select Hour'] + TIME_HOUR_RANGE
+TIME_HOUR_RANGE_COMBO   = ['Hour'] + TIME_HOUR_RANGE
 TIME_MINUTE_RANGE       = map(str, range(0, 61))
-TIME_MINUTE_RANGE_COMBO = ['Select Hour'] + TIME_MINUTE_RANGE
+TIME_MINUTE_RANGE_COMBO = ['Minute'] + TIME_MINUTE_RANGE
 TRACK_RANGE             = map(str, range(1, 6))
 TRACK_RANGE_COMBO       = ['Select Track'] + TRACK_RANGE
 
@@ -558,8 +558,9 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
         # Get data from form
         carNumber    = self.gpsForm.getNumber()
         carColor     = self.gpsForm.getColor()
-        timeHour    = self.gpsForm.getHour()
-        timeMinute  = self.gpsForm.getMinute()
+        timeHour     = self.gpsForm.getHour()
+        timeMinute   = self.gpsForm.getMinute()
+        trackNumber  = self.gpsForm.getTrack()
         # Establish source folder
         srcDirectory = ensure_structure(path, 'gps', carNumber, carColor)
         # Format data
@@ -568,6 +569,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             'car_color': carColor,
             'gps_start_time_hour': timeHour,
             'gps_start_time_minute': timeMinute,
+            'track_number': trackNumber,
         }
         content = open(join(srcDirectory, 'track.gpx'), 'rb')
         files = {
