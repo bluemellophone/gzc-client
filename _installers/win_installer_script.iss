@@ -6,14 +6,14 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{47BE3DA2-261D-4672-9849-18BB2EB382FC}
+AppId={{A57C5DDA-4623-4CB0-8964-E95326706904}
 AppName=GZCClient
 AppVersion=1
 ;AppVerName=GZCClient 1
 AppPublisher=Rensselaer Polytechnic Institute
-AppPublisherURL=www.rpi.edu/~crallj/
-AppSupportURL=www.rpi.edu/~crallj/
-AppUpdatesURL=www.rpi.edu/~crallj/
+AppPublisherURL=ibeis.org
+AppSupportURL=ibeis.org
+AppUpdatesURL=ibeis.org
 DefaultDirName={pf}\GZCClient
 DefaultGroupName=GZCClient
 OutputBaseFilename=gzc-client-win32-setup
