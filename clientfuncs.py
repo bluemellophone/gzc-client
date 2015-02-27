@@ -124,6 +124,7 @@ class ExtractGPS(QtCore.QThread):
             pass
 
     def run(self):
+        gpx_content = []
         try:
             # Ensure can find libs and connected
             self.findLib()
@@ -132,7 +133,6 @@ class ExtractGPS(QtCore.QThread):
             args = [self.igotu2gpx_path, '--action', 'dump', '2>&1']
             print('[FindLib.run] ' + ' '.join(args))
             p = subprocess.Popen(' '.join(args), stdout=subprocess.PIPE, shell=True)
-            gpx_content = []
             try:
                 for line in p.stdout:
                     # print(line)
