@@ -172,7 +172,8 @@ def find_candidates(search_path, search_str, verbose=False):
         return sorted(temp)
 
     direct = Directory(search_path, recursive=True, include_file_extensions='images')
-    if len(search_str.strip()) == 0:
+    search_str = search_str.strip()
+    if len(search_str) == 0:
         return direct.files()
     if verbose:
         print('TESTING FOR %d TRANSFORMS ON %d FILES' % (len(transform_list) ** 2, len(direct.files())))
@@ -182,6 +183,11 @@ def find_candidates(search_path, search_str, verbose=False):
         candidate_str = basename(candidate_path)
         if verbose:
             print('Testing %r' % (candidate_path, ))
+        # First check if search_str is digit and candidate_str ends with that digit
+        if search_str.isdigit() and splitext(candidate_str)[0].endswith(search_str):
+            print('    Trying %r == %r - FOUND! (ENDSWITH)' % (candidate_str, search_str, ))
+            found = True
+            found_list.append(candidate_path)
         if found:
             if verbose:
                 print('    Appending %r' % (candidate_path, ))
@@ -190,8 +196,7 @@ def find_candidates(search_path, search_str, verbose=False):
             for candidate_ in transform(candidate_str):
                 for search_ in transform(search_str):
                     if candidate_ == search_:
-                        if verbose:
-                            print('    Trying %r == %r - FOUND!' % (candidate_, search_, ))
+                        print('    Trying %r == %r - FOUND! (TRANDFORM)' % (candidate_, search_, ))
                         found = True
                         found_list.append(candidate_path)
                     else:
