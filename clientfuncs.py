@@ -10,7 +10,7 @@ import subprocess
 
 
 def resource_path(relative_path, _file='.'):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
+    ''' Get absolute path to resource, works for dev and for PyInstaller '''
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
@@ -87,6 +87,7 @@ class ExtractGPS(QtCore.QThread):
         self.wait()
 
     def findLib(self):
+        print('FINDING LIB FOR SYSTEM: %r' % (sys.platform, ))
         if sys.platform == 'darwin':
             self.igotu2gpx_path = join(IGOTU2GPX_BASE, 'darwin', 'MacOS', 'igotu2gpx')
         elif sys.platform == 'win32' or sys.platform == 'cygwin':
@@ -102,7 +103,8 @@ class ExtractGPS(QtCore.QThread):
             for line in p.stdout:
                 # print(line)
                 if 'Unable to download' in line:
-                    raise RuntimeError('i-GotU GPS dongle not connected.  Check connection and try again.')
+                    raise RuntimeError('i-GotU Libs working! ...as far as I can tell')
+                    # raise RuntimeError('i-GotU GPS dongle not connected.  Check connection and try again.')
         except IOError:
             pass
 
