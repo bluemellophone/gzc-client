@@ -19,7 +19,8 @@ import requests
 RESOURCE_PATH      = ut.get_app_resource_dir('gzc-client')
 RESOURCE_CONFIG    = join(RESOURCE_PATH, 'config.json')
 TOGGLE_BUTTON_SIZE = 100
-DEFAULT_DOMAIN     = 'http://localhost:5000'
+# DEFAULT_DOMAIN     = 'http://localhost:5000'
+DEFAULT_DOMAIN     = 'http://192.168.0.100:5000'
 DEFAULT_PATH       = abspath(expanduser(join('~', 'Desktop', 'gzc-client-data')))
 TOGGLE_BUTTON_CAM  = resource_path(join('assets', 'icons', 'icon_camera_small.png'))
 TOGGLE_BUTTON_GPS  = resource_path(join('assets', 'icons', 'icon_gps_small.png'))
