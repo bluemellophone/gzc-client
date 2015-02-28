@@ -58,6 +58,8 @@
     <addaction name="separator"/>
     <addaction name="actionManuallySelectImages"/>
     <addaction name="actionManuallySelectGPS"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoadDefaultConfig"/>
    </widget>
    <addaction name="menuOptions"/>
   </widget>
@@ -79,6 +81,11 @@
   <action name="actionManuallySelectGPS">
    <property name="text">
     <string>Manually Select GPX File</string>
+   </property>
+  </action>
+  <action name="actionLoadDefaultConfig">
+   <property name="text">
+    <string>Load Default Configuration</string>
    </property>
   </action>
  </widget>

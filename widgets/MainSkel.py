@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Main.ui'
 #
-# Created: Fri Feb 27 22:16:41 2015
+# Created: Sat Feb 28 03:41:03 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -61,11 +61,15 @@ class Ui_MainWindow(object):
         self.actionManuallySelectImages.setObjectName(_fromUtf8("actionManuallySelectImages"))
         self.actionManuallySelectGPS = QtGui.QAction(MainWindow)
         self.actionManuallySelectGPS.setObjectName(_fromUtf8("actionManuallySelectGPS"))
+        self.actionLoadDefaultConfig = QtGui.QAction(MainWindow)
+        self.actionLoadDefaultConfig.setObjectName(_fromUtf8("actionLoadDefaultConfig"))
         self.menuOptions.addAction(self.actionSpecifyDomain)
         self.menuOptions.addAction(self.actionSpecifyFilepaths)
         self.menuOptions.addSeparator()
         self.menuOptions.addAction(self.actionManuallySelectImages)
         self.menuOptions.addAction(self.actionManuallySelectGPS)
+        self.menuOptions.addSeparator()
+        self.menuOptions.addAction(self.actionLoadDefaultConfig)
         self.menubar.addAction(self.menuOptions.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -78,4 +82,5 @@ class Ui_MainWindow(object):
         self.actionSpecifyFilepaths.setText(_translate("MainWindow", "Specify Filepaths", None))
         self.actionManuallySelectImages.setText(_translate("MainWindow", "Manually Select Images", None))
         self.actionManuallySelectGPS.setText(_translate("MainWindow", "Manually Select GPX File", None))
+        self.actionLoadDefaultConfig.setText(_translate("MainWindow", "Load Default Configuration", None))
 

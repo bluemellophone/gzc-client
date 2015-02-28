@@ -15,6 +15,7 @@ from widgets.GZCQWidgets import QLabelButton
 from clientfuncs import ex_deco, resource_path
 import simplejson as json
 import requests
+import shutil
 
 RESOURCE_PATH      = ut.get_app_resource_dir('gzc-client')
 RESOURCE_CONFIG    = join(RESOURCE_PATH, 'config.json')
@@ -76,6 +77,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.actionSpecifyFilepaths.triggered.connect(self.specifyFilepaths)
         self.actionManuallySelectImages.triggered.connect(self.manuallySelectImages)
         self.actionManuallySelectGPS.triggered.connect(self.manuallySelectGPS)
+        self.actionLoadDefaultConfig.triggered.connect(self.loadDefaultConfig)
         # Shortcut for fullscreen
         self.shortcutFull = QtGui.QShortcut(self)
         self.shortcutFull.setKey(QtGui.QKeySequence('F11'))
@@ -136,6 +138,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         except requests.exceptions.ConnectionError:
             pass
 
+    def loadDefaultConfig(self, checked):
+        self.loadConfig(reset=True)
+
     # Functions
     @ex_deco
     def saveConfig(self, domain=None, backupDestinationPaths=None):
@@ -155,9 +160,11 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         with open(RESOURCE_CONFIG, 'w') as config:
             json.dump(temp, config)
 
-    @ex_deco
-    def loadConfig(self):
+    def loadConfig(self, reset=False):
         print('[client] loadConfig')
+        if reset and exists(RESOURCE_PATH):
+            print('[client.loadConfig] Loading default configuration')
+            shutil.rmtree(RESOURCE_PATH)
         ut.ensuredir(RESOURCE_PATH)
         if not exists(RESOURCE_CONFIG):
             self.saveConfig()

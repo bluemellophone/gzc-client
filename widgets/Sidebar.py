@@ -290,7 +290,7 @@ class Sidebar(QtGui.QWidget, Ui_Sidebar):
             carNumber    = self.gpsForm.getNumber()
             carColor     = self.gpsForm.getColor()
             timeHour     = self.gpsForm.getHour()
-            timeMinute   = self.imageForm.getMinute()
+            timeMinute   = self.gpsForm.getMinute()
             trackNumber  = self.gpsForm.getTrack()
             # GPS - Step 1
             if carNumber not in CAR_NUMBERS:
